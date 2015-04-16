@@ -7,45 +7,41 @@ module.exports = function(config) {
   'use strict';
 
   config.set({
-    // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
 
-    // base path, that will be used to resolve files and exclude
     basePath: '../',
 
-    // testing framework to use (jasmine/mocha/qunit/...)
     frameworks: ['jasmine'],
 
-    // list of files / patterns to load in the browser
     files: [
       // bower:js
       'bower_components/jquery/dist/jquery.js',
       'bower_components/angular/angular.js',
-      'bower_components/bootstrap/dist/js/bootstrap.js',
-      'bower_components/angular-aria/angular-aria.js',
       'bower_components/angular-messages/angular-messages.js',
       'bower_components/angular-mocks/angular-mocks.js',
+      'bower_components/jasmine-jquery/lib/jasmine-jquery.js',
+      'bower_components/mox/src/mox.js',
       // endbower
-      'app/scripts/**/*.js',
-      'test/mock/**/*.js',
+      'src/afModule.js',
+      'src/*.js',
+      'test/mock/karma-jasmine-jquery.js',
+      'test/mock/html/**/*.html',
       'test/spec/**/*.js'
     ],
 
-    // list of files / patterns to exclude
     exclude: [
     ],
 
-    // web server port
+    preprocessors: {
+      'test/mock/html/**/*.html': 'ng-html2js'
+    },
+
+    ngHtml2JsPreprocessor: {
+      stripPrefix: 'test/mock/html/'
+    },
+
     port: 8080,
 
-    // Start these browsers, currently available:
-    // - Chrome
-    // - ChromeCanary
-    // - Firefox
-    // - Opera
-    // - Safari (only Mac)
-    // - PhantomJS
-    // - IE (only Windows)
     browsers: [
       'PhantomJS'
     ],
@@ -53,18 +49,16 @@ module.exports = function(config) {
     // Which plugins to enable
     plugins: [
       'karma-phantomjs-launcher',
-      'karma-jasmine'
+      'karma-jasmine',
+      'karma-ng-html2js-preprocessor'
     ],
 
-    // Continuous Integration mode
-    // if true, it capture browsers, run tests and exit
     singleRun: false,
 
     colors: true,
 
-    // level of logging
-    // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-    logLevel: config.LOG_INFO,
+    // LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
+    logLevel: config.LOG_INFO
 
     // Uncomment the following lines if you are using grunt's server to run the tests
     // proxies: {
