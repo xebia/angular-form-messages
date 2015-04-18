@@ -19,12 +19,12 @@ module.exports = function(config) {
       'bower_components/angular/angular.js',
       'bower_components/angular-messages/angular-messages.js',
       'bower_components/angular-mocks/angular-mocks.js',
-      'bower_components/jasmine-jquery/lib/jasmine-jquery.js',
       'bower_components/mox/src/mox.js',
+      'bower_components/jasmine-jquery/lib/jasmine-jquery.js',
       // endbower
       'src/afModule.js',
       'src/*.js',
-      'test/mock/karma-jasmine-jquery.js',
+      'test/mock/*.js',
       'test/mock/html/**/*.html',
       'test/spec/**/*.js'
     ],

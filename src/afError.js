@@ -5,10 +5,10 @@ angular.module('angularFormMessages').directive('afError', function () {
     link: function linkFn($scope, elem, attrs) {
 
       $scope.$on('afValidation', function (event, modelPath, isValid, message) {
-        if (modelPath == attrs.afModelPath) {
+        if (modelPath === attrs.afModelPath) {
           $scope.message = isValid ? undefined : message;
         }
       });
     }
-  }
+  };
 });
