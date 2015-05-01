@@ -1,34 +1,52 @@
-angular.module('angularFormMessages').directive('afSubmit', function ($parse, $rootScope) {
-  var trigger; // FIXME: This is a closure which we don't want
+angular.module('angularFormMessages').directive('afSubmit', function () {
 
   return {
     scope: false,
-    require: 'form',
-    controller: function() {
-      this.trigger = function () {
-        return trigger;
+    require: 'afSubmit',
+    controller: function afSubmitController($scope) {
+      this.validations = {};
+
+      this.validate = function (modelPath, isValid, message) {
+        this.validations[modelPath] = {
+          isValid: isValid,
+          message: message
+        };
+        $scope.validations = this.validations; // Temp
+        $scope.$broadcast('validation', modelPath, isValid, message);
       };
+
+      this.isValid = function () {
+        var isValid = true;
+        angular.forEach(this.validations, function (validation) {
+          if (!validation.isValid) {
+            isValid = false;
+            return;
+          }
+        });
+        return isValid;
+      };
+
     },
-    link: function ($scope, elem, attrs, formController) {
+    link: function ($scope, elem, attrs, submit) {
       function isPromise(obj) {
         return angular.isObject(obj) && typeof (obj.then) === 'function';
       }
 
-      function doSubmit(event) {
-        $rootScope.$broadcast('validate');
-        if (formController.$invalid) { // TODO: geen gebruik maken van angular form validatie?
-          return;
-        }
-
+      function doSubmit() {
+        $scope.$broadcast('validate');
         $scope.$apply(function () {
+
+          if (!submit.isValid()) {
+            return;
+          }
+
           function processErrors(result) {
             angular.forEach(result.validation, function (error, modelPath) {
-              $rootScope.$broadcast('afValidation', modelPath, error.isValid, error.message);
+              submit.validate(modelPath, error.isValid, error.message);
             });
           }
 
-          var submitCallback = $parse(attrs.afSubmit);
-          var callbackResult = submitCallback($scope, { $event: event });
+          var callbackResult = $scope.$eval(attrs.afSubmit);
           if (isPromise(callbackResult)) {
             callbackResult
               .catch(processErrors);
@@ -36,7 +54,7 @@ angular.module('angularFormMessages').directive('afSubmit', function ($parse, $r
         });
       }
 
-      $scope.trigger = attrs.afTrigger || 'change';
+      submit.trigger = attrs.afTrigger || 'change';
       elem.on('submit', doSubmit);
     }
   };

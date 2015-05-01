@@ -1,29 +1,28 @@
-angular.module('angularFormMessages').directive('afField', function ($rootScope) {
+angular.module('angularFormMessages').directive('afField', function () {
   return {
-    require: 'ngModel',
-    link: function linkFn($scope, elem, attrs, ngModel) {
+    require: ['ngModel', '^afFieldWrap', '^afSubmit', '^form'],
+    link: function linkFn($scope, elem, attrs, ctrls) {
+      var ngModel = ctrls[0];
+      var fieldWrap = ctrls[1];
+      var submit = ctrls[2];
+      var form = ctrls[3];
 
-      function hasChanged(value) {
-        if (!value || $scope.trigger === 'submit') {
-          $rootScope.$broadcast('afValidation', ngModel.$name, true, 'message');
-        } else {
-          emitValidation();
+      function hasValidationChanged(newValue, oldValue) {
+        //console.log('changed', afFieldWrap.modelPath, newValue, oldValue);
+        if (newValue !== oldValue && submit.trigger === 'change') {
+          updateValidation();
         }
-        return value;
       }
 
-      function emitValidation() {
+      function updateValidation() {
         ngModel.$validate();
-        $rootScope.$broadcast('afValidation', ngModel.$name, ngModel.$valid, 'Client side error message');
+        //console.log('send validation', afFieldWrap.modelPath, ngModel.$valid);
+        submit.validate(fieldWrap.modelPath, ngModel.$valid, Object.keys(ngModel.$error).join(', '));
       }
 
-      // Model to view
-      ngModel.$formatters.push(hasChanged);
+      $scope.$watch(form.$name + '["' + ngModel.$name + '"].$error', hasValidationChanged, true);
 
-      // View to model
-      ngModel.$parsers.push(hasChanged);
-
-      $scope.$on('validate', emitValidation);
+      $scope.$on('validate', updateValidation);
     }
   };
 });
