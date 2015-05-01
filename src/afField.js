@@ -8,7 +8,6 @@ angular.module('angularFormMessages').directive('afField', function () {
       var form = ctrls[3];
 
       function hasValidationChanged(newValue, oldValue) {
-        //console.log('changed', afFieldWrap.modelPath, newValue, oldValue);
         if (newValue !== oldValue && submit.trigger === 'change') {
           updateValidation();
         }
@@ -16,7 +15,6 @@ angular.module('angularFormMessages').directive('afField', function () {
 
       function updateValidation() {
         ngModel.$validate();
-        //console.log('send validation', afFieldWrap.modelPath, ngModel.$valid);
         submit.validate(fieldWrap.modelPath, ngModel.$valid, Object.keys(ngModel.$error).join(', '));
       }
 
