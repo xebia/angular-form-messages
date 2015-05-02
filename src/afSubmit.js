@@ -32,7 +32,8 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
         return angular.isObject(obj) && typeof (obj.then) === 'function';
       }
 
-      function doSubmit() {
+      function doSubmit(event) {
+        event.preventDefault();
         $scope.$broadcast('validate');
         $scope.$apply(function () {
 
