@@ -5,6 +5,7 @@ module.exports = function () {
   return {
     files: [
       // Libraries
+      n('bower_components/lodash/lodash.js'),
       n('bower_components/jquery/dist/jquery.js'),
       n('bower_components/angular/angular.js'),
       n('bower_components/angular-messages/angular-messages.js'),
