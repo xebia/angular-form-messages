@@ -7,7 +7,6 @@ angular.module('angularFormMessages').directive('afError', function () {
 
       $scope.$on('validation', function (event, modelPath, isValid, message) {
         if (modelPath === ctrl.modelPath) {
-          //console.log('receive error', ctrl.modelPath, modelPath, isValid, message, isValid ? undefined : message);
           $scope.message = isValid ? undefined : message;
         }
       });
