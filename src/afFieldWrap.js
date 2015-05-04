@@ -8,13 +8,6 @@ angular.module('angularFormMessages').directive('afFieldWrap', function () {
         // (post-)link function of the afFieldElements have ran
         pre: function linkFn($scope, elem, attrs, fieldWrap) {
           fieldWrap.modelPath = attrs.afModelPath;
-
-          $scope.$on('validation', function onValidation(event, modelPath, isValid) {
-            if (modelPath === attrs.afModelPath) {
-              //console.log('receive validation', modelPath, isValid);
-              elem[(isValid ? 'remove' : 'add') + 'Class']('has-error');
-            }
-          });
         }
       };
     }
