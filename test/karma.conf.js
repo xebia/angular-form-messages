@@ -34,12 +34,15 @@ module.exports = function(config) {
     ],
 
     preprocessors: {
+      'src/**/*.js': ['coverage'],
       'test/mock/html/**/*.html': 'ng-html2js'
     },
 
     ngHtml2JsPreprocessor: {
       stripPrefix: 'test/mock/html/'
     },
+
+    reporters: ['progress', 'coverage'],
 
     port: 8080,
 
@@ -51,7 +54,8 @@ module.exports = function(config) {
     plugins: [
       'karma-phantomjs-launcher',
       'karma-jasmine',
-      'karma-ng-html2js-preprocessor'
+      'karma-ng-html2js-preprocessor',
+      'karma-coverage'
     ],
 
     singleRun: false,
@@ -59,7 +63,16 @@ module.exports = function(config) {
     colors: true,
 
     // LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-    logLevel: config.LOG_INFO
+    logLevel: config.LOG_INFO,
+
+    coverageReporter: {
+      dir: 'test/coverage',
+      reporters: [
+        { type: 'lcov' },
+        { type: 'text-summary' },
+        { type: 'json' }
+      ]
+    }
 
     // Uncomment the following lines if you are using grunt's server to run the tests
     // proxies: {

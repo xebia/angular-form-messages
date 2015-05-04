@@ -91,6 +91,21 @@ module.exports = function (grunt) {
       src: '<%= paths.test %>/mock/**/*.json'
     },
 
+    coverage: {
+      dist: {
+        options: {
+          thresholds: {
+            statements: 98,
+            branches: 98,
+            functions: 98,
+            lines: 98
+          },
+          dir: 'coverage',
+          root: 'test'
+        }
+      }
+    },
+
     karma: {
       unit: {
         configFile: 'test/karma.conf.js',
@@ -105,7 +120,8 @@ module.exports = function (grunt) {
           '.tmp',
           '<%= paths.dist %>/{,*/}*',
           '!<%= paths.dist %>/.git{,*/}*'
-        ]
+        ],
+        coverage: 'test/coverage'
       }]
     },
 
