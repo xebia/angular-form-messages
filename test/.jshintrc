@@ -8,8 +8,10 @@
     "compileHtml": false,
     "createController": false,
     "createScope": false,
+    "extendedElement": false,
     "getMockData": false,
     "inject": false,
-    "mox": false
+    "mox": false,
+    "reject": false
   }
 }

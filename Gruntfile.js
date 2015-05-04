@@ -9,6 +9,7 @@ module.exports = function (grunt) {
     dist: 'dist'
   };
 
+  grunt.loadNpmTasks('grunt-mutation-testing');
   grunt.option('verbose', true);
   grunt.initConfig({
     option: { verbose: true },
@@ -64,7 +65,7 @@ module.exports = function (grunt) {
         }
       },
       test: {
-        src: ['test/{,**/}*.js']
+        src: ['test/spec/{,**/}*.js']
       }
     },
 
@@ -114,15 +115,17 @@ module.exports = function (grunt) {
     },
 
     clean: {
-      files: [{
-        dot: true,
-        src: [
-          '.tmp',
-          '<%= paths.dist %>/{,*/}*',
-          '!<%= paths.dist %>/.git{,*/}*'
-        ],
-        coverage: 'test/coverage'
-      }]
+      dist: {
+        files: [
+          {
+            dot: true,
+            src: [
+              '<%= paths.dist %>/**/*'
+            ]
+          }
+        ]
+      },
+      coverage: 'test/coverage'
     },
 
     wiredep: {

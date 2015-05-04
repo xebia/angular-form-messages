@@ -50,7 +50,7 @@ describe('afField', function () {
       });
 
       it('should validate', function () {
-        this.$scope.$digest()
+        this.$scope.$digest();
         expect(ngModel.$validate).toHaveBeenCalled();
       });
     });

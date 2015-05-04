@@ -1,7 +1,5 @@
 describe('afError', function () {
-  var
-    $rootScope,
-    error;
+  var $rootScope;
 
   beforeEach(function () {
     mox

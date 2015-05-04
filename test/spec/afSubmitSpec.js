@@ -87,7 +87,8 @@ describe('afSubmit', function () {
       beforeEach(function () {
         submit.validations = [{
           isValid: true
-        },{
+        },
+        {
           isValid: false
         }];
         this.element.submit();
