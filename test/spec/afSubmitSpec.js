@@ -2,7 +2,7 @@ describe('afSubmit', function () {
   var
     callbackResult = {
       validation: {
-        OMGWTF: { message: 'OMGWTF geen error', isValid: false },
+        OMGWTF: { message: 'OMGWTF geen error', isValid: true },
         'user.name': { message: 'User name server side error', isValid: false }
       }
     },
@@ -49,31 +49,45 @@ describe('afSubmit', function () {
       expect(this.$scope.$broadcast).toHaveBeenCalledWith('validate');
     });
 
-    describe('when the form is valid', function () {
-      beforeEach(function () {
-        this.element.submit();
-      });
+    describe('when the form is client side valid', function () {
 
       it('should call the submit callback', function () {
+        this.element.submit();
         expect(this.$scope.submit).toHaveBeenCalled();
       });
 
       describe('when the submit callback returns a rejecting promise', function () {
+        beforeEach(function () {
+          this.element.submit();
+        });
 
         it('should save the validation results', function () {
           expect(submit.validations).toEqual(callbackResult.validation);
         });
 
         it('sends a validation event per server side validation', function () {
-          expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'OMGWTF', false, 'OMGWTF geen error');
+          expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'OMGWTF', true, 'OMGWTF geen error');
           expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', false, 'User name server side error');
+        });
+      });
+
+      describe('when the submit callback does not return a promise', function () {
+        beforeEach(function () {
+          this.$scope.submit.and.returnValue('noPromise');
+          this.element.submit();
+        });
+
+        it('does no further processing', function () {
+          expect(submit.validate).not.toHaveBeenCalled();
         });
       });
     });
 
-    describe('when the form is invalid', function () {
+    describe('when the form is client side invalid', function () {
       beforeEach(function () {
         submit.validations = [{
+          isValid: true
+        },{
           isValid: false
         }];
         this.element.submit();
