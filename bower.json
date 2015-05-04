@@ -10,6 +10,11 @@
     "jasmine-jquery": "~2.1.0",
     "lodash": "~3.8.0"
   },
+  "overrides": {
+    "jasmine": {
+      "main": []
+    }
+  },
   "appPath": "src",
   "moduleName": "angularFormMessages",
   "resolutions": {
