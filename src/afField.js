@@ -18,7 +18,15 @@ angular.module('angularFormMessages').directive('afField', function () {
         submit.validate(fieldWrap.modelPath, ngModel.$valid, Object.keys(ngModel.$error).join(', '));
       }
 
+      function cleanValidation(viewValue) {
+        if (submit.trigger === 'submit') {
+          submit.validate(fieldWrap.modelPath, true, '');
+        }
+        return viewValue;
+      }
+
       $scope.$watch(form.$name + '["' + ngModel.$name + '"].$error', hasValidationChanged, true);
+      ngModel.$parsers.push(cleanValidation);
 
       $scope.$on('validate', updateValidation);
     }
