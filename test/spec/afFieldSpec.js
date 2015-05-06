@@ -16,10 +16,70 @@ describe('afField', function () {
     spyOn(ngModel, '$validate');
   });
 
-  // TODO restructure tests, group by validation trigger, then by event
+  describe('when the form should be validated on change', function () {
+    beforeEach(function () {
+      submit.trigger = 'change';
+    });
+
+    describe('and the model changes', function () {
+      beforeEach(function () {
+        this.$scope.user.name = '';
+        this.$scope.$digest();
+      });
+
+      it('should validate the form', function () {
+        expect(ngModel.$validate).toHaveBeenCalled();
+        expect(submit.validate).toHaveBeenCalledWith('user.name', false, 'required');
+      });
+    });
+
+    describe('and the user changes the field', function () {
+      beforeEach(function () {
+        this.element.find('[af-field]').val('').trigger('change');
+      });
+
+      it('should not clear validation errors but revalidates', function () {
+        expect(submit.validate).not.toHaveBeenCalledWith('user.name', true, '');
+        expect(submit.validate).toHaveBeenCalledWith('user.name', false, 'required');
+      });
+
+    });
+  });
+
+  describe('when the form should be validated on submit', function () {
+    beforeEach(function () {
+      submit.trigger = 'submit';
+    });
+
+    describe('and the model changes', function () {
+      beforeEach(function () {
+        this.$scope.user.name = '';
+        this.$scope.$digest();
+      });
+
+      it('should not validate the form', function () {
+        expect(ngModel.$validate).not.toHaveBeenCalled();
+        expect(submit.validate).not.toHaveBeenCalledWith('user.name', false, 'required');
+      });
+    });
+
+    describe('and the user changes the field', function () {
+
+      beforeEach(function () {
+        this.element.find('[af-field]').val('').trigger('change'); // this would normally make the field invalid 'required'
+      });
+
+      it('should clear validation errors and do not a revalidation', function () {
+        expect(submit.validate).toHaveBeenCalledWith('user.name', true, '');
+        expect(submit.validate).not.toHaveBeenCalledWith('user.name', false, 'required');
+      });
+
+    });
+  });
 
   describe('when a request for validation event is fired', function () {
 
+    // These are the same expectation as the case where the trigger is change and the model changes
     beforeEach(inject(function ($rootScope) {
       $rootScope.$broadcast('validate');
     }));
@@ -32,65 +92,13 @@ describe('afField', function () {
       expect(submit.validate).toHaveBeenCalledWith('user.name', true, '');
     });
 
-    it('should send validation "invalid" to the ngSubmitController', function () {
+    it('should send validation "invalid" to the ngSubmitController', inject(function ($rootScope) {
+      // Make field invalid to trigger a second validation event via the model watch
       this.$scope.user.name = '';
       this.$scope.$digest();
+
       expect(submit.validate).toHaveBeenCalledWith('user.name', false, 'required');
-    });
+    }));
   });
 
-  describe('when the model changes', function () {
-    beforeEach(function () {
-      this.$scope.user.name = '';
-    });
-
-    describe('when the form should be validated on model change', function () {
-      beforeEach(function () {
-        submit.trigger = 'change';
-      });
-
-      it('should validate', function () {
-        this.$scope.$digest();
-        expect(ngModel.$validate).toHaveBeenCalled();
-      });
-    });
-
-    describe('when the form should not be validated on model change', function () {
-      beforeEach(function () {
-        submit.trigger = 'not-change';
-      });
-
-      it('should not validate', function () {
-        this.$scope.$digest();
-        expect(ngModel.$validate).not.toHaveBeenCalled();
-      });
-    });
-
-  });
-
-  describe('when the user changes the field', function () {
-
-    describe('when the form should be validated on submit', function () {
-      beforeEach(function () {
-        submit.trigger = 'submit';
-        this.element.find('[af-field]').val('').trigger('change'); // this would normally make the field invalid 'required'
-      });
-
-      it('should clear validation errors', function () {
-        expect(submit.validate).toHaveBeenCalledWith('user.name', true, '');
-      });
-    });
-
-    describe('when the form also should be validated when validation trigger is not submit', function () {
-      beforeEach(function () {
-        submit.trigger = 'change';
-        this.element.find('[af-field]').val('other value').trigger('change');
-      });
-
-      it('should clear validation errors', function () {
-        expect(submit.validate).not.toHaveBeenCalled();
-      });
-    });
-
-  });
 });
