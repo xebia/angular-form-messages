@@ -24,7 +24,7 @@ module.exports = function (grunt) {
       },
       js: {
         files: ['<%= paths.src %>/{,*/}*.js'],
-        tasks: ['newer:jshint:all'],
+        tasks: ['newer:jshint:all']
       },
       jsTest: {
         files: ['test/spec/{,*/}*.js'],
@@ -175,7 +175,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', [
     'wiredep',
-    'karma'
+    'karma',
+    'coverage'
   ]);
 
   grunt.registerTask('build', [
