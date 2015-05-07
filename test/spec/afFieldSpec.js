@@ -92,13 +92,13 @@ describe('afField', function () {
       expect(submit.validate).toHaveBeenCalledWith('user.name', true, '');
     });
 
-    it('should send validation "invalid" to the ngSubmitController', inject(function ($rootScope) {
+    it('should send validation "invalid" to the ngSubmitController', function () {
       // Make field invalid to trigger a second validation event via the model watch
       this.$scope.user.name = '';
       this.$scope.$digest();
 
       expect(submit.validate).toHaveBeenCalledWith('user.name', false, 'required');
-    }));
+    });
   });
 
 });
