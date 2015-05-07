@@ -14,9 +14,6 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
 
       this.isValid = function () {
         for (var key in this.validations) {
-          if (!this.validations.hasOwnProperty(key)) {
-            continue;
-          }
           var errors = this.validations[key];
           if (errors.length) {
             return false;

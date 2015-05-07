@@ -99,5 +99,18 @@ describe('afSubmit', function () {
         expect(this.$scope.submit).not.toHaveBeenCalled();
       });
     });
+
+    describe('when the form has only empty errors', function () {
+      beforeEach(function () {
+        submit.validations = {
+          'user.name': []
+        };
+        this.element.submit();
+      });
+
+      it('should continue further processing', function () {
+        expect(this.$scope.submit).toHaveBeenCalled();
+      });
+    });
   });
 });
