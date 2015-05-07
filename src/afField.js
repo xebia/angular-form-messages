@@ -15,12 +15,17 @@ angular.module('angularFormMessages').directive('afField', function () {
 
       function updateValidation() {
         ngModel.$validate();
-        submit.validate(fieldWrap.modelPath, ngModel.$valid, Object.keys(ngModel.$error).join(', '));
+        var errors = [];
+        var errorKeys = Object.keys(ngModel.$error);
+        angular.forEach(errorKeys, function (key) {
+          errors.push({ message: key });
+        });
+        submit.validate(fieldWrap.modelPath, errors);
       }
 
       function cleanValidation(viewValue) {
         if (submit.trigger === 'submit') {
-          submit.validate(fieldWrap.modelPath, true, '');
+          submit.validate(fieldWrap.modelPath, []);
         }
         return viewValue;
       }

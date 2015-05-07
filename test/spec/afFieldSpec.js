@@ -29,18 +29,18 @@ describe('afField', function () {
 
       it('should validate the form', function () {
         expect(ngModel.$validate).toHaveBeenCalled();
-        expect(submit.validate).toHaveBeenCalledWith('user.name', false, 'required');
+        expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required' }]);
       });
     });
 
     describe('and the user changes the field', function () {
       beforeEach(function () {
+        submit.validate.calls.reset();
         this.element.find('[af-field]').val('').trigger('change');
       });
 
-      it('should not clear validation errors but revalidates', function () {
-        expect(submit.validate).not.toHaveBeenCalledWith('user.name', true, '');
-        expect(submit.validate).toHaveBeenCalledWith('user.name', false, 'required');
+      it('should revalidate the form', function () {
+        expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required' }]);
       });
 
     });
@@ -66,12 +66,12 @@ describe('afField', function () {
     describe('and the user changes the field', function () {
 
       beforeEach(function () {
+        submit.validate.calls.reset();
         this.element.find('[af-field]').val('').trigger('change'); // this would normally make the field invalid 'required'
       });
 
       it('should clear validation errors and do not a revalidation', function () {
-        expect(submit.validate).toHaveBeenCalledWith('user.name', true, '');
-        expect(submit.validate).not.toHaveBeenCalledWith('user.name', false, 'required');
+        expect(submit.validate).toHaveBeenCalledWith('user.name', []);
       });
 
     });
@@ -89,15 +89,16 @@ describe('afField', function () {
     });
 
     it('should send validation "valid" to the ngSubmitController', function () {
-      expect(submit.validate).toHaveBeenCalledWith('user.name', true, '');
+      expect(submit.validate).toHaveBeenCalledWith('user.name', []);
     });
 
     it('should send validation "invalid" to the ngSubmitController', function () {
+      submit.validate.calls.reset();
       // Make field invalid to trigger a second validation event via the model watch
       this.$scope.user.name = '';
       this.$scope.$digest();
 
-      expect(submit.validate).toHaveBeenCalledWith('user.name', false, 'required');
+      expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required' }]);
     });
   });
 
