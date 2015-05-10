@@ -11,9 +11,9 @@ describe('afError', function () {
     });
 
     createScope({
-      errors: [{
-        message: 'Initial message' // Directive has no isolate scope, so we can set values on the parent scope
-      }]
+      errors: [
+        'Initial message' // Directive has no isolate scope, so we can set values on the parent scope
+      ]
     });
     this.element = extendedElement(
       compileHtml('<div af-field-wrap af-model-path="user.name"><div af-error></div></div>', this.$scope),
@@ -46,7 +46,7 @@ describe('afError', function () {
 
     describe('when the field is invalid', function () {
       beforeEach(function () {
-        $rootScope.$broadcast('validation', 'user.name', [{ message: 'New error' }]);
+        $rootScope.$broadcast('validation', 'user.name', ['New error']);
         this.$scope.$digest();
       });
 

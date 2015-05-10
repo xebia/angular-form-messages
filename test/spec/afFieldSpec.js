@@ -29,7 +29,7 @@ describe('afField', function () {
 
       it('should validate the form', function () {
         expect(ngModel.$validate).toHaveBeenCalled();
-        expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required' }]);
+        expect(submit.validate).toHaveBeenCalledWith('user.name', ['required']);
       });
     });
 
@@ -40,7 +40,7 @@ describe('afField', function () {
       });
 
       it('should revalidate the form', function () {
-        expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required' }]);
+        expect(submit.validate).toHaveBeenCalledWith('user.name', ['required']);
       });
 
     });
@@ -59,7 +59,7 @@ describe('afField', function () {
 
       it('should not validate the form', function () {
         expect(ngModel.$validate).not.toHaveBeenCalled();
-        expect(submit.validate).not.toHaveBeenCalledWith('user.name', false, 'required');
+        expect(submit.validate).not.toHaveBeenCalledWith('user.name', ['required']);
       });
     });
 
@@ -98,7 +98,7 @@ describe('afField', function () {
       this.$scope.user.name = '';
       this.$scope.$digest();
 
-      expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required' }]);
+      expect(submit.validate).toHaveBeenCalledWith('user.name', ['required']);
     });
   });
 

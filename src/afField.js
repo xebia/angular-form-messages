@@ -18,7 +18,7 @@ angular.module('angularFormMessages').directive('afField', function () {
         var errors = [];
         var errorKeys = Object.keys(ngModel.$error);
         angular.forEach(errorKeys, function (key) {
-          errors.push({ message: key });
+          errors.push(key);
         });
         submit.validate(fieldWrap.modelPath, errors);
       }
