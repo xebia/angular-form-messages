@@ -2,8 +2,8 @@ describe('afSubmit', function () {
   var
     callbackResult = {
       validation: {
-        OMGWTF: { message: 'OMGWTF geen error', isValid: true },
-        'user.name': { message: 'User name server side error', isValid: false }
+        address: [],
+        'user.name': ['User name server side error']
       }
     },
     submit;
@@ -66,8 +66,8 @@ describe('afSubmit', function () {
         });
 
         it('sends a validation event per server side validation', function () {
-          expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'OMGWTF', true, 'OMGWTF geen error');
-          expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', false, 'User name server side error');
+          expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'address', []);
+          expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', ['User name server side error']);
         });
       });
 
@@ -85,17 +85,31 @@ describe('afSubmit', function () {
 
     describe('when the form is client side invalid', function () {
       beforeEach(function () {
-        submit.validations = [{
-          isValid: true
-        },
-        {
-          isValid: false
-        }];
+        submit.validations = {
+          'user.name': [{
+            isValid: true
+          }, {
+            isValid: false
+          }]
+        };
         this.element.submit();
       });
 
       it('should stop further processing', function () {
         expect(this.$scope.submit).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when the form has only empty errors', function () {
+      beforeEach(function () {
+        submit.validations = {
+          'user.name': []
+        };
+        this.element.submit();
+      });
+
+      it('should continue further processing', function () {
+        expect(this.$scope.submit).toHaveBeenCalled();
       });
     });
   });

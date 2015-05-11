@@ -6,24 +6,20 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
     controller: function afSubmitController($scope) {
       this.validations = {};
 
-      this.validate = function (modelPath, isValid, message) {
-        this.validations[modelPath] = {
-          isValid: isValid,
-          message: message
-        };
+      this.validate = function (modelPath, errors) {
+        this.validations[modelPath] = errors;
         $scope.validations = this.validations; // Temp
-        $scope.$broadcast('validation', modelPath, isValid, message);
+        $scope.$broadcast('validation', modelPath, errors);
       };
 
       this.isValid = function () {
-        var isValid = true;
-        angular.forEach(this.validations, function (validation) {
-          if (!validation.isValid) {
-            isValid = false;
-            return;
+        for (var key in this.validations) {
+          var errors = this.validations[key];
+          if (errors.length) {
+            return false;
           }
-        });
-        return isValid;
+        }
+        return true;
       };
 
     },
@@ -42,8 +38,8 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
           }
 
           function processErrors(result) {
-            angular.forEach(result.validation, function (error, modelPath) {
-              submit.validate(modelPath, error.isValid, error.message);
+            angular.forEach(result.validation, function (errors, modelPath) {
+              submit.validate(modelPath, errors);
             });
           }
 

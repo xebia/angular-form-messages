@@ -4,10 +4,9 @@ angular.module('angularFormMessages').directive('afError', function () {
     require: '^afFieldWrap',
     scope: true,
     link: function linkFn($scope, elem, attrs, ctrl) {
-
-      $scope.$on('validation', function (event, modelPath, isValid, message) {
+      $scope.$on('validation', function (event, modelPath, errors) {
         if (modelPath === ctrl.modelPath) {
-          $scope.message = isValid ? undefined : message;
+          $scope.errors = errors;
         }
       });
     }
