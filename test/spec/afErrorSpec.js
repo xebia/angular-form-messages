@@ -16,7 +16,7 @@ describe('afError', function () {
       ]
     });
     this.element = extendedElement(
-      compileHtml('<div af-field-wrap af-model-path="user.name"><div af-error></div></div>', this.$scope),
+      compileHtml('<div af-field-wrap="user.name"><div af-error></div></div>', this.$scope),
       { error: '[af-error]' }
     );
   });

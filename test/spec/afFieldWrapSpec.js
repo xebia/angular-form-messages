@@ -11,10 +11,10 @@ describe('afFieldWrap', function () {
     });
 
     createScope();
-    compileHtml('<div af-field-wrap af-model-path="user.name"></div>', this.$scope);
+    compileHtml('<div af-field-wrap="user.name"></div>', this.$scope);
   });
 
   it('should set the modelPath in the controller from the directive attribute', function () {
-    expect(this.element.controller('afFieldWrap').modelPath).toBe('user.name');
+    expect(this.element.controller('afFieldWrap').messageId).toBe('user.name');
   });
 });

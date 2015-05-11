@@ -7,7 +7,7 @@ describe('afField', function () {
       .run();
 
     createScope({ user: { name: 'Misko' } });
-    compileHtml('<form name="userForm" af-submit><div af-field-wrap af-model-path="user.name"><div af-error></div><input af-field name="name" ng-model="user.name" required /></div></form>', this.$scope);
+    compileHtml('<form name="userForm" af-submit><div af-field-wrap="user.name"><div af-error></div><input af-field name="name" ng-model="user.name" required /></div></form>', this.$scope);
 
     // Setup spies on parent controllers
     submit = this.element.controller('afSubmit');

@@ -6,10 +6,10 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
     controller: function afSubmitController($scope) {
       this.validations = {};
 
-      this.validate = function (modelPath, errors) {
-        this.validations[modelPath] = errors;
+      this.validate = function (messageId, errors) {
+        this.validations[messageId] = errors;
         $scope.validations = this.validations; // Temp
-        $scope.$broadcast('validation', modelPath, errors);
+        $scope.$broadcast('validation', messageId, errors);
       };
 
       this.isValid = function () {
@@ -34,8 +34,8 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
         $scope.$apply(function () {
 
           function processErrors(result) {
-            angular.forEach(result.validation, function (errors, modelPath) {
-              submit.validate(modelPath, errors);
+            angular.forEach(result.validation, function (errors, messageId) {
+              submit.validate(messageId, errors);
             });
           }
 
