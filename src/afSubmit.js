@@ -33,14 +33,14 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
         $scope.$broadcast('validate');
         $scope.$apply(function () {
 
-          if (!submit.isValid()) {
-            return;
-          }
-
           function processErrors(result) {
             angular.forEach(result.validation, function (errors, modelPath) {
               submit.validate(modelPath, errors);
             });
+          }
+
+          if (!submit.isValid()) {
+            return;
           }
 
           var callbackResult = $scope.$eval(attrs.afSubmit);
