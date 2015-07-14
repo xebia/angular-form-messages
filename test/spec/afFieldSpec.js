@@ -7,7 +7,12 @@ describe('afField', function () {
       .run();
 
     createScope({ user: { name: 'Misko' } });
-    compileHtml('<form name="userForm" af-submit><div af-field-wrap="user.name"><div af-error></div><input af-field name="name" ng-model="user.name" required /></div></form>', this.$scope);
+    compileHtml('<form name="userForm" af-submit>' +
+                  '<div af-field-wrap="user.name">' +
+                    '<input af-field name="name" ng-model="user.name" required />' +
+                    '<div af-error></div>' +
+                  '</div>' +
+                '</form>', this.$scope);
 
     // Setup spies on parent controllers
     submit = this.element.controller('afSubmit');
@@ -21,7 +26,7 @@ describe('afField', function () {
       submit.trigger = 'change';
     });
 
-    describe('and the model changes', function () {
+    describe('and the model changes to an invalid value', function () {
       beforeEach(function () {
         this.$scope.user.name = '';
         this.$scope.$digest();
