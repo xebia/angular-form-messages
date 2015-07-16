@@ -56,29 +56,56 @@ describe('afSubmit', function () {
         expect(this.$scope.submit).toHaveBeenCalled();
       });
 
-      describe('when the submit callback returns a rejecting promise', function () {
-        beforeEach(function () {
-          this.element.submit();
+      describe('when the submit callback returns a promise', function () {
+
+        describe('which does not resolve', function () {
+          it('should set $scope.isSubmitting to false', function () {
+            this.$scope.submit.and.returnValue(unresolvedPromise());
+            this.element.submit();
+            expect(this.$scope.isSubmitting).toBe(true);
+          });
         });
 
-        it('should save the validation results', function () {
-          expect(submit.validations).toEqual(callbackResult.validation);
+        describe('which resolves', function () {
+          it('should set $scope.isSubmitting to false', function () {
+            this.element.submit();
+            expect(this.$scope.isSubmitting).toBe(false);
+          });
         });
 
-        it('sends a validation event per server side validation', function () {
-          expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'address', []);
-          expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', ['User name server side error']);
+        describe('which rejects', function () {
+
+          beforeEach(function () {
+            this.element.submit();
+          });
+
+          it('should save the validation results', function () {
+            expect(submit.validations).toEqual(callbackResult.validation);
+          });
+
+          it('sends a validation event per server side validation', function () {
+            expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'address', []);
+            expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', ['User name server side error']);
+          });
+
+          it('should set $scope.isSubmitting to false', function () {
+            expect(this.$scope.isSubmitting).toBe(false);
+          });
         });
       });
 
       describe('when the submit callback does not return a promise', function () {
         beforeEach(function () {
-          this.$scope.submit.and.returnValue('noPromise');
+          this.$scope.submit.and.returnValue(callbackResult);
           this.element.submit();
         });
 
         it('does no further processing', function () {
           expect(submit.validate).not.toHaveBeenCalled();
+        });
+
+        it('should not set $scope.isSubmitting', function () {
+          expect(this.$scope.isSubmitting).toBeUndefined();
         });
       });
     });
