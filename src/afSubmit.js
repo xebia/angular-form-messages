@@ -5,10 +5,10 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
     controller: function afSubmitController($scope) {
       this.validations = {};
 
-      this.validate = function (modelPath, errors) {
-        this.validations[modelPath] = errors;
+      this.validate = function (messageId, errors) {
+        this.validations[messageId] = errors;
         $scope.validations = this.validations; // Temp
-        $scope.$broadcast('validation', modelPath, errors);
+        $scope.$broadcast('validation', messageId, errors);
       };
 
       this.isValid = function () {
@@ -29,23 +29,28 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
 
       function doSubmit(event) {
         event.preventDefault();
+
         $scope.$broadcast('validate');
         $scope.$apply(function () {
+
+          function processErrors(result) {
+            angular.forEach(result.validation, function (errors, messageId) {
+              submit.validate(messageId, errors);
+            });
+          }
 
           if (!submit.isValid()) {
             return;
           }
 
-          function processErrors(result) {
-            angular.forEach(result.validation, function (errors, modelPath) {
-              submit.validate(modelPath, errors);
-            });
-          }
-
           var callbackResult = $scope.$eval(attrs.afSubmit);
           if (isPromise(callbackResult)) {
+            $scope.isSubmitting = true;
             callbackResult
-              .catch(processErrors);
+              .catch(processErrors)
+              ['finally'](function () {
+                $scope.isSubmitting = false;
+              });
           }
         });
       }

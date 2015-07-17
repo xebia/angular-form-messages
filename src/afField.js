@@ -27,12 +27,12 @@ angular.module('angularFormMessages').directive('afField', function () {
         angular.forEach(errorKeys, function (key) {
           errors.push(key);
         });
-        submit.validate(fieldWrap.modelPath, errors);
+        submit.validate(fieldWrap.messageId, errors);
       }
 
       function cleanValidation(viewValue) {
         if (submit.triggerOn === 'submit') {
-          submit.validate(fieldWrap.modelPath, []);
+          submit.validate(fieldWrap.messageId, []);
         }
         return viewValue;
       }

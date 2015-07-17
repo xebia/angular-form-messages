@@ -5,10 +5,18 @@ describe('afSubmitButton', function () {
       .run();
 
     createScope();
-    compileHtml('<div af-submit-button></div>', this.$scope);
+    compileHtml('<div af-submit-button></div>');
   });
 
-  it('still does nothing', function () {
+  it('should set the disabled attribute when isSubmitted is truthy', function () {
+    expect(this.element).not.toHaveAttr('disabled');
 
+    this.$scope.isSubmitting = true;
+    this.$scope.$digest();
+    expect(this.element).toHaveAttr('disabled', 'disabled');
+
+    this.$scope.isSubmitting = false;
+    this.$scope.$digest();
+    expect(this.element).not.toHaveAttr('disabled');
   });
 });

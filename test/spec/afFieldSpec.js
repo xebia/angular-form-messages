@@ -8,9 +8,9 @@ describe('afField', function () {
 
     createScope({ user: { name: 'Misko' } });
     compileHtml('<form name="userForm" af-submit>' +
-                  '<div af-field-wrap af-model-path="user.name">' +
-                    '<div af-error></div>' +
+                  '<div af-field-wrap="user.name">' +
                     '<input af-field name="name" ng-model="user.name" af-trigger="triggerValue" required />' +
+                    '<div af-error></div>' +
                   '</div>' +
                 '</form>', this.$scope);
 
@@ -26,7 +26,7 @@ describe('afField', function () {
       submit.triggerOn = 'change';
     });
 
-    describe('and the model changes', function () {
+    describe('and the model changes to an invalid value', function () {
       beforeEach(function () {
         ngModel.$setViewValue('');
       });
