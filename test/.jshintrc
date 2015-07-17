@@ -12,6 +12,7 @@
     "getMockData": false,
     "inject": false,
     "mox": false,
-    "reject": false
+    "reject": false,
+    "unresolvedPromise": false
   }
 }
