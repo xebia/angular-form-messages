@@ -59,7 +59,7 @@ describe('afSubmit', function () {
       describe('when the submit callback returns a promise', function () {
 
         describe('which does not resolve', function () {
-          it('should set $scope.isSubmitting to false', function () {
+          it('should set $scope.isSubmitting to true', function () {
             this.$scope.submit.and.returnValue(unresolvedPromise());
             this.element.submit();
             expect(this.$scope.isSubmitting).toBe(true);
