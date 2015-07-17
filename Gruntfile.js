@@ -96,10 +96,10 @@ module.exports = function (grunt) {
       dist: {
         options: {
           thresholds: {
-            statements: 98,
-            branches: 98,
-            functions: 98,
-            lines: 98
+            statements: 100,
+            branches: 100,
+            functions: 100,
+            lines: 100
           },
           dir: 'coverage',
           root: 'test'
