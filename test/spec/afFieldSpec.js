@@ -18,13 +18,12 @@ describe('afField', function () {
 
   describe('when the form should be validated on change', function () {
     beforeEach(function () {
-      submit.trigger = 'change';
+      submit.triggerOn = 'change';
     });
 
     describe('and the model changes', function () {
       beforeEach(function () {
-        this.$scope.user.name = '';
-        this.$scope.$digest();
+        ngModel.$setViewValue('');
       });
 
       it('should validate the form', function () {
@@ -48,7 +47,7 @@ describe('afField', function () {
 
   describe('when the form should be validated on submit', function () {
     beforeEach(function () {
-      submit.trigger = 'submit';
+      submit.triggerOn = 'submit';
     });
 
     describe('and the model changes', function () {
@@ -95,9 +94,7 @@ describe('afField', function () {
     it('should send validation "invalid" to the ngSubmitController', function () {
       submit.validate.calls.reset();
       // Make field invalid to trigger a second validation event via the model watch
-      this.$scope.user.name = '';
-      this.$scope.$digest();
-
+      ngModel.$setViewValue('');
       expect(submit.validate).toHaveBeenCalledWith('user.name', ['required']);
     });
   });

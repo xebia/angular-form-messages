@@ -9,7 +9,7 @@ describe('afSubmit', function () {
     submit;
 
   function compileWithTrigger($scope, trigger) {
-    compileHtml('<form af-submit="submit()" af-trigger="' + trigger + '"></form>', $scope);
+    compileHtml('<form af-submit="submit()" af-trigger-on="' + trigger + '"></form>', $scope);
   }
 
   beforeEach(function () {
@@ -29,12 +29,12 @@ describe('afSubmit', function () {
   describe('the trigger setting', function () {
 
     it('should be saved in the controller with value from the af-trigger attribute', function () {
-      expect(submit.trigger).toBe('change');
+      expect(submit.triggerOn).toBe('change');
     });
 
     it('should be saved in the controller with a default value', function () {
       compileWithTrigger(this.$scope, undefined);
-      expect(submit.trigger).toBe('change');
+      expect(submit.triggerOn).toBe('change');
     });
   });
 

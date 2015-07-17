@@ -50,7 +50,7 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
         });
       }
 
-      submit.trigger = attrs.afTrigger || 'change';
+      submit.triggerOn = attrs.afTriggerOn || 'change';
       elem.on('submit', doSubmit);
     }
   };
