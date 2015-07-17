@@ -7,7 +7,12 @@ describe('afField', function () {
       .run();
 
     createScope({ user: { name: 'Misko' } });
-    compileHtml('<form name="userForm" af-submit><div af-field-wrap af-model-path="user.name"><div af-error></div><input af-field name="name" ng-model="user.name" required /></div></form>', this.$scope);
+    compileHtml('<form name="userForm" af-submit>' +
+                  '<div af-field-wrap af-model-path="user.name">' +
+                    '<div af-error></div>' +
+                    '<input af-field name="name" ng-model="user.name" af-trigger="triggerValue" required />' +
+                  '</div>' +
+                '</form>', this.$scope);
 
     // Setup spies on parent controllers
     submit = this.element.controller('afSubmit');
@@ -26,7 +31,7 @@ describe('afField', function () {
         ngModel.$setViewValue('');
       });
 
-      it('should validate the form', function () {
+      it('should validate the field', function () {
         expect(ngModel.$validate).toHaveBeenCalled();
         expect(submit.validate).toHaveBeenCalledWith('user.name', ['required']);
       });
@@ -38,7 +43,7 @@ describe('afField', function () {
         this.element.find('[af-field]').val('').trigger('change');
       });
 
-      it('should revalidate the form', function () {
+      it('should revalidate the field', function () {
         expect(submit.validate).toHaveBeenCalledWith('user.name', ['required']);
       });
 
@@ -56,7 +61,7 @@ describe('afField', function () {
         this.$scope.$digest();
       });
 
-      it('should not validate the form', function () {
+      it('should not validate the field', function () {
         expect(ngModel.$validate).not.toHaveBeenCalled();
         expect(submit.validate).not.toHaveBeenCalledWith('user.name', ['required']);
       });
@@ -76,6 +81,17 @@ describe('afField', function () {
     });
   });
 
+  describe('when the trigger value changes', function () {
+    beforeEach(function () {
+      this.$scope.triggerValue = 'changed';
+      this.$scope.$digest();
+    });
+
+    it('should validate the field', function () {
+      expect(ngModel.$validate).toHaveBeenCalled();
+    });
+  });
+
   describe('when a request for validation event is fired', function () {
 
     // These are the same expectation as the case where the trigger is change and the model changes
@@ -83,7 +99,7 @@ describe('afField', function () {
       $rootScope.$broadcast('validate');
     }));
 
-    it('should validate the form model', function () {
+    it('should validate the field', function () {
       expect(ngModel.$validate).toHaveBeenCalled();
     });
 

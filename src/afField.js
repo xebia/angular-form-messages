@@ -1,16 +1,12 @@
 angular.module('angularFormMessages').directive('afField', function () {
   return {
+    priority: 100,
     require: ['ngModel', '^afFieldWrap', '^afSubmit', '^form'],
-    scope: {
-      afTrigger: '='
-    },
     link: function linkFn($scope, elem, attrs, ctrls) {
       var ngModel = ctrls[0];
       var fieldWrap = ctrls[1];
       var submit = ctrls[2];
       var form = ctrls[3];
-
-      $scope[form.$name] = form;
 
       function hasValidationChangedAndDirty() {
         if (ngModel.$dirty && submit.triggerOn === 'change') {
@@ -42,7 +38,7 @@ angular.module('angularFormMessages').directive('afField', function () {
       }
 
       $scope.$watchCollection(form.$name + '["' + ngModel.$name + '"].$error', hasValidationChangedAndDirty);
-      $scope.$watch('afTrigger', validationTrigger);
+      $scope.$watch(attrs.afTrigger, validationTrigger);
       ngModel.$parsers.push(cleanValidation);
 
       $scope.$on('validate', updateValidation);
