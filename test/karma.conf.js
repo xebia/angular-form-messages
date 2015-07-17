@@ -19,8 +19,8 @@ module.exports = function(config) {
       'bower_components/angular/angular.js',
       'bower_components/angular-messages/angular-messages.js',
       'bower_components/angular-mocks/angular-mocks.js',
-      'bower_components/mox/src/mox.js',
       'bower_components/jasmine-jquery/lib/jasmine-jquery.js',
+      'bower_components/mox/dist/mox.js',
       'bower_components/lodash/lodash.js',
       // endbower
       'src/afModule.js',
