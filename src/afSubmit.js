@@ -29,6 +29,7 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
 
       function doSubmit(event) {
         event.preventDefault();
+
         $scope.$broadcast('validate');
         $scope.$apply(function () {
 
@@ -44,8 +45,12 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
 
           var callbackResult = $scope.$eval(attrs.afSubmit);
           if (isPromise(callbackResult)) {
+            $scope.isSubmitting = true;
             callbackResult
-              .catch(processErrors);
+              .catch(processErrors)
+              ['finally'](function () {
+                $scope.isSubmitting = false;
+              });
           }
         });
       }
