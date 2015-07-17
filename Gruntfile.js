@@ -157,11 +157,11 @@ module.exports = function (grunt) {
 
     uglify: {
       dist: {
-        files: {
-          '<%= paths.dist %>/<%= bwr.name %>.js': [
-            '<%= paths.dist %>/<%= bwr.name %>.js'
-          ]
-        }
+        expand: true,
+        cwd: 'dist/', // 'dist' when using concat, else 'src/'
+        src: '*.js',
+        dest: 'dist',
+        ext: '.min.js'
       }
     },
 
