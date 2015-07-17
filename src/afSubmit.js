@@ -1,7 +1,6 @@
 angular.module('angularFormMessages').directive('afSubmit', function () {
 
   return {
-    scope: false,
     require: 'afSubmit',
     controller: function afSubmitController($scope) {
       this.validations = {};
