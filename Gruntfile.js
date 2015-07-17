@@ -169,6 +169,12 @@ module.exports = function (grunt) {
       dist: {
         files: { 'dist/<%= bwr.name %>.js': 'dist/<%= bwr.name %>.js' }
       }
+    },
+
+    githooks: {
+      all: {
+        'pre-commit': 'default'
+      }
     }
 
   });
