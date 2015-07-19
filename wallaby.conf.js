@@ -11,8 +11,8 @@ module.exports = function () {
       n('bower_components/angular-messages/angular-messages.js'),
       n('bower_components/angular-mocks/angular-mocks.js'),
       n('bower_components/jasmine-jquery/lib/jasmine-jquery.js'),
-      n('bower_components/jasmine-mox-matchers/src/jasmine-mox-matchers-2.x.js'),
-      n('bower_components/mox/src/mox.js'),
+      n('bower_components/jasmine-mox-matchers/src/jasmine-mox-matchers.js'),
+      n('bower_components/mox/dist/mox.js'),
 
       // Mock data
       { pattern: 'test/mock/json/**/*.json', instrument: false, load: false },
