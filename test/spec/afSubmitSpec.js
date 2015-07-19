@@ -9,7 +9,7 @@ describe('afSubmit', function () {
     submit;
 
   function compileWithTrigger($scope, trigger) {
-    compileHtml('<form af-submit="submit()" af-trigger-on="' + trigger + '"></form>', $scope);
+    compileHtml('<form af-submit="submit()" af-trigger-on="' + trigger + '" af-show-success="showSuccess"></form>', $scope);
   }
 
   beforeEach(function () {
@@ -26,15 +26,34 @@ describe('afSubmit', function () {
     this.$scope.submit.and.returnValue(reject(callbackResult));
   });
 
-  describe('the trigger setting', function () {
+  describe('the form settings', function () {
 
-    it('should be saved in the controller with value from the af-trigger attribute', function () {
-      expect(submit.triggerOn).toBe('change');
+    describe('the trigger setting', function () {
+
+      it('should be saved in the controller with value from the af-trigger attribute', function () {
+        expect(submit.triggerOn).toBe('change');
+      });
+
+      it('should be saved in the controller with a default value', function () {
+        compileWithTrigger(this.$scope, undefined);
+        expect(submit.triggerOn).toBe('change');
+      });
     });
 
-    it('should be saved in the controller with a default value', function () {
-      compileWithTrigger(this.$scope, undefined);
-      expect(submit.triggerOn).toBe('change');
+    describe('the showSuccess setting', function () {
+      it('should be saved in the controller with boolean value from the af-show-success attribute', function () {
+        this.$scope.showSuccess = true;
+        this.$scope.$digest();
+        expect(submit.showSuccess).toBe(true);
+
+        this.$scope.showSuccess = false;
+        this.$scope.$digest();
+        expect(submit.showSuccess).toBe(false);
+      });
+
+      it('should be saved in the controller with a default value', function () {
+        expect(submit.showSuccess).toBe(false);
+      });
     });
   });
 

@@ -55,8 +55,13 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
         });
       }
 
-      submit.triggerOn = attrs.afTriggerOn || 'change';
       elem.on('submit', doSubmit);
+
+      // Settings
+      submit.triggerOn = attrs.afTriggerOn || 'change';
+      $scope.$watch(attrs.afShowSuccess, function (newVal) {
+        submit.showSuccess = !!newVal;
+      });
     }
   };
 
