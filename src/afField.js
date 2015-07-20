@@ -22,12 +22,13 @@ angular.module('angularFormMessages').directive('afField', function () {
 
       function updateValidation() {
         ngModel.$validate();
-        var errors = [];
+        var messages = [];
         var errorKeys = Object.keys(ngModel.$error);
         angular.forEach(errorKeys, function (key) {
-          errors.push(key);
+          // For now, the message is just the key and the message type is always 'error'
+          messages.push({ message: key, type: 'error' });
         });
-        submit.validate(fieldWrap.messageId, errors);
+        submit.validate(fieldWrap.messageId, messages);
       }
 
       function cleanValidation(viewValue) {

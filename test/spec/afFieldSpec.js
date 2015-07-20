@@ -32,7 +32,7 @@ describe('afField', function () {
 
       it('should validate the field', function () {
         expect(ngModel.$validate).toHaveBeenCalled();
-        expect(submit.validate).toHaveBeenCalledWith('user.name', ['required']);
+        expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
       });
     });
 
@@ -43,7 +43,7 @@ describe('afField', function () {
       });
 
       it('should revalidate the field', function () {
-        expect(submit.validate).toHaveBeenCalledWith('user.name', ['required']);
+        expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
       });
 
     });
@@ -62,7 +62,7 @@ describe('afField', function () {
 
       it('should not validate the field', function () {
         expect(ngModel.$validate).not.toHaveBeenCalled();
-        expect(submit.validate).not.toHaveBeenCalledWith('user.name', ['required']);
+        expect(submit.validate).not.toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
       });
     });
 
@@ -110,7 +110,7 @@ describe('afField', function () {
       submit.validate.calls.reset();
       // Make field invalid to trigger a second validation event via the model watch
       ngModel.$setViewValue('');
-      expect(submit.validate).toHaveBeenCalledWith('user.name', ['required']);
+      expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
     });
   });
 

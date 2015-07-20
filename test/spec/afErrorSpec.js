@@ -11,8 +11,8 @@ describe('afError', function () {
     });
 
     createScope({
-      errors: [
-        'Initial message' // Directive has no isolate scope, so we can set values on the parent scope initially
+      messages: [
+        { message: 'Initial message', type: 'error' } // Directive has no isolate scope, so we can set values on the parent scope initially
       ]
     });
     this.element = extendedElement(
@@ -29,7 +29,7 @@ describe('afError', function () {
       });
 
       it('should do nothing', function () {
-        expect(this.element.find('[af-error]').scope().errors).toEqual(['Initial message']);
+        expect(this.element.find('[af-error]').scope().messages).toEqual([{ message: 'Initial message', type: 'error' }]);
       });
     });
 
@@ -40,18 +40,18 @@ describe('afError', function () {
       });
 
       it('should remove the message', function () {
-        expect(this.element.find('[af-error]').scope().errors).toEqual([]);
+        expect(this.element.find('[af-error]').scope().messages).toEqual([]);
       });
     });
 
     describe('when the field is invalid', function () {
       beforeEach(function () {
-        $rootScope.$broadcast('validation', 'user.name', ['New error']);
+        $rootScope.$broadcast('validation', 'user.name', [{ message: 'New error', type: 'error' }]);
         this.$scope.$digest();
       });
 
       it('should set the message on the scope', function () {
-        expect(this.element.find('[af-error]').scope().errors).toEqual(['New error']);
+        expect(this.element.find('[af-error]').scope().messages).toEqual([{ message: 'New error', type: 'error' }]);
       });
     });
   });
