@@ -1,5 +1,8 @@
 describe('afField', function () {
-  var ngModel, submit;
+  var
+    afField,
+    ngModel,
+    afSubmit;
 
   beforeEach(function () {
     mox
@@ -14,69 +17,55 @@ describe('afField', function () {
                 '</form>', this.$scope);
 
     // Setup spies on parent controllers
-    submit = this.element.controller('afSubmit');
+    afSubmit = this.element.controller('afSubmit');
     ngModel = this.element.find('[af-field]').controller('ngModel');
-    spyOn(submit, 'validate');
+    afField = this.element.find('[af-field]').controller('afField');
+    spyOn(afSubmit, 'validate');
     spyOn(ngModel, '$validate');
   });
 
   describe('when the form should be validated on change', function () {
     beforeEach(function () {
-      submit.triggerOn = 'change';
+      afSubmit.triggerOn = 'change';
     });
 
-    describe('and the model changes to an invalid value', function () {
+    describe('and the user changes the field to an invalid value', function () {
       beforeEach(function () {
         ngModel.$setViewValue('');
       });
 
-      it('should validate the field', function () {
+      it('should validate the field and set the default (error) message', function () {
         expect(ngModel.$validate).toHaveBeenCalled();
-        expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
+        expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
       });
-    });
-
-    describe('and the user changes the field', function () {
-      beforeEach(function () {
-        submit.validate.calls.reset();
-        this.element.find('[af-field]').val('').trigger('change');
-      });
-
-      it('should revalidate the field', function () {
-        expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
-      });
-
     });
   });
 
   describe('when the form should be validated on submit', function () {
     beforeEach(function () {
-      submit.triggerOn = 'submit';
+      afSubmit.triggerOn = 'submit';
     });
 
     describe('and the model changes', function () {
       beforeEach(function () {
-        this.$scope.user.name = '';
+        ngModel.$setViewValue('');
         this.$scope.$digest();
       });
 
       it('should not validate the field', function () {
         expect(ngModel.$validate).not.toHaveBeenCalled();
-        expect(submit.validate).not.toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
+        expect(afSubmit.validate).not.toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
       });
     });
 
     describe('and the user changes the field', function () {
-
       beforeEach(function () {
-        submit.validate.calls.reset();
-        this.element.find('[af-field]').val('').trigger('change'); // this would normally make the field invalid 'required'
+        ngModel.$setViewValue(''); // this would normally make the field invalid 'required'
       });
 
       it('should clear validation errors and do not a revalidation', function () {
-        expect(submit.validate).toHaveBeenCalledWith('user.name', []);
+        expect(afSubmit.validate).toHaveBeenCalledWith('user.name', []);
       });
-
     });
   });
 
@@ -103,14 +92,37 @@ describe('afField', function () {
     });
 
     it('should send validation "valid" to the ngSubmitController', function () {
-      expect(submit.validate).toHaveBeenCalledWith('user.name', []);
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', []);
     });
 
     it('should send validation "invalid" to the ngSubmitController', function () {
-      submit.validate.calls.reset();
+      afSubmit.validate.calls.reset();
       // Make field invalid to trigger a second validation event via the model watch
       ngModel.$setViewValue('');
-      expect(submit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
+    });
+  });
+
+  describe('when extra validation info is set in afField.$messages', function () {
+    it('should validate the field and set the default message with the type that has been set via afField methods', function () {
+      afField.setError('required');
+      ngModel.$setViewValue('');
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
+
+      afField.setWarning('required');
+      this.$scope.triggerValue = 'something-else';
+      this.$scope.$digest();
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'warning' }]);
+
+      afField.setInfo('required');
+      this.$scope.triggerValue = 'another-value';
+      this.$scope.$digest();
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'info' }]);
+
+      afField.setSuccess('required');
+      this.$scope.triggerValue = 'trigger-again';
+      this.$scope.$digest();
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'success' }]);
     });
   });
 

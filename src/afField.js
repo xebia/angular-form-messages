@@ -1,12 +1,30 @@
 angular.module('angularFormMessages').directive('afField', function () {
   return {
     priority: 100,
-    require: ['ngModel', '^afFieldWrap', '^afSubmit', '^form'],
+    require: ['ngModel', 'afField', '^afFieldWrap', '^afSubmit', '^form'],
+    controller: function () {
+      function setMessage(type) {
+        return function (key) {
+          this.$messages[key] = {
+            type: type
+          };
+        };
+      }
+
+      // Object for storing extra message data such as message type
+      this.$messages = {};
+
+      this.setError = setMessage('error');
+      this.setWarning = setMessage('warning');
+      this.setInfo = setMessage('info');
+      this.setSuccess = setMessage('success');
+    },
     link: function linkFn($scope, elem, attrs, ctrls) {
       var ngModel = ctrls[0];
-      var fieldWrap = ctrls[1];
-      var submit = ctrls[2];
-      var form = ctrls[3];
+      var afField = ctrls[1];
+      var fieldWrap = ctrls[2];
+      var submit = ctrls[3];
+      var form = ctrls[4];
 
       function hasValidationChangedAndDirty() {
         if (ngModel.$dirty && submit.triggerOn === 'change') {
@@ -20,17 +38,28 @@ angular.module('angularFormMessages').directive('afField', function () {
         }
       }
 
+      /*
+       * Collects validation info from ngModel and afField and passes it to submit.validate()
+       */
       function updateValidation() {
         ngModel.$validate();
         var messages = [];
         var errorKeys = Object.keys(ngModel.$error);
+
         angular.forEach(errorKeys, function (key) {
-          // For now, the message is just the key and the message type is always 'error'
-          messages.push({ message: key, type: 'error' });
+          // For now, the message is just the key
+          // The message type is stored in afField.$messages when for example afField.setError has been called, additionally to ngModel.$setValidity
+          messages.push({
+            message: key,
+            type: (afField.$messages[key] && afField.$messages[key].type) || 'error'
+          });
         });
         submit.validate(fieldWrap.messageId, messages);
       }
 
+      /**
+       * Clears validation after submit has been called when trigger is "submit"
+       */
       function cleanValidation(viewValue) {
         if (submit.triggerOn === 'submit') {
           submit.validate(fieldWrap.messageId, []);
