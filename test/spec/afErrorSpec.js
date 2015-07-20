@@ -3,7 +3,7 @@ describe('afError', function () {
 
   beforeEach(function () {
     mox
-      .module('angularFormMessages', 'templates/error.html')
+      .module('angularFormMessages')
       .run();
 
     inject(function (_$rootScope_) {
@@ -12,7 +12,7 @@ describe('afError', function () {
 
     createScope({
       errors: [
-        'Initial message' // Directive has no isolate scope, so we can set values on the parent scope
+        'Initial message' // Directive has no isolate scope, so we can set values on the parent scope initially
       ]
     });
     this.element = extendedElement(
@@ -29,7 +29,7 @@ describe('afError', function () {
       });
 
       it('should do nothing', function () {
-        expect(this.element.error).toHaveText('Initial message');
+        expect(this.element.find('[af-error]').scope().errors).toEqual(['Initial message']);
       });
     });
 
@@ -40,7 +40,7 @@ describe('afError', function () {
       });
 
       it('should remove the message', function () {
-        expect(this.element.error).toHaveText('');
+        expect(this.element.find('[af-error]').scope().errors).toEqual([]);
       });
     });
 
@@ -51,7 +51,7 @@ describe('afError', function () {
       });
 
       it('should set the message on the scope', function () {
-        expect(this.element.error).toHaveText('New error');
+        expect(this.element.find('[af-error]').scope().errors).toEqual(['New error']);
       });
     });
   });

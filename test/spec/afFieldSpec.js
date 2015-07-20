@@ -3,14 +3,13 @@ describe('afField', function () {
 
   beforeEach(function () {
     mox
-      .module('angularFormMessages', 'templates/error.html')
+      .module('angularFormMessages')
       .run();
 
     createScope({ user: { name: 'Misko' } });
     compileHtml('<form name="userForm" af-submit>' +
                   '<div af-field-wrap="user.name">' +
                     '<input af-field name="name" ng-model="user.name" af-trigger="triggerValue" required />' +
-                    '<div af-error></div>' +
                   '</div>' +
                 '</form>', this.$scope);
 
