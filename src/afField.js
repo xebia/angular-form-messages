@@ -1,4 +1,4 @@
-angular.module('angularFormMessages').directive('afField', function () {
+angular.module('angularFormMessages').directive('afField', function (MESSAGE_TYPES) {
   return {
     priority: 100,
     require: ['ngModel', 'afField', '^afFieldWrap', '^afSubmit', '^form'],
@@ -14,10 +14,10 @@ angular.module('angularFormMessages').directive('afField', function () {
       // Object for storing extra message data such as message type
       this.$messages = {};
 
-      this.setError = setMessage('error');
-      this.setWarning = setMessage('warning');
-      this.setInfo = setMessage('info');
-      this.setSuccess = setMessage('success');
+      this.setError = setMessage(MESSAGE_TYPES[3]);
+      this.setWarning = setMessage(MESSAGE_TYPES[2]);
+      this.setInfo = setMessage(MESSAGE_TYPES[1]);
+      this.setSuccess = setMessage(MESSAGE_TYPES[0]);
     },
     link: function linkFn($scope, elem, attrs, ctrls) {
       var ngModel = ctrls[0];
@@ -51,7 +51,7 @@ angular.module('angularFormMessages').directive('afField', function () {
           // The message type is stored in afField.$messages when for example afField.setError has been called, additionally to ngModel.$setValidity
           messages.push({
             message: key,
-            type: (afField.$messages[key] && afField.$messages[key].type) || 'error'
+            type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
           });
         });
         submit.validate(fieldWrap.messageId, messages);

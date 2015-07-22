@@ -1,13 +1,16 @@
 describe('afField', function () {
   var
     afField,
-    ngModel,
-    afSubmit;
+    afSubmit,
+    MESSAGE_TYPES,
+    ngModel;
 
   beforeEach(function () {
     mox
       .module('angularFormMessages')
       .run();
+
+    MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
 
     createScope({ user: { name: 'Misko' } });
     compileHtml('<form name="userForm" af-submit>' +
@@ -36,7 +39,7 @@ describe('afField', function () {
 
       it('should validate the field and set the default (error) message', function () {
         expect(ngModel.$validate).toHaveBeenCalled();
-        expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
+        expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }]);
       });
     });
   });
@@ -54,7 +57,7 @@ describe('afField', function () {
 
       it('should not validate the field', function () {
         expect(ngModel.$validate).not.toHaveBeenCalled();
-        expect(afSubmit.validate).not.toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
+        expect(afSubmit.validate).not.toHaveBeenCalledWith('user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }]);
       });
     });
 
@@ -99,7 +102,7 @@ describe('afField', function () {
       afSubmit.validate.calls.reset();
       // Make field invalid to trigger a second validation event via the model watch
       ngModel.$setViewValue('');
-      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }]);
     });
   });
 
@@ -107,22 +110,22 @@ describe('afField', function () {
     it('should validate the field and set the default message with the type that has been set via afField methods', function () {
       afField.setError('required');
       ngModel.$setViewValue('');
-      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'error' }]);
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }]);
 
       afField.setWarning('required');
       this.$scope.triggerValue = 'something-else';
       this.$scope.$digest();
-      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'warning' }]);
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: MESSAGE_TYPES[2] }]);
 
       afField.setInfo('required');
       this.$scope.triggerValue = 'another-value';
       this.$scope.$digest();
-      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'info' }]);
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: MESSAGE_TYPES[1] }]);
 
       afField.setSuccess('required');
       this.$scope.triggerValue = 'trigger-again';
       this.$scope.$digest();
-      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: 'success' }]);
+      expect(afSubmit.validate).toHaveBeenCalledWith('user.name', [{ message: 'required', type: MESSAGE_TYPES[0] }]);
     });
   });
 
