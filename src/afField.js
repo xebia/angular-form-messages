@@ -1,4 +1,7 @@
-angular.module('angularFormMessages').directive('afField', function (MESSAGE_TYPES) {
+angular.module('angularFormMessages').directive('afField', function (
+  MESSAGE_TYPES,
+  MessageService
+) {
   return {
     priority: 100,
     require: ['ngModel', 'afField', '^afFieldWrap', '^afSubmit', '^form'],
@@ -54,7 +57,7 @@ angular.module('angularFormMessages').directive('afField', function (MESSAGE_TYP
             type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
           });
         });
-        submit.validate(fieldWrap.messageId, messages);
+        submit.validate(fieldWrap.messageId, messages, MessageService.determineMessageType(messages));
       }
 
       /**
