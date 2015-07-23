@@ -3,9 +3,9 @@ angular.module('angularFormMessages').directive('afError', function () {
     templateUrl: 'templates/error.html',
     require: '^afFieldWrap',
     scope: true,
-    link: function linkFn($scope, elem, attrs, ctrl) {
+    link: function linkFn($scope, elem, attrs, afFieldWrapCtrl) {
       $scope.$on('validation', function (event, messageId, errors) {
-        if (messageId === ctrl.messageId) {
+        if (messageId === afFieldWrapCtrl.messageId) {
           $scope.errors = errors;
         }
       });
