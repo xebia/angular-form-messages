@@ -3,6 +3,7 @@
   "regexp": true,
   "jasmine": true,
   "globals": {
+    "_": false,
     "addSelectors": false,
     "angular": false,
     "browser": false,
