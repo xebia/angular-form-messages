@@ -5,6 +5,7 @@ module.exports = function (grunt) {
 
   var appConfig = {
     src: require('./bower.json').appPath || 'src',
+    tmp: '.tmp',
     test: 'test',
     dist: 'dist'
   };
@@ -44,7 +45,7 @@ module.exports = function (grunt) {
       all: {
         src: [
           'Gruntfile.js',
-          '<%= paths.src %>/{,*/}*.js'
+          '<%= paths.src %>/**/!(templateCache)*.js'
         ]
       },
       test: {
@@ -61,7 +62,7 @@ module.exports = function (grunt) {
       },
       all: {
         files: {
-          src: ['<%= paths.src %>/{,**/}*.js']
+          src: ['<%= paths.src %>/**/!(templateCache)*.js']
         }
       },
       test: {
@@ -120,7 +121,8 @@ module.exports = function (grunt) {
           {
             dot: true,
             src: [
-              '<%= paths.dist %>/**/*'
+              '<%= paths.dist %>/**/*',
+              '<%= paths.tmp %>/**/*'
             ]
           }
         ]
@@ -147,11 +149,23 @@ module.exports = function (grunt) {
       }
     },
 
+    ngtemplates: {
+      options: {
+        module: 'angularFormMessages'
+      },
+      dist: {
+        src: 'templates/*.html',
+        dest: '<%= paths.src %>/templateCache.js'
+      }
+    },
+
     concat: {
       dist: {
-        files: {
-          '<%= paths.dist %>/<%= bwr.name %>.js': '<%= paths.src %>/*.js'
-        }
+        src: [
+          '<%= paths.src %>/*.js',
+          '<%= paths.tmp %>/*.js'
+        ],
+        dest: '<%= paths.dist %>/<%= bwr.name %>.js'
       }
     },
 
@@ -186,8 +200,9 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build', [
-    'clean',
+    'clean:dist',
     'wiredep',
+    'ngtemplates',
     'concat',
     'ngAnnotate',
     'uglify'
