@@ -1,14 +1,16 @@
-angular.module('angularFormMessages').directive('afSubmit', function () {
+angular.module('angularFormMessages').directive('afSubmit', function (
+  MessageService
+) {
 
   return {
     require: 'afSubmit',
     controller: function afSubmitController($scope) {
       this.validations = {};
 
-      this.validate = function (messageId, errors) {
+      this.validate = function (messageId, errors, messageType) {
         this.validations[messageId] = errors;
         $scope.validations = this.validations; // Temp
-        $scope.$broadcast('validation', messageId, errors);
+        $scope.$broadcast('validation', messageId, errors, messageType);
       };
 
       this.isValid = function () {
@@ -34,8 +36,8 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
         $scope.$apply(function () {
 
           function processErrors(result) {
-            angular.forEach(result.validation, function (errors, messageId) {
-              submit.validate(messageId, errors);
+            angular.forEach(result.validation, function (messages, messageId) {
+              submit.validate(messageId, messages, MessageService.determineMessageType(messages));
             });
           }
 

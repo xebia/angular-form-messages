@@ -5,10 +5,11 @@ describe('afSubmit', function () {
         address: [],
         'user.name': [{
           message: 'User name server side error',
-          type: 'error'
+          type: 'ERROR'
         }]
       }
     },
+    MESSAGE_TYPES,
     submit;
 
   function compileWithTrigger($scope, trigger) {
@@ -18,6 +19,13 @@ describe('afSubmit', function () {
   beforeEach(function () {
     mox
       .module('angularFormMessages')
+      .mockServices('MessageService')
+      .setupResults(function () {
+        MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
+        return {
+          MessageService: { determineMessageType: MESSAGE_TYPES[0] }
+        };
+      })
       .run();
 
     createScope({
@@ -106,8 +114,8 @@ describe('afSubmit', function () {
           });
 
           it('sends a validation event per server side validation', function () {
-            expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'address', []);
-            expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'User name server side error', type: 'error' }]);
+            expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'address', [], MESSAGE_TYPES[0]);
+            expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
           });
 
           it('should set $scope.isSubmitting to false', function () {
