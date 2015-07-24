@@ -1,6 +1,9 @@
 angular.module('angularFormMessages')
   .constant('MESSAGE_TYPES', ['SUCCESS', 'INFO', 'WARNING', 'ERROR'])
-  .factory('MessageService', function (MESSAGE_TYPES) {
+  .factory('MessageService', function (
+    $rootScope,
+    MESSAGE_TYPES
+  ) {
     return {
       /**
        * Determine the message type with the highest severity from a list of messages
@@ -16,6 +19,15 @@ angular.module('angularFormMessages')
           }
         });
         return severityIndex === -1 ? undefined : MESSAGE_TYPES[severityIndex];
+      },
+
+      validation: function (messageId, callback) {
+
+        $rootScope.$on('validation', function (event, validationMessageId, messages, messageType) {
+          if (validationMessageId === messageId) {
+            callback(messages, messageType);
+          }
+        });
       }
     };
   });

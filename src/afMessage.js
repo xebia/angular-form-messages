@@ -1,12 +1,12 @@
 angular.module('angularFormMessages')
-  .directive('afMessage', function () {
+  .directive('afMessage', function (
+    MessageService
+  ) {
     return {
       scope: true,
       link: function linkFn($scope, elem, attrs) {
-        $scope.$on('validation', function (event, messageId, messages) {
-          if (messageId === attrs.afMessage) {
-            $scope.messages = messages;
-          }
+        MessageService.validation(attrs.afMessage, function (messages) {
+          $scope.messages = messages;
         });
       }
     };

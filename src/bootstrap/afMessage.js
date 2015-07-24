@@ -1,6 +1,7 @@
 angular.module('angularFormMessagesBootstrap')
   .directive('afMessage', function (
-    MESSAGE_TYPES
+    MESSAGE_TYPES,
+    MessageService
   ) {
     var icons = {
       ERROR: 'glyphicon-exclamation-sign',
@@ -25,20 +26,17 @@ angular.module('angularFormMessagesBootstrap')
       restrict: 'A',
       templateUrl: 'templates/messageDirective.html',
       link: function ($scope, elem, attrs) {
+        MessageService.validation(attrs.afMessage, function (messages, messageType) {
+          // Feedback
+          $scope.messageType = messageType || MESSAGE_TYPES[0];
+          $scope.icon = feedbackIcons[$scope.messageType];
 
-        $scope.$on('validation', function onValidation(event, messageId, messages, messageType) {
-          if (messageId === attrs.afMessage) {
-            // Feedback
-            $scope.messageType = messageType || MESSAGE_TYPES[0];
-            $scope.icon = feedbackIcons[$scope.messageType];
-
-            // Messages
-            angular.forEach(messages, function (message) {
-              message.alertClass = alertClasses[message.type];
-              message.icon = icons[message.type];
-            });
-            $scope.messages = messages;
-          }
+          // Messages
+          angular.forEach(messages, function (message) {
+            message.alertClass = alertClasses[message.type];
+            message.icon = icons[message.type];
+          });
+          $scope.messages = messages;
         });
       }
     };
