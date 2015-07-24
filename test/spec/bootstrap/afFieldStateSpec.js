@@ -61,7 +61,7 @@ describe('afFieldState', function () {
 
     createScope();
     this.element = compileHtml('<form name="userForm" af-submit>' +
-                                 '<div af-field-wrap="user.name" field-state></div>' +
+                                 '<div field-state="user.name"></div>' +
                                '</form>', this.$scope).find('[field-state]');
   });
 

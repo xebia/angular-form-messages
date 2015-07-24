@@ -7,7 +7,7 @@ angular.module('angularFormMessagesBootstrap')
       link: function ($scope, elem, attrs, afSubmitCtrl) {
 
         $scope.$on('validation', function onValidation(event, messageId, messages, messageType) {
-          if (messageId === attrs.afFieldWrap) {
+          if (messageId === attrs.fieldState) {
             angular.forEach(MESSAGE_TYPES, function (type) {
               attrs.$removeClass('has-' + type.toLowerCase());
             });

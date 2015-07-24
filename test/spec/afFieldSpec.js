@@ -19,9 +19,7 @@ describe('afField', function () {
 
     createScope({ user: { name: 'Misko' } });
     compileHtml('<form name="userForm" af-submit>' +
-                  '<div af-field-wrap="user.name">' +
-                    '<input af-field name="name" ng-model="user.name" af-trigger="triggerValue" required />' +
-                  '</div>' +
+                  '<input af-field name="user.name" ng-model="user.name" af-trigger="triggerValue" required />' +
                 '</form>', this.$scope);
 
     // Setup spies on parent controllers

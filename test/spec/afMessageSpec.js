@@ -15,10 +15,7 @@ describe('afError', function () {
         { message: 'Initial message', type: 'error' } // Directive has no isolate scope, so we can set values on the parent scope initially
       ]
     });
-    this.element = extendedElement(
-      compileHtml('<form name="userForm"><div af-field-wrap="user.name"><div af-message></div></div></form>'),
-      { error: '[af-message]' }
-    );
+    compileHtml('<div af-message="user.name"></div>');
   });
 
   describe('when a validation event is broadcasted', function () {
@@ -29,7 +26,7 @@ describe('afError', function () {
       });
 
       it('should do nothing', function () {
-        expect(this.element.find('[af-message]').scope().messages).toEqual([{ message: 'Initial message', type: 'error' }]);
+        expect(this.element.scope().messages).toEqual([{ message: 'Initial message', type: 'error' }]);
       });
     });
 
@@ -40,7 +37,7 @@ describe('afError', function () {
       });
 
       it('should remove the message', function () {
-        expect(this.element.find('[af-message]').scope().messages).toEqual([]);
+        expect(this.element.scope().messages).toEqual([]);
       });
     });
 
@@ -51,7 +48,7 @@ describe('afError', function () {
       });
 
       it('should set the message on the scope', function () {
-        expect(this.element.find('[af-message]').scope().messages).toEqual([{ message: 'New error', type: 'error' }]);
+        expect(this.element.scope().messages).toEqual([{ message: 'New error', type: 'error' }]);
       });
     });
   });

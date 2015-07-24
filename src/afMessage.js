@@ -1,11 +1,10 @@
 angular.module('angularFormMessages')
   .directive('afMessage', function () {
     return {
-      require: '^afFieldWrap',
       scope: true,
-      link: function linkFn($scope, elem, attrs, afFieldWrapCtrl) {
+      link: function linkFn($scope, elem, attrs) {
         $scope.$on('validation', function (event, messageId, messages) {
-          if (messageId === afFieldWrapCtrl.messageId) {
+          if (messageId === attrs.afMessage) {
             $scope.messages = messages;
           }
         });

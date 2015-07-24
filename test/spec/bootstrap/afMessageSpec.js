@@ -25,7 +25,7 @@ describe('messageDirective', function () {
     ];
 
     createScope();
-    this.element = addSelectors(compileHtml('<form><div af-field-wrap="user.name"><div af-message></div></div></form>'), {
+    this.element = addSelectors(compileHtml('<form><div af-message="user.name"></div></form>'), {
       feedbackIcon: '.form-control-feedback',
       alerts: '.alert',
       alert: {

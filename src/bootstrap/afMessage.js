@@ -23,12 +23,11 @@ angular.module('angularFormMessagesBootstrap')
 
     return {
       restrict: 'A',
-      require: '^afFieldWrap',
       templateUrl: 'templates/messageDirective.html',
-      link: function ($scope, elem, attrs, afFieldWrapCtrl) {
+      link: function ($scope, elem, attrs) {
 
         $scope.$on('validation', function onValidation(event, messageId, messages, messageType) {
-          if (messageId === afFieldWrapCtrl.messageId) {
+          if (messageId === attrs.afMessage) {
             // Feedback
             $scope.messageType = messageType || MESSAGE_TYPES[0];
             $scope.icon = feedbackIcons[$scope.messageType];
