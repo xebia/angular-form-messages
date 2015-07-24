@@ -3,7 +3,10 @@ describe('afSubmit', function () {
     callbackResult = {
       validation: {
         address: [],
-        'user.name': ['User name server side error']
+        'user.name': [{
+          message: 'User name server side error',
+          type: 'error'
+        }]
       }
     },
     submit;
@@ -104,7 +107,7 @@ describe('afSubmit', function () {
 
           it('sends a validation event per server side validation', function () {
             expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'address', []);
-            expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', ['User name server side error']);
+            expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'User name server side error', type: 'error' }]);
           });
 
           it('should set $scope.isSubmitting to false', function () {

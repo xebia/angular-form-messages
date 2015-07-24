@@ -12,9 +12,9 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
       };
 
       this.isValid = function () {
-        for (var key in this.validations) {
-          var errors = this.validations[key];
-          if (errors.length) {
+        for (var messageId in this.validations) {
+          var messages = this.validations[messageId];
+          if (messages.length) {
             return false;
           }
         }
