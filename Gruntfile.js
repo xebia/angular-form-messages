@@ -33,6 +33,10 @@ module.exports = function (grunt) {
       },
       gruntfile: {
         files: ['Gruntfile.js']
+      },
+      build: {
+        files: ['<%= paths.src %>/{,*/}*.js'],
+        tasks: ['default']
       }
     },
 
