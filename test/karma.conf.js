@@ -25,7 +25,8 @@ module.exports = function(config) {
       'bower_components/lodash/lodash.js',
       // endbower
       'src/afModule.js',
-      'src/*.js',
+      'src/**/*.js',
+      'templates/**/*.html',
       'test/mock/*.js',
       'test/mock/html/**/*.html',
       'test/spec/**/*.js'
@@ -36,7 +37,8 @@ module.exports = function(config) {
 
     preprocessors: {
       'src/**/*.js': ['coverage'],
-      'test/mock/html/**/*.html': 'ng-html2js'
+      'test/mock/html/**/*.html': 'ng-html2js',
+      'templates/**/*.html': 'ng-html2js'
     },
 
     ngHtml2JsPreprocessor: {

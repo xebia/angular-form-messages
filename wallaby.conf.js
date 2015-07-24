@@ -21,7 +21,8 @@ module.exports = function () {
 
       // Scripts
       'src/afModule.js',
-      'src/*.js'
+      'src/**/*.js',
+      'templates/**/*.html'
     ],
     tests: [
       n('test/spec/**/*.js')
@@ -31,6 +32,9 @@ module.exports = function () {
         return require('wallaby-ng-html2js-preprocessor').transform(file, {
           stripPrefix: 'test/mock/html/'
         });
+      },
+      'templates/**/*.html': function (file) {
+        return require('wallaby-ng-html2js-preprocessor').transform(file);
       }
     }
   };

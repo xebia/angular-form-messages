@@ -1,18 +1,7 @@
-angular.module('angularFormMessages').directive('afError', function () {
-  return {
-    require: '^afFieldWrap',
-    scope: true,
-    link: function linkFn($scope, elem, attrs, ctrl) {
-      $scope.$on('validation', function (event, messageId, messages) {
-        if (messageId === ctrl.messageId) {
-          $scope.messages = messages;
-        }
-      });
-    }
-  };
-});
-
-angular.module('angularFormMessages').directive('afField', function () {
+angular.module('angularFormMessages').directive('afField', ["MESSAGE_TYPES", "MessageService", function (
+  MESSAGE_TYPES,
+  MessageService
+) {
   return {
     priority: 100,
     require: ['ngModel', 'afField', '^afFieldWrap', '^afSubmit', '^form'],
@@ -28,10 +17,10 @@ angular.module('angularFormMessages').directive('afField', function () {
       // Object for storing extra message data such as message type
       this.$messages = {};
 
-      this.setError = setMessage('error');
-      this.setWarning = setMessage('warning');
-      this.setInfo = setMessage('info');
-      this.setSuccess = setMessage('success');
+      this.setError = setMessage(MESSAGE_TYPES[3]);
+      this.setWarning = setMessage(MESSAGE_TYPES[2]);
+      this.setInfo = setMessage(MESSAGE_TYPES[1]);
+      this.setSuccess = setMessage(MESSAGE_TYPES[0]);
     },
     link: function linkFn($scope, elem, attrs, ctrls) {
       var ngModel = ctrls[0];
@@ -65,10 +54,10 @@ angular.module('angularFormMessages').directive('afField', function () {
           // The message type is stored in afField.$messages when for example afField.setError has been called, additionally to ngModel.$setValidity
           messages.push({
             message: key,
-            type: (afField.$messages[key] && afField.$messages[key].type) || 'error'
+            type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
           });
         });
-        submit.validate(fieldWrap.messageId, messages);
+        submit.validate(fieldWrap.messageId, messages, MessageService.determineMessageType(messages));
       }
 
       /**
@@ -88,7 +77,7 @@ angular.module('angularFormMessages').directive('afField', function () {
       $scope.$on('validate', updateValidation);
     }
   };
-});
+}]);
 
 angular.module('angularFormMessages').directive('afFieldWrap', function () {
   return {
@@ -114,19 +103,37 @@ angular.module('angularFormMessages').directive('afFieldWrap', function () {
   };
 });
 
-angular.module('angularFormMessages', []);
+angular.module('angularFormMessages')
+  .directive('afMessage', function () {
+    return {
+      require: '^afFieldWrap',
+      scope: true,
+      link: function linkFn($scope, elem, attrs, afFieldWrapCtrl) {
+        $scope.$on('validation', function (event, messageId, messages) {
+          if (messageId === afFieldWrapCtrl.messageId) {
+            $scope.messages = messages;
+          }
+        });
+      }
+    };
+  });
 
-angular.module('angularFormMessages').directive('afSubmit', function () {
+angular.module('angularFormMessages', []);
+angular.module('angularFormMessagesBootstrap', ['angularFormMessages']);
+
+angular.module('angularFormMessages').directive('afSubmit', ["MessageService", function (
+  MessageService
+) {
 
   return {
     require: 'afSubmit',
     controller: ["$scope", function afSubmitController($scope) {
       this.validations = {};
 
-      this.validate = function (messageId, errors) {
+      this.validate = function (messageId, errors, messageType) {
         this.validations[messageId] = errors;
         $scope.validations = this.validations; // Temp
-        $scope.$broadcast('validation', messageId, errors);
+        $scope.$broadcast('validation', messageId, errors, messageType);
       };
 
       this.isValid = function () {
@@ -152,8 +159,8 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
         $scope.$apply(function () {
 
           function processErrors(result) {
-            angular.forEach(result.validation, function (errors, messageId) {
-              submit.validate(messageId, errors);
+            angular.forEach(result.validation, function (messages, messageId) {
+              submit.validate(messageId, messages, MessageService.determineMessageType(messages));
             });
           }
 
@@ -183,7 +190,7 @@ angular.module('angularFormMessages').directive('afSubmit', function () {
     }
   };
 
-});
+}]);
 
 angular.module('angularFormMessages').directive('afSubmitButton', function () {
   return {
@@ -194,3 +201,40 @@ angular.module('angularFormMessages').directive('afSubmitButton', function () {
     }
   };
 });
+
+angular.module('angularFormMessages')
+  .constant('MESSAGE_TYPES', ['SUCCESS', 'INFO', 'WARNING', 'ERROR'])
+  .factory('MessageService', ["MESSAGE_TYPES", function (MESSAGE_TYPES) {
+    return {
+      /**
+       * Determine the message type with the highest severity from a list of messages
+       * @param {Object[]} messages
+       * @returns {string} message type with the highest severity
+       */
+      determineMessageType: function (messages) {
+        var severityIndex = -1;
+        angular.forEach(messages, function (message) {
+          var index = MESSAGE_TYPES.indexOf(message.type);
+          if (index > severityIndex) {
+            severityIndex = index;
+          }
+        });
+        return severityIndex === -1 ? undefined : MESSAGE_TYPES[severityIndex];
+      }
+    };
+  }]);
+
+angular.module('angularFormMessages').run(['$templateCache', function($templateCache) {
+  'use strict';
+
+  $templateCache.put('templates/messageDirective.html',
+    "<span class=\"glyphicon form-control-feedback\" ng-class=\"icon\" aria-hidden=\"true\" ng-if=\"messageType\"></span>\n" +
+    "<span class=\"sr-only\">({{messageType}}))</span>\n" +
+    "<div class=\"alert help-block\" ng-class=\"message.alertClass\" ng-style=\"{ 'margin-bottom': $last ? undefined : '0px' }\" role=\"alert\" ng-repeat=\"message in messages track by $index\">\n" +
+    "  <span class=\"glyphicon\" ng-class=\"message.icon\" aria-hidden=\"true\"></span>\n" +
+    "  <span class=\"sr-only\">{{message.type}}:</span>\n" +
+    "  {{message.message}}\n" +
+    "</div>\n"
+  );
+
+}]);
