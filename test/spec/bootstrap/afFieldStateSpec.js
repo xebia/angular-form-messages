@@ -56,6 +56,19 @@ describe('afFieldState', function () {
   beforeEach(function () {
     mox
       .module('angularFormMessagesBootstrap')
+      .mockServices('MessageService')
+      .setupResults(function () {
+        return {
+          MessageService: {
+            validation: function (messageId, callback) {
+              // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
+              mox.inject('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
+                callback(messages, messageType);
+              });
+            }
+          }
+        };
+      })
       .run();
     inj = mox.inject('$rootScope', 'MESSAGE_TYPES');
 
@@ -166,23 +179,6 @@ describe('afFieldState', function () {
           it('should remove the "has-error" class', expectHasNoError);
         });
       });
-
     });
-
-    describe('when it is not meant for this field wrap', function () {
-
-      it('should not add the "has-error" and "has-feedback" class', function () {
-        errorSetup.call(this, 'user.other');
-        expectHasNoFeedback.call(this);
-        expectHasNoError.call(this);
-      });
-
-      it('should not remove the "has-error" and "has-feedback" class', function () {
-        noMessageSetup.call(this, 'user.other');
-        expectHasFeedback.call(this);
-        expectHasError.call(this);
-      });
-    });
-
   });
 });
