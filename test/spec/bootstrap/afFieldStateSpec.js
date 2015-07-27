@@ -50,8 +50,7 @@ describe('afFieldState', function () {
     expectHasNoError = _.partial(checkMessageClass, 'has-error', true),
     expectHasNoWarning = _.partial(checkMessageClass, 'has-warning', true),
     expectHasNoInfo = _.partial(checkMessageClass, 'has-info', true),
-    expectHasNoSuccess = _.partial(checkMessageClass, 'has-success', true),
-    expectHasNoFeedback = _.partial(checkMessageClass, 'has-feedback', true);
+    expectHasNoSuccess = _.partial(checkMessageClass, 'has-success', true);
 
   beforeEach(function () {
     mox
