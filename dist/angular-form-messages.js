@@ -4,7 +4,7 @@ angular.module('angularFormMessages').directive('afField', ["MESSAGE_TYPES", "Me
 ) {
   return {
     priority: 100,
-    require: ['ngModel', 'afField', '^afFieldWrap', '^afSubmit', '^form'],
+    require: ['ngModel', 'afField', '^afSubmit', '^form'],
     controller: function () {
       function setMessage(type) {
         return function (key) {
@@ -25,9 +25,8 @@ angular.module('angularFormMessages').directive('afField', ["MESSAGE_TYPES", "Me
     link: function linkFn($scope, elem, attrs, ctrls) {
       var ngModel = ctrls[0];
       var afField = ctrls[1];
-      var fieldWrap = ctrls[2];
-      var submit = ctrls[3];
-      var form = ctrls[4];
+      var submit = ctrls[2];
+      var form = ctrls[3];
 
       function hasValidationChangedAndDirty() {
         if (ngModel.$dirty && submit.triggerOn === 'change') {
@@ -57,7 +56,7 @@ angular.module('angularFormMessages').directive('afField', ["MESSAGE_TYPES", "Me
             type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
           });
         });
-        submit.validate(fieldWrap.messageId, messages, MessageService.determineMessageType(messages));
+        submit.validate(attrs.name, messages, MessageService.determineMessageType(messages));
       }
 
       /**
@@ -65,7 +64,7 @@ angular.module('angularFormMessages').directive('afField', ["MESSAGE_TYPES", "Me
        */
       function cleanValidation(viewValue) {
         if (submit.triggerOn === 'submit') {
-          submit.validate(fieldWrap.messageId, []);
+          submit.validate(attrs.name, []);
         }
         return viewValue;
       }
@@ -79,44 +78,19 @@ angular.module('angularFormMessages').directive('afField', ["MESSAGE_TYPES", "Me
   };
 }]);
 
-angular.module('angularFormMessages').directive('afFieldWrap', function () {
-  return {
-    require: ['afFieldWrap', '^form'],
-    controller: function afFieldWrapController() {
-    },
-    compile: function () {
-      return {
-        // Use a pre-link function because we want to make sure that the messageId is on the controller before the
-        // (post-)link function of the afFieldElements have ran
-        pre: function linkFn($scope, elem, attrs, ctrls) {
-          var
-            fieldWrap = ctrls[0],
-            form = ctrls[1];
-
-          fieldWrap.messageId = attrs.afFieldWrap;
-
-          // isolateScope breaks scope inheritance of the formCtrl, so we put the formCtrl on the scope manually
-          $scope[form.$name] = form;
-        }
-      };
-    }
-  };
-});
-
 angular.module('angularFormMessages')
-  .directive('afMessage', function () {
+  .directive('afMessage', ["MessageService", function (
+    MessageService
+  ) {
     return {
-      require: '^afFieldWrap',
       scope: true,
-      link: function linkFn($scope, elem, attrs, afFieldWrapCtrl) {
-        $scope.$on('validation', function (event, messageId, messages) {
-          if (messageId === afFieldWrapCtrl.messageId) {
-            $scope.messages = messages;
-          }
+      link: function linkFn($scope, elem, attrs) {
+        MessageService.validation(attrs.afMessage, function (messages) {
+          $scope.messages = messages;
         });
       }
     };
-  });
+  }]);
 
 angular.module('angularFormMessages', []);
 angular.module('angularFormMessagesBootstrap', ['angularFormMessages']);
@@ -204,7 +178,10 @@ angular.module('angularFormMessages').directive('afSubmitButton', function () {
 
 angular.module('angularFormMessages')
   .constant('MESSAGE_TYPES', ['SUCCESS', 'INFO', 'WARNING', 'ERROR'])
-  .factory('MessageService', ["MESSAGE_TYPES", function (MESSAGE_TYPES) {
+  .factory('MessageService', ["$rootScope", "MESSAGE_TYPES", function (
+    $rootScope,
+    MESSAGE_TYPES
+  ) {
     return {
       /**
        * Determine the message type with the highest severity from a list of messages
@@ -220,6 +197,15 @@ angular.module('angularFormMessages')
           }
         });
         return severityIndex === -1 ? undefined : MESSAGE_TYPES[severityIndex];
+      },
+
+      validation: function (messageId, callback) {
+
+        $rootScope.$on('validation', function (event, validationMessageId, messages, messageType) {
+          if (validationMessageId === messageId) {
+            callback(messages, messageType);
+          }
+        });
       }
     };
   }]);
