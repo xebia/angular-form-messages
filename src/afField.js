@@ -4,7 +4,7 @@ angular.module('angularFormMessages').directive('afField', function (
 ) {
   return {
     priority: 100,
-    require: ['ngModel', 'afField', '^afFieldWrap', '^afSubmit', '^form'],
+    require: ['ngModel', 'afField', '^afSubmit', '^form'],
     controller: function () {
       function setMessage(type) {
         return function (key) {
@@ -25,9 +25,8 @@ angular.module('angularFormMessages').directive('afField', function (
     link: function linkFn($scope, elem, attrs, ctrls) {
       var ngModel = ctrls[0];
       var afField = ctrls[1];
-      var fieldWrap = ctrls[2];
-      var submit = ctrls[3];
-      var form = ctrls[4];
+      var submit = ctrls[2];
+      var form = ctrls[3];
 
       function hasValidationChangedAndDirty() {
         if (ngModel.$dirty && submit.triggerOn === 'change') {
@@ -57,7 +56,7 @@ angular.module('angularFormMessages').directive('afField', function (
             type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
           });
         });
-        submit.validate(fieldWrap.messageId, messages, MessageService.determineMessageType(messages));
+        submit.validate(attrs.name, messages, MessageService.determineMessageType(messages));
       }
 
       /**
@@ -65,7 +64,7 @@ angular.module('angularFormMessages').directive('afField', function (
        */
       function cleanValidation(viewValue) {
         if (submit.triggerOn === 'submit') {
-          submit.validate(fieldWrap.messageId, []);
+          submit.validate(attrs.name, []);
         }
         return viewValue;
       }

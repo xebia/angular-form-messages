@@ -4,6 +4,19 @@ describe('afError', function () {
   beforeEach(function () {
     mox
       .module('angularFormMessages')
+      .mockServices('MessageService')
+      .setupResults(function () {
+        return {
+          MessageService: {
+            validation: function (messageId, callback) {
+              // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
+              mox.inject('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
+                callback(messages, messageType);
+              });
+            }
+          }
+        };
+      })
       .run();
 
     inject(function (_$rootScope_) {
@@ -15,24 +28,10 @@ describe('afError', function () {
         { message: 'Initial message', type: 'error' } // Directive has no isolate scope, so we can set values on the parent scope initially
       ]
     });
-    this.element = extendedElement(
-      compileHtml('<form name="userForm"><div af-field-wrap="user.name"><div af-message></div></div></form>'),
-      { error: '[af-message]' }
-    );
+    compileHtml('<div af-message="user.name"></div>');
   });
 
   describe('when a validation event is broadcasted', function () {
-    describe('the the event is not addressed to this field wrap', function () {
-      beforeEach(function () {
-        $rootScope.$broadcast('validation', 'user.other', []);
-        this.$scope.$digest();
-      });
-
-      it('should do nothing', function () {
-        expect(this.element.find('[af-message]').scope().messages).toEqual([{ message: 'Initial message', type: 'error' }]);
-      });
-    });
-
     describe('when the field is valid', function () {
       beforeEach(function () {
         $rootScope.$broadcast('validation', 'user.name', []);
@@ -40,7 +39,7 @@ describe('afError', function () {
       });
 
       it('should remove the message', function () {
-        expect(this.element.find('[af-message]').scope().messages).toEqual([]);
+        expect(this.element.scope().messages).toEqual([]);
       });
     });
 
@@ -51,7 +50,7 @@ describe('afError', function () {
       });
 
       it('should set the message on the scope', function () {
-        expect(this.element.find('[af-message]').scope().messages).toEqual([{ message: 'New error', type: 'error' }]);
+        expect(this.element.scope().messages).toEqual([{ message: 'New error', type: 'error' }]);
       });
     });
   });
