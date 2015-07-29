@@ -9,6 +9,7 @@ describe('afSubmit', function () {
         }]
       }
     },
+    form,
     MESSAGE_TYPES,
     submit;
 
@@ -33,7 +34,7 @@ describe('afSubmit', function () {
     });
     compileWithTrigger(this.$scope, 'change');
     submit = this.element.controller('afSubmit');
-    spyOn(submit, 'validate').and.callThrough();
+    form = this.element.controller('form');
     this.$scope.submit.and.returnValue(reject(callbackResult));
   });
 
@@ -113,10 +114,6 @@ describe('afSubmit', function () {
             this.element.submit();
           });
 
-          it('should save the validation results', function () {
-            expect(submit.validations).toEqual(callbackResult.validation);
-          });
-
           it('sends a validation event per server side validation', function () {
             expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'address', [], MESSAGE_TYPES[0]);
             expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
@@ -135,7 +132,7 @@ describe('afSubmit', function () {
         });
 
         it('does no further processing', function () {
-          expect(submit.validate).not.toHaveBeenCalled();
+          expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation');
         });
 
         it('should not set $scope.isSubmitting', function () {
@@ -146,13 +143,7 @@ describe('afSubmit', function () {
 
     describe('when the form is client side invalid', function () {
       beforeEach(function () {
-        submit.validations = {
-          'user.name': [{
-            isValid: true
-          }, {
-            isValid: false
-          }]
-        };
+        form.$valid = false;
         this.element.submit();
       });
 
@@ -163,9 +154,7 @@ describe('afSubmit', function () {
 
     describe('when the form has only empty errors', function () {
       beforeEach(function () {
-        submit.validations = {
-          'user.name': []
-        };
+        form.$valid = true;
         this.element.submit();
       });
 

@@ -1,4 +1,5 @@
-angular.module('angularFormMessages').directive('afField', ["MESSAGE_TYPES", "MessageService", function (
+angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSAGE_TYPES", "MessageService", function (
+  $rootScope,
   MESSAGE_TYPES,
   MessageService
 ) {
@@ -56,7 +57,8 @@ angular.module('angularFormMessages').directive('afField', ["MESSAGE_TYPES", "Me
             type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
           });
         });
-        submit.validate(attrs.name, messages, MessageService.determineMessageType(messages));
+
+        $rootScope.$broadcast('validation', attrs.name, messages, MessageService.determineMessageType(messages));
       }
 
       /**
@@ -64,7 +66,7 @@ angular.module('angularFormMessages').directive('afField', ["MESSAGE_TYPES", "Me
        */
       function cleanValidation(viewValue) {
         if (submit.triggerOn === 'submit') {
-          submit.validate(attrs.name, []);
+          $rootScope.$broadcast('validation', attrs.name, []);
         }
         return viewValue;
       }
@@ -101,28 +103,14 @@ angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "Mess
 ) {
 
   return {
-    require: 'afSubmit',
-    controller: ["$scope", function afSubmitController($scope) {
-      this.validations = {};
+    require: ['form', 'afSubmit'],
+    controller: function afSubmitController() {
+    },
+    link: function ($scope, elem, attrs, ctrls) {
+      var
+        form = ctrls[0],
+        submit = ctrls[1];
 
-      this.validate = function (messageId, errors, messageType) {
-        this.validations[messageId] = errors;
-        $scope.validations = this.validations; // Temp
-        $rootScope.$broadcast('validation', messageId, errors, messageType);
-      };
-
-      this.isValid = function () {
-        for (var messageId in this.validations) {
-          var messages = this.validations[messageId];
-          if (messages.length) {
-            return false;
-          }
-        }
-        return true;
-      };
-
-    }],
-    link: function ($scope, elem, attrs, submit) {
       function isPromise(obj) {
         return angular.isObject(obj) && typeof (obj.then) === 'function';
       }
@@ -135,11 +123,11 @@ angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "Mess
 
           function processErrors(result) {
             angular.forEach(result.validation, function (messages, messageId) {
-              submit.validate(messageId, messages, MessageService.determineMessageType(messages));
+              $rootScope.$broadcast('validation', messageId, messages, MessageService.determineMessageType(messages));
             });
           }
 
-          if (!submit.isValid()) {
+          if (!form.$valid) {
             return;
           }
 

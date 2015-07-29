@@ -4,28 +4,14 @@ angular.module('angularFormMessages').directive('afSubmit', function (
 ) {
 
   return {
-    require: 'afSubmit',
-    controller: function afSubmitController($scope) {
-      this.validations = {};
-
-      this.validate = function (messageId, errors, messageType) {
-        this.validations[messageId] = errors;
-        $scope.validations = this.validations; // Temp
-        $rootScope.$broadcast('validation', messageId, errors, messageType);
-      };
-
-      this.isValid = function () {
-        for (var messageId in this.validations) {
-          var messages = this.validations[messageId];
-          if (messages.length) {
-            return false;
-          }
-        }
-        return true;
-      };
-
+    require: ['form', 'afSubmit'],
+    controller: function afSubmitController() {
     },
-    link: function ($scope, elem, attrs, submit) {
+    link: function ($scope, elem, attrs, ctrls) {
+      var
+        form = ctrls[0],
+        submit = ctrls[1];
+
       function isPromise(obj) {
         return angular.isObject(obj) && typeof (obj.then) === 'function';
       }
@@ -38,11 +24,11 @@ angular.module('angularFormMessages').directive('afSubmit', function (
 
           function processErrors(result) {
             angular.forEach(result.validation, function (messages, messageId) {
-              submit.validate(messageId, messages, MessageService.determineMessageType(messages));
+              $rootScope.$broadcast('validation', messageId, messages, MessageService.determineMessageType(messages));
             });
           }
 
-          if (!submit.isValid()) {
+          if (!form.$valid) {
             return;
           }
 
