@@ -1,4 +1,9 @@
 angular.module('angularFormMessagesBootstrap')
+/**
+ * This directive shows the 'has-error', 'has-warning', 'has-info' or 'has-success' when there is one message on the field.
+ * Where there are multiple messages, no class is added.
+ * When there is no message (the field is valid) and showSuccess is true, show the 'has-success' class.
+ */
   .directive('fieldState', function (
     MESSAGE_TYPES,
     MessageService
@@ -11,16 +16,11 @@ angular.module('angularFormMessagesBootstrap')
           angular.forEach(MESSAGE_TYPES, function (type) {
             attrs.$removeClass('has-' + type.toLowerCase());
           });
-          attrs.$removeClass('has-feedback');
 
           if (messageType && messages.length === 1) {
             attrs.$addClass('has-' + messageType.toLowerCase());
-            attrs.$addClass('has-feedback');
-          } else if (afSubmitCtrl.showSuccess) {
-            if (!messages.length) {
-              attrs.$addClass('has-success');
-            }
-            attrs.$addClass('has-feedback');
+          } else if (afSubmitCtrl.showSuccess && !messages.length) {
+            attrs.$addClass('has-success');
           }
         });
       }
