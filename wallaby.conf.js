@@ -21,6 +21,7 @@ module.exports = function () {
 
       // Scripts
       'src/afModule.js',
+      'src/bootstrap/afModule.js',
       'src/**/*.js',
       'templates/**/*.html'
     ],

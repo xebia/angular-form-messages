@@ -25,6 +25,7 @@ module.exports = function(config) {
       'bower_components/lodash/lodash.js',
       // endbower
       'src/afModule.js',
+      'src/bootstrap/afModule.js',
       'src/**/*.js',
       'templates/**/*.html',
       'test/mock/*.js',

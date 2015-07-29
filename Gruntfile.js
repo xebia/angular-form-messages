@@ -125,8 +125,7 @@ module.exports = function (grunt) {
           {
             dot: true,
             src: [
-              '<%= paths.dist %>/**/*',
-              '<%= paths.tmp %>/**/*'
+              '<%= paths.dist %>/**/*'
             ]
           }
         ]
@@ -157,19 +156,26 @@ module.exports = function (grunt) {
       options: {
         module: 'angularFormMessages'
       },
-      dist: {
-        src: 'templates/*.html',
-        dest: '<%= paths.src %>/templateCache.js'
+      bootstrap: {
+        src: 'templates/bootstrap/*.html',
+        dest: '<%= paths.src %>/bootstrap/templateCache.js'
       }
     },
 
     concat: {
       dist: {
         src: [
-          '<%= paths.src %>/*.js',
-          '<%= paths.tmp %>/*.js'
+          '<%= paths.src %>/afModule.js',
+          '<%= paths.src %>/*.js'
         ],
         dest: '<%= paths.dist %>/<%= bwr.name %>.js'
+      },
+      bootstrap: {
+        src: [
+          '<%= paths.src %>/bootstrap/afModule.js',
+          '<%= paths.src %>/bootstrap/*.js'
+        ],
+        dest: '<%= paths.dist %>/<%= bwr.name %>-bootstrap.js'
       }
     },
 
@@ -177,7 +183,14 @@ module.exports = function (grunt) {
       dist: {
         expand: true,
         cwd: 'dist/', // 'dist' when using concat, else 'src/'
-        src: '*.js',
+        src: '<%= bwr.name %>.js',
+        dest: 'dist',
+        ext: '.min.js'
+      },
+      bootstrap: {
+        expand: true,
+        cwd: 'dist/', // 'dist' when using concat, else 'src/'
+        src: '<%= bwr.name %>-bootstrap.js',
         dest: 'dist',
         ext: '.min.js'
       }
@@ -185,7 +198,10 @@ module.exports = function (grunt) {
 
     ngAnnotate: {
       dist: {
-        files: { 'dist/<%= bwr.name %>.js': 'dist/<%= bwr.name %>.js' }
+        files: {
+          'dist/<%= bwr.name %>.js': 'dist/<%= bwr.name %>.js',
+          'dist/<%= bwr.name %>-bootstrap.js': 'dist/<%= bwr.name %>-bootstrap.js'
+        }
       }
     },
 

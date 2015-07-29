@@ -9,7 +9,7 @@ describe('messageDirective', function () {
       .module(
         'angularFormMessages',
         'angularFormMessagesBootstrap',
-        'templates/messageDirective.html'
+        'templates/bootstrap/messageDirective.html'
       )
       .mockServices('MessageService')
       .setupResults(function () {
