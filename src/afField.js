@@ -1,4 +1,5 @@
 angular.module('angularFormMessages').directive('afField', function (
+  $rootScope,
   MESSAGE_TYPES,
   MessageService
 ) {
@@ -56,7 +57,8 @@ angular.module('angularFormMessages').directive('afField', function (
             type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
           });
         });
-        submit.validate(attrs.name, messages, MessageService.determineMessageType(messages));
+
+        $rootScope.$broadcast('validation', attrs.name, messages, MessageService.determineMessageType(messages));
       }
 
       /**
@@ -64,7 +66,7 @@ angular.module('angularFormMessages').directive('afField', function (
        */
       function cleanValidation(viewValue) {
         if (submit.triggerOn === 'submit') {
-          submit.validate(attrs.name, []);
+          $rootScope.$broadcast('validation', attrs.name, []);
         }
         return viewValue;
       }
