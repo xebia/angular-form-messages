@@ -5,7 +5,7 @@ angular.module('angularFormMessages')
     return {
       scope: true,
       link: function linkFn($scope, elem, attrs) {
-        MessageService.validation(attrs.afMessage, function (messages) {
+        MessageService.validation(attrs.afMessage || attrs.afMessageId, function (messages) {
           $scope.messages = messages;
         });
       }

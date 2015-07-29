@@ -7,7 +7,7 @@ angular.module('angularFormMessagesBootstrap')
       require: '^afSubmit',
       link: function ($scope, elem, attrs, afSubmitCtrl) {
 
-        MessageService.validation(attrs.afFeedback, function (messages) {
+        MessageService.validation(attrs.afFeedback || attrs.afMessageId, function (messages) {
           if (messages.length || afSubmitCtrl.showSuccess) {
             attrs.$addClass('has-feedback');
           } else {

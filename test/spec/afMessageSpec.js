@@ -31,6 +31,23 @@ describe('afError', function () {
     compileHtml('<div af-message="user.name"></div>');
   });
 
+  describe('on initialization', function () {
+    it('should register the validation event listener via the MessageService', function () {
+      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+    });
+
+    describe('when the messageId is passed via the messageId attribute', function () {
+      beforeEach(function () {
+        mox.get.MessageService.validation.calls.reset();
+        compileHtml('<div af-message af-message-id="user.name"></div>');
+      });
+
+      it('should register the validation event listener via the MessageService', function () {
+        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+      });
+    });
+  });
+
   describe('when a validation event is broadcasted', function () {
     describe('when the field is valid', function () {
       beforeEach(function () {

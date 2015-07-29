@@ -35,7 +35,7 @@ describe('messageDirective', function () {
     ];
 
     createScope();
-    this.element = addSelectors(compileHtml('<form><div af-message="user.name"></div></form>'), {
+    this.element = addSelectors(compileHtml('<div af-message="user.name"></div>'), {
       feedbackIcon: '.form-control-feedback',
       alerts: '.alert',
       alert: {
@@ -56,6 +56,21 @@ describe('messageDirective', function () {
 
     it('should show no feedback icon', function () {
       expect(this.element.feedbackIcon()).not.toExist();
+    });
+
+    it('should register the validation event listener via the MessageService', function () {
+      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+    });
+
+    describe('when the messageId is passed via the messageId attribute', function () {
+      beforeEach(function () {
+        mox.get.MessageService.validation.calls.reset();
+        compileHtml('<div af-message af-message-id="user.name"></div>');
+      });
+
+      it('should register the validation event listener via the MessageService', function () {
+        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+      });
     });
   });
 

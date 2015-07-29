@@ -12,7 +12,7 @@ angular.module('angularFormMessagesBootstrap')
       require: '^afSubmit',
       link: function ($scope, elem, attrs, afSubmitCtrl) {
 
-        MessageService.validation(attrs.afFieldState, function (messages, messageType) {
+        MessageService.validation(attrs.afFieldState || attrs.afMessageId, function (messages, messageType) {
           angular.forEach(MESSAGE_TYPES, function (type) {
             attrs.$removeClass('has-' + type.toLowerCase());
           });

@@ -9,7 +9,7 @@ angular.module('angularFormMessagesBootstrap')
       require: '^afSubmit',
       link: function ($scope, elem, attrs, afSubmitCtrl) {
 
-        MessageService.validation(attrs.afFeedback, function (messages) {
+        MessageService.validation(attrs.afFeedback || attrs.afMessageId, function (messages) {
           if (messages.length || afSubmitCtrl.showSuccess) {
             attrs.$addClass('has-feedback');
           } else {
@@ -34,7 +34,7 @@ angular.module('angularFormMessagesBootstrap')
       require: '^afSubmit',
       link: function ($scope, elem, attrs, afSubmitCtrl) {
 
-        MessageService.validation(attrs.afFieldState, function (messages, messageType) {
+        MessageService.validation(attrs.afFieldState || attrs.afMessageId, function (messages, messageType) {
           angular.forEach(MESSAGE_TYPES, function (type) {
             attrs.$removeClass('has-' + type.toLowerCase());
           });
@@ -77,7 +77,7 @@ angular.module('angularFormMessagesBootstrap')
       restrict: 'A',
       templateUrl: 'templates/bootstrap/messageDirective.html',
       link: function ($scope, elem, attrs) {
-        MessageService.validation(attrs.afMessage, function (messages, messageType) {
+        MessageService.validation(attrs.afMessage || attrs.afMessageId, function (messages, messageType) {
           // Feedback
           $scope.messageType = messageType || MESSAGE_TYPES[0];
           $scope.icon = feedbackIcons[$scope.messageType];

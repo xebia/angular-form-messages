@@ -26,7 +26,7 @@ angular.module('angularFormMessagesBootstrap')
       restrict: 'A',
       templateUrl: 'templates/bootstrap/messageDirective.html',
       link: function ($scope, elem, attrs) {
-        MessageService.validation(attrs.afMessage, function (messages, messageType) {
+        MessageService.validation(attrs.afMessage || attrs.afMessageId, function (messages, messageType) {
           // Feedback
           $scope.messageType = messageType || MESSAGE_TYPES[0];
           $scope.icon = feedbackIcons[$scope.messageType];

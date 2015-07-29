@@ -70,6 +70,19 @@ describe('afFeedback', function () {
       expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
     });
 
+    describe('when the messageId is passed via the messageId attribute', function () {
+      beforeEach(function () {
+        mox.get.MessageService.validation.calls.reset();
+        compileHtml('<form name="userForm" af-submit>' +
+                     '<div af-feedback af-message-id="user.name"></div>' +
+                     '</form>', this.$scope).find('[af-feedback]');
+      });
+
+      it('should register the validation event listener via the MessageService', function () {
+        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+      });
+    });
+
     describe('when showSuccess is true on the afSubmit directive', function () {
       beforeEach(_.partial(showSuccess, true));
 
