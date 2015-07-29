@@ -6,7 +6,7 @@ describe('afFeedback', function () {
   }
 
   function setup(messageType, messageCount, fieldName) {
-    this.element[(messageType ? 'remove' : 'add') + 'Class']('has-feedback');
+    this.element.feedback()[(messageType ? 'remove' : 'add') + 'Class']('has-feedback');
 
     var messages = _.map(_.range(messageCount), function (i) {
       return {
@@ -18,7 +18,7 @@ describe('afFeedback', function () {
   }
 
   function checkMessageClass(className, invert) {
-    var ex = expect(this.element);
+    var ex = expect(this.element.feedback());
     if (invert) {
       ex = ex.not;
     }
@@ -52,18 +52,18 @@ describe('afFeedback', function () {
         };
       })
       .run();
-    inj = mox.inject('$rootScope', 'MESSAGE_TYPES');
 
+    inj = mox.inject('$rootScope', 'MESSAGE_TYPES');
     createScope();
-    this.element = compileHtml('<form name="userForm" af-submit>' +
-                                 '<div af-feedback="user.name"></div>' +
-                               '</form>', this.$scope).find('[af-feedback]');
+    addSelectors(compileHtml('<form af-submit><div af-feedback="user.name"></div></form>'), {
+      feedback: '[af-feedback]'
+    });
   });
 
   describe('when a validation event has been fired', function () {
 
     function showSuccess(value) {
-      this.element.parent().controller('afSubmit').showSuccess = value;
+      this.element.controller('afSubmit').showSuccess = value;
     }
 
     it('should register the validation event listener via the MessageService', function () {
@@ -73,9 +73,7 @@ describe('afFeedback', function () {
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
         mox.get.MessageService.validation.calls.reset();
-        compileHtml('<form name="userForm" af-submit>' +
-                     '<div af-feedback af-message-id="user.name"></div>' +
-                     '</form>', this.$scope).find('[af-feedback]');
+        compileHtml('<form af-submit><div af-feedback af-message-id="user.name"></div></form>');
       });
 
       it('should register the validation event listener via the MessageService', function () {

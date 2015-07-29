@@ -1,4 +1,4 @@
-describe('afError', function () {
+describe('afMessage', function () {
   var $rootScope;
 
   beforeEach(function () {
@@ -6,11 +6,12 @@ describe('afError', function () {
       .module('angularFormMessages')
       .mockServices('MessageService')
       .setupResults(function () {
+        $rootScope = mox.inject('$rootScope');
         return {
           MessageService: {
             validation: function (messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
-              mox.inject('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
+              $rootScope.$on('validation', function (event, validationMessageId, messages, messageType) {
                 callback(messages, messageType);
               });
             }
@@ -18,10 +19,6 @@ describe('afError', function () {
         };
       })
       .run();
-
-    inject(function (_$rootScope_) {
-      $rootScope = _$rootScope_;
-    });
 
     createScope({
       messages: [
@@ -52,7 +49,6 @@ describe('afError', function () {
     describe('when the field is valid', function () {
       beforeEach(function () {
         $rootScope.$broadcast('validation', 'user.name', []);
-        this.$scope.$digest();
       });
 
       it('should remove the message', function () {
@@ -63,7 +59,6 @@ describe('afError', function () {
     describe('when the field is invalid', function () {
       beforeEach(function () {
         $rootScope.$broadcast('validation', 'user.name', [{ message: 'New error', type: 'error' }]);
-        this.$scope.$digest();
       });
 
       it('should set the message on the scope', function () {

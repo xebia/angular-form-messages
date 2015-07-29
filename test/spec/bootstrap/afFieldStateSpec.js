@@ -7,9 +7,9 @@ describe('afFieldState', function () {
 
   function setup(messageType, messageCount, fieldName) {
     if (messageType) {
-      this.element.removeClass('has-' + messageType.toLowerCase());
+      this.element.fieldState().removeClass('has-' + messageType.toLowerCase());
     }
-    this.element.addClass(messageType === inj.MESSAGE_TYPES[3] ? 'has-warning has-info has-success' : 'has-error');
+    this.element.fieldState().addClass(messageType === inj.MESSAGE_TYPES[3] ? 'has-warning has-info has-success' : 'has-error');
 
     var messages = _.map(_.range(messageCount), function (i) {
       return {
@@ -21,7 +21,7 @@ describe('afFieldState', function () {
   }
 
   function checkMessageClass(className, invert) {
-    var ex = expect(this.element);
+    var ex = expect(this.element.fieldState());
     if (invert) {
       ex = ex.not;
     }
@@ -65,18 +65,18 @@ describe('afFieldState', function () {
         };
       })
       .run();
-    inj = mox.inject('$rootScope', 'MESSAGE_TYPES');
 
+    inj = mox.inject('$rootScope', 'MESSAGE_TYPES');
     createScope();
-    this.element = compileHtml('<form name="userForm" af-submit>' +
-                                 '<div af-field-state="user.name"></div>' +
-                               '</form>', this.$scope).find('[af-field-state]');
+    addSelectors(compileHtml('<form af-submit><div af-field-state="user.name"></div></form>'), {
+      fieldState: '[af-field-state]'
+    });
   });
 
   describe('when a validation event has been fired', function () {
 
     function showSuccess(value) {
-      this.element.parent().controller('afSubmit').showSuccess = value;
+      this.element.controller('afSubmit').showSuccess = value;
     }
 
     it('should register the validation event listener via the MessageService', function () {
@@ -86,9 +86,7 @@ describe('afFieldState', function () {
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
         mox.get.MessageService.validation.calls.reset();
-        compileHtml('<form name="userForm" af-submit>' +
-                    '<div af-field-state af-message-id="user.name"></div>' +
-                    '</form>', this.$scope).find('[af-field-state]');
+        compileHtml('<form af-submit><div af-field-state af-message-id="user.name"></div></form>');
       });
 
       it('should register the validation event listener via the MessageService', function () {

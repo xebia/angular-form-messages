@@ -7,7 +7,6 @@ describe('messageDirective', function () {
   beforeEach(function () {
     mox
       .module(
-        'angularFormMessages',
         'angularFormMessagesBootstrap',
         'templates/bootstrap/messageDirective.html'
       )
@@ -28,7 +27,7 @@ describe('messageDirective', function () {
 
     inj = mox.inject('$rootScope', 'MESSAGE_TYPES');
     messages = [
-      { message: 'This is the message', type: inj.MESSAGE_TYPES[0] },
+      { message: 'This is the first message', type: inj.MESSAGE_TYPES[0] },
       { message: 'This is the second message', type: inj.MESSAGE_TYPES[1] },
       { message: 'This is the third message', type: inj.MESSAGE_TYPES[2] },
       { message: 'This is the fourth message', type: inj.MESSAGE_TYPES[3] }
