@@ -69,102 +69,103 @@ describe('afFieldState', function () {
 
     createScope();
     this.element = compileHtml('<form name="userForm" af-submit>' +
-                                 '<div field-state="user.name"></div>' +
-                               '</form>', this.$scope).find('[field-state]');
+                                 '<div af-field-state="user.name"></div>' +
+                               '</form>', this.$scope).find('[af-field-state]');
   });
 
   describe('when a validation event has been fired', function () {
 
-    describe('when it is meant for the field wrap with the modelPath attached to the event', function () {
+    function showSuccess(value) {
+      this.element.parent().controller('afSubmit').showSuccess = value;
+    }
 
-      function showSuccess(value) {
-        this.element.parent().controller('afSubmit').showSuccess = value;
-      }
+    it('should register the validation event listener via the MessageService', function () {
+      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+    });
 
-      describe('when showSuccess is true on the afSubmit directive', function () {
-        beforeEach(_.partial(showSuccess, true));
+    describe('when showSuccess is true on the afSubmit directive', function () {
+      beforeEach(_.partial(showSuccess, true));
 
-        describe('when the validation is "valid"', function () {
-          beforeEach(_.partial(noMessageSetup, 'user.name'));
+      describe('when the validation is "valid"', function () {
+        beforeEach(_.partial(noMessageSetup, 'user.name'));
 
-          it('should add the "has-success" class to the element', expectHasSuccess);
-          it('should remove the "has-error" class from the element', expectHasNoError);
-          it('should remove the "has-warning" class from the element', expectHasNoWarning);
-          it('should remove the "has-info" class from the element', expectHasNoInfo);
-        });
-
-        describe('when the validation is "error"', function () {
-          beforeEach(_.partial(errorSetup, 'user.name'));
-
-          it('should add the "has-error" class to the element', expectHasError);
-          it('should remove the "has-warning" class from the element', expectHasNoWarning);
-          it('should remove the "has-info" class from the element', expectHasNoInfo);
-          it('should remove the "has-success" class from the element', expectHasNoSuccess);
-        });
-
-        describe('when the validation is "warning"', function () {
-          beforeEach(_.partial(warningSetup, 'user.name'));
-
-          it('should add the "has-warning" class to the element', expectHasWarning);
-          it('should remove the "has-error" class from the element', expectHasNoError);
-          it('should remove the "has-info" class from the element', expectHasNoInfo);
-          it('should remove the "has-success" class from the element', expectHasNoSuccess);
-        });
-
-        describe('when the validation is "info"', function () {
-          beforeEach(_.partial(infoSetup, 'user.name'));
-
-          it('should add the "has-info" class to the element', expectHasInfo);
-          it('should remove the "has-error" class from the element', expectHasNoError);
-          it('should remove the "has-warning" class from the element', expectHasNoWarning);
-          it('should remove the "has-success" class from the element', expectHasNoSuccess);
-        });
-
-        describe('when the validation is "success"', function () {
-          beforeEach(_.partial(successSetup, 'user.name'));
-
-          it('should add the "has-success" class to the element', expectHasSuccess);
-          it('should remove the "has-error" class from the element', expectHasNoError);
-          it('should remove the "has-warning" class from the element', expectHasNoWarning);
-          it('should remove the "has-info" class from the element', expectHasNoInfo);
-        });
-
-        describe('when there are multiple validations', function () {
-          beforeEach(_.partial(successInfoSetup, 'user.name'));
-
-          it('should remove the "has-warning" class from the element', expectHasNoInfo);
-          it('should remove the "has-error" class from the element', expectHasNoError);
-          it('should remove the "has-warning" class from the element', expectHasNoWarning);
-          it('should remove the "has-success" class from the element', expectHasNoSuccess);
-        });
+        it('should add the "has-success" class to the element', expectHasSuccess);
+        it('should remove the "has-error" class from the element', expectHasNoError);
+        it('should remove the "has-warning" class from the element', expectHasNoWarning);
+        it('should remove the "has-info" class from the element', expectHasNoInfo);
       });
 
-      describe('when showSuccess is false on the afSubmit directive', function () {
-        beforeEach(_.partial(showSuccess, false));
+      describe('when the validation is "error"', function () {
+        beforeEach(_.partial(errorSetup, 'user.name'));
 
-        describe('when the validation is "valid"', function () {
-          beforeEach(_.partial(noMessageSetup, 'user.name'));
+        it('should add the "has-error" class to the element', expectHasError);
+        it('should remove the "has-warning" class from the element', expectHasNoWarning);
+        it('should remove the "has-info" class from the element', expectHasNoInfo);
+        it('should remove the "has-success" class from the element', expectHasNoSuccess);
+      });
 
-          it('should not add the "has-success" class', expectHasNoSuccess);
-        });
+      describe('when the validation is "warning"', function () {
+        beforeEach(_.partial(warningSetup, 'user.name'));
 
-        describe('when the validation is "error"', function () {
-          beforeEach(_.partial(errorSetup, 'user.name'));
+        it('should add the "has-warning" class to the element', expectHasWarning);
+        it('should remove the "has-error" class from the element', expectHasNoError);
+        it('should remove the "has-info" class from the element', expectHasNoInfo);
+        it('should remove the "has-success" class from the element', expectHasNoSuccess);
+      });
 
-          it('should add the "has-error" class', expectHasError);
-          it('should remove the "has-success" class', expectHasNoSuccess);
-          it('should remove the "has-info" class', expectHasNoInfo);
-          it('should remove the "has-warning" class', expectHasNoWarning);
-        });
+      describe('when the validation is "info"', function () {
+        beforeEach(_.partial(infoSetup, 'user.name'));
 
-        describe('when the validation is "success"', function () {
-          beforeEach(_.partial(successSetup, 'user.name'));
+        it('should add the "has-info" class to the element', expectHasInfo);
+        it('should remove the "has-error" class from the element', expectHasNoError);
+        it('should remove the "has-warning" class from the element', expectHasNoWarning);
+        it('should remove the "has-success" class from the element', expectHasNoSuccess);
+      });
 
-          it('should add the "has-success" class', expectHasSuccess);
-          it('should remove the "has-info" class', expectHasNoInfo);
-          it('should remove the "has-warning" class', expectHasNoWarning);
-          it('should remove the "has-error" class', expectHasNoError);
-        });
+      describe('when the validation is "success"', function () {
+        beforeEach(_.partial(successSetup, 'user.name'));
+
+        it('should add the "has-success" class to the element', expectHasSuccess);
+        it('should remove the "has-error" class from the element', expectHasNoError);
+        it('should remove the "has-warning" class from the element', expectHasNoWarning);
+        it('should remove the "has-info" class from the element', expectHasNoInfo);
+      });
+
+      describe('when there are multiple validations', function () {
+        beforeEach(_.partial(successInfoSetup, 'user.name'));
+
+        it('should remove the "has-warning" class from the element', expectHasNoInfo);
+        it('should remove the "has-error" class from the element', expectHasNoError);
+        it('should remove the "has-warning" class from the element', expectHasNoWarning);
+        it('should remove the "has-success" class from the element', expectHasNoSuccess);
+      });
+    });
+
+    describe('when showSuccess is false on the afSubmit directive', function () {
+      beforeEach(_.partial(showSuccess, false));
+
+      describe('when the validation is "valid"', function () {
+        beforeEach(_.partial(noMessageSetup, 'user.name'));
+
+        it('should not add the "has-success" class', expectHasNoSuccess);
+      });
+
+      describe('when the validation is "error"', function () {
+        beforeEach(_.partial(errorSetup, 'user.name'));
+
+        it('should add the "has-error" class', expectHasError);
+        it('should remove the "has-success" class', expectHasNoSuccess);
+        it('should remove the "has-info" class', expectHasNoInfo);
+        it('should remove the "has-warning" class', expectHasNoWarning);
+      });
+
+      describe('when the validation is "success"', function () {
+        beforeEach(_.partial(successSetup, 'user.name'));
+
+        it('should add the "has-success" class', expectHasSuccess);
+        it('should remove the "has-info" class', expectHasNoInfo);
+        it('should remove the "has-warning" class', expectHasNoWarning);
+        it('should remove the "has-error" class', expectHasNoError);
       });
     });
   });
