@@ -1,4 +1,5 @@
 angular.module('angularFormMessages').directive('afSubmit', function (
+  $rootScope,
   MessageService
 ) {
 
@@ -10,7 +11,7 @@ angular.module('angularFormMessages').directive('afSubmit', function (
       this.validate = function (messageId, errors, messageType) {
         this.validations[messageId] = errors;
         $scope.validations = this.validations; // Temp
-        $scope.$broadcast('validation', messageId, errors, messageType);
+        $rootScope.$broadcast('validation', messageId, errors, messageType);
       };
 
       this.isValid = function () {

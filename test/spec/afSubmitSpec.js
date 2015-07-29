@@ -70,13 +70,17 @@ describe('afSubmit', function () {
 
   describe('on form submit', function () {
 
+    var $rootScope;
+
     beforeEach(function () {
-      spyOn(this.$scope, '$broadcast');
+      $rootScope = mox.inject('$rootScope');
+      // Warning: since all child scopes inherit from $rootScope, the child scopes are also watched
+      spyOn(mox.inject('$rootScope'), '$broadcast');
     });
 
     it('should request validation from all form elements', function () {
       this.element.submit();
-      expect(this.$scope.$broadcast).toHaveBeenCalledWith('validate');
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validate');
     });
 
     describe('when the form is client side valid', function () {
@@ -114,8 +118,8 @@ describe('afSubmit', function () {
           });
 
           it('sends a validation event per server side validation', function () {
-            expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'address', [], MESSAGE_TYPES[0]);
-            expect(this.$scope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+            expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'address', [], MESSAGE_TYPES[0]);
+            expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
           });
 
           it('should set $scope.isSubmitting to false', function () {
