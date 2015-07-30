@@ -9,10 +9,14 @@ angular.module('angularFormMessagesBootstrap')
     MessageService
   ) {
     return {
-      require: '^afSubmit',
-      link: function ($scope, elem, attrs, afSubmitCtrl) {
+      require: ['^afSubmit', '^form'],
+      link: function ($scope, elem, attrs, ctrls) {
+        var
+          afSubmitCtrl = ctrls[0],
+          formCtrl = ctrls[1],
+          messageId = attrs.afFieldState || attrs.afMessageId;
 
-        MessageService.validation(attrs.afFieldState || attrs.afMessageId, function (messages, messageType) {
+        MessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
           angular.forEach(MESSAGE_TYPES, function (type) {
             attrs.$removeClass('has-' + type.toLowerCase());
           });

@@ -6,16 +6,17 @@ angular.module('angularFormMessagesBootstrap')
     MessageService
   ) {
     return {
-      require: ['afFeedback', '^afSubmit'],
+      require: ['afFeedback', '^afSubmit', '^form'],
       controller: angular.noop,
       link: function ($scope, elem, attrs, ctrls) {
         var
           afFeedbackCtrl = ctrls[0],
-          afSubmitCtrl = ctrls[1];
+          afSubmitCtrl = ctrls[1],
+          formCtrl = ctrls[2];
 
         afFeedbackCtrl.messageId = attrs.afFeedback || attrs.afMessageId;
 
-        MessageService.validation(afFeedbackCtrl.messageId, function (messages) {
+        MessageService.validation(formCtrl.$name + '.' + afFeedbackCtrl.messageId, function (messages) {
           if (messages.length || afSubmitCtrl.showSuccess) {
             attrs.$addClass('has-feedback');
           } else {
@@ -37,10 +38,14 @@ angular.module('angularFormMessagesBootstrap')
     MessageService
   ) {
     return {
-      require: '^afSubmit',
-      link: function ($scope, elem, attrs, afSubmitCtrl) {
+      require: ['^afSubmit', '^form'],
+      link: function ($scope, elem, attrs, ctrls) {
+        var
+          afSubmitCtrl = ctrls[0],
+          formCtrl = ctrls[1],
+          messageId = attrs.afFieldState || attrs.afMessageId;
 
-        MessageService.validation(attrs.afFieldState || attrs.afMessageId, function (messages, messageType) {
+        MessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
           angular.forEach(MESSAGE_TYPES, function (type) {
             attrs.$removeClass('has-' + type.toLowerCase());
           });
@@ -81,10 +86,15 @@ angular.module('angularFormMessagesBootstrap')
 
     return {
       restrict: 'A',
-      require: '?^afFeedback',
+      require: ['?^afFeedback', '^form'],
       templateUrl: 'templates/bootstrap/messageDirective.html',
-      link: function ($scope, elem, attrs, afFeedbackCtrl) {
-        MessageService.validation(attrs.afMessage || attrs.afMessageId, function (messages, messageType) {
+      link: function ($scope, elem, attrs, ctrls) {
+        var
+          afFeedbackCtrl = ctrls[0],
+          formCtrl = ctrls[1],
+          messageId = attrs.afMessage || attrs.afMessageId;
+
+        MessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.messageId === attrs.afMessage) {
             $scope.messageType = messageType || MESSAGE_TYPES[0];
