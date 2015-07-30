@@ -4,10 +4,16 @@ angular.module('angularFormMessagesBootstrap')
     MessageService
   ) {
     return {
-      require: '^afSubmit',
-      link: function ($scope, elem, attrs, afSubmitCtrl) {
+      require: ['afFeedback', '^afSubmit'],
+      controller: angular.noop,
+      link: function ($scope, elem, attrs, ctrls) {
+        var
+          afFeedbackCtrl = ctrls[0],
+          afSubmitCtrl = ctrls[1];
 
-        MessageService.validation(attrs.afFeedback || attrs.afMessageId, function (messages) {
+        afFeedbackCtrl.messageId = attrs.afFeedback || attrs.afMessageId;
+
+        MessageService.validation(afFeedbackCtrl.messageId, function (messages) {
           if (messages.length || afSubmitCtrl.showSuccess) {
             attrs.$addClass('has-feedback');
           } else {

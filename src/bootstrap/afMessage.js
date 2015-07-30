@@ -24,12 +24,15 @@ angular.module('angularFormMessagesBootstrap')
 
     return {
       restrict: 'A',
+      require: '?^afFeedback',
       templateUrl: 'templates/bootstrap/messageDirective.html',
-      link: function ($scope, elem, attrs) {
+      link: function ($scope, elem, attrs, afFeedbackCtrl) {
         MessageService.validation(attrs.afMessage || attrs.afMessageId, function (messages, messageType) {
           // Feedback
-          $scope.messageType = messageType || MESSAGE_TYPES[0];
-          $scope.icon = feedbackIcons[$scope.messageType];
+          if (afFeedbackCtrl && afFeedbackCtrl.messageId === attrs.afMessage) {
+            $scope.messageType = messageType || MESSAGE_TYPES[0];
+            $scope.icon = feedbackIcons[$scope.messageType];
+          }
 
           // Messages
           angular.forEach(messages, function (message) {

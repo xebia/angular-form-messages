@@ -6,10 +6,16 @@ angular.module('angularFormMessagesBootstrap')
     MessageService
   ) {
     return {
-      require: '^afSubmit',
-      link: function ($scope, elem, attrs, afSubmitCtrl) {
+      require: ['afFeedback', '^afSubmit'],
+      controller: angular.noop,
+      link: function ($scope, elem, attrs, ctrls) {
+        var
+          afFeedbackCtrl = ctrls[0],
+          afSubmitCtrl = ctrls[1];
 
-        MessageService.validation(attrs.afFeedback || attrs.afMessageId, function (messages) {
+        afFeedbackCtrl.messageId = attrs.afFeedback || attrs.afMessageId;
+
+        MessageService.validation(afFeedbackCtrl.messageId, function (messages) {
           if (messages.length || afSubmitCtrl.showSuccess) {
             attrs.$addClass('has-feedback');
           } else {
@@ -75,12 +81,15 @@ angular.module('angularFormMessagesBootstrap')
 
     return {
       restrict: 'A',
+      require: '?^afFeedback',
       templateUrl: 'templates/bootstrap/messageDirective.html',
-      link: function ($scope, elem, attrs) {
+      link: function ($scope, elem, attrs, afFeedbackCtrl) {
         MessageService.validation(attrs.afMessage || attrs.afMessageId, function (messages, messageType) {
           // Feedback
-          $scope.messageType = messageType || MESSAGE_TYPES[0];
-          $scope.icon = feedbackIcons[$scope.messageType];
+          if (afFeedbackCtrl && afFeedbackCtrl.messageId === attrs.afMessage) {
+            $scope.messageType = messageType || MESSAGE_TYPES[0];
+            $scope.icon = feedbackIcons[$scope.messageType];
+          }
 
           // Messages
           angular.forEach(messages, function (message) {
@@ -97,8 +106,10 @@ angular.module('angularFormMessages').run(['$templateCache', function($templateC
   'use strict';
 
   $templateCache.put('templates/bootstrap/messageDirective.html',
-    "<span class=\"glyphicon form-control-feedback\" ng-class=\"icon\" aria-hidden=\"true\" ng-if=\"messageType\"></span>\n" +
-    "<span class=\"sr-only\">({{messageType}}))</span>\n" +
+    "<span ng-if=\"messageType\" data-test=\"feedback\">\n" +
+    "  <span class=\"glyphicon form-control-feedback\" ng-class=\"icon\" aria-hidden=\"true\"></span>\n" +
+    "  <span class=\"sr-only\">({{messageType}})</span>\n" +
+    "</span>\n" +
     "<div class=\"alert help-block\" ng-class=\"message.alertClass\" ng-style=\"{ 'margin-bottom': $last ? undefined : '0px' }\" role=\"alert\" ng-repeat=\"message in messages track by $index\">\n" +
     "  <span class=\"glyphicon\" ng-class=\"message.icon\" aria-hidden=\"true\"></span>\n" +
     "  <span class=\"sr-only\">{{message.type}}:</span>\n" +
