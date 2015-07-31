@@ -24,13 +24,6 @@ describe('afSubmit', function () {
   beforeEach(function () {
     mox
       .module('angularFormMessages')
-      .mockServices('MessageService')
-      .setupResults(function () {
-        MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
-        return {
-          MessageService: { determineMessageType: MESSAGE_TYPES[0] }
-        };
-      })
       .mockDirectives('afField')
       .run();
 
@@ -38,6 +31,8 @@ describe('afSubmit', function () {
       submit: jasmine.createSpy('submit callback')
     });
     compileWithTrigger(this.$scope, 'change');
+
+    MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
     submit = this.element.controller('afSubmit');
     form = this.element.controller('form');
     this.$scope.submit.and.returnValue(reject(callbackResult));

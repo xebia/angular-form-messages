@@ -1,6 +1,5 @@
 angular.module('angularFormMessages').directive('afSubmit', function (
-  $rootScope,
-  MessageService
+  $rootScope
 ) {
 
   return {
