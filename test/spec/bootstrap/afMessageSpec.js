@@ -48,7 +48,7 @@ describe('messageDirective', function () {
     createScope({
       messageId: 'user.name'
     });
-    this.element = addSelectors(compileHtml('<form name="userForm"><div af-message="user.name"></div></form>'), {
+    this.element = addSelectors(compileHtml('<form name="userForm" af-submit><div af-message="user.name"></div></form>'), {
       feedbackIcon: '.form-control-feedback',
       feedbackScreenreader: '.form-control-feedback + .sr-only',
       alerts: '.alert',
@@ -80,7 +80,7 @@ describe('messageDirective', function () {
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
         mox.get.MessageService.validation.calls.reset();
-        compileHtml('<form name="userForm"><div af-message af-message-id="user.name"></div></form>');
+        compileHtml('<form name="userForm" af-submit><div af-message af-message-id="user.name"></div></form>');
       });
 
       it('should register the validation event listener via the MessageService', function () {
@@ -128,45 +128,68 @@ describe('messageDirective', function () {
     describe('when there is a parent afFeedback directive with the same messageId', function () {
 
       beforeEach(function () {
-        this.element = addSelectors(compileHtml('<form name="userForm"><div af-feedback="user.name"><div af-message="user.name"></div></div></form>'), {
-          feedbackIcon: '.form-control-feedback',
-          feedbackText: '.form-control-feedback + .sr-only'
+        this.element = addSelectors(compileHtml('<form name="userForm" af-submit><div af-feedback="user.name" af-show-success="true"><div af-message="user.name"></div></div></form>'), {
+          feedback: {
+            selector: '[data-test="feedback"]',
+            sub: {
+              icon: '.form-control-feedback',
+              label: '.form-control-feedback + .sr-only'
+            }
+          }
         });
-        validation();
       });
 
       it('should show a feedback icon in the input field', function () {
-        expect(this.element.feedbackIcon()).toHaveClass('glyphicon-ok');
-        expect(this.element.feedbackText()).toHaveText('(SUCCESS)');
+        validation(inj.MESSAGE_TYPES[0]);
+        var feedback = this.element.feedback();
+        expect(feedback.icon()).toHaveClass('glyphicon-ok');
+        expect(feedback.label()).toHaveText('(SUCCESS)');
 
-        validation(inj.MESSAGE_TYPES[1]);
-        expect(this.element.feedbackIcon()).toHaveClass('glyphicon-info-sign');
-        expect(this.element.feedbackText()).toHaveText('(INFO)');
+        validation.call(this, inj.MESSAGE_TYPES[1]);
+        expect(feedback.icon()).toHaveClass('glyphicon-info-sign');
+        expect(feedback.label()).toHaveText('(INFO)');
 
-        validation(inj.MESSAGE_TYPES[2]);
-        expect(this.element.feedbackIcon()).toHaveClass('glyphicon-warning-sign');
-        expect(this.element.feedbackText()).toHaveText('(WARNING)');
+        validation.call(this, inj.MESSAGE_TYPES[2]);
+        expect(feedback.icon()).toHaveClass('glyphicon-warning-sign');
+        expect(feedback.label()).toHaveText('(WARNING)');
 
-        validation(inj.MESSAGE_TYPES[3]);
-        expect(this.element.feedbackIcon()).toHaveClass('glyphicon-remove');
-        expect(this.element.feedbackText()).toHaveText('(ERROR)');
+        validation.call(this, inj.MESSAGE_TYPES[3]);
+        expect(feedback.icon()).toHaveClass('glyphicon-remove');
+        expect(feedback.label()).toHaveText('(ERROR)');
       });
 
       describe('when the validation is "valid" (no message type)', function () {
-        it('should show the success feedback icon', function () {
-          validation(undefined);
-          expect(this.element.feedbackIcon()).toHaveClass('glyphicon-ok');
-          expect(this.element.feedbackText()).toHaveText('(SUCCESS)');
+        describe('when showSucces is true on the afSubmit', function () {
+          beforeEach(function () {
+            this.element.controller('afSubmit').showSuccess = true;
+            validation();
+          });
+
+          it('should show the success feedback icon', function () {
+            expect(this.element.feedback().icon()).toHaveClass('glyphicon-ok');
+            expect(this.element.feedback().label()).toHaveText('(SUCCESS)');
+          });
+        });
+
+        describe('when showSuccess is false on the afSubmit', function () {
+          beforeEach(function () {
+            this.element.controller('afSubmit').showSuccess = false;
+            validation();
+          });
+
+          it('should show the success feedback icon', function () {
+            expect(this.element.feedback()).not.toExist();
+          });
         });
       });
     });
 
     describe('when there is no parent afFeedback directive with the same messageId', function () {
       beforeEach(function () {
-        addSelectors(compileHtml('<form name="userForm"><div af-feedback="user.other"><div af-message="user.name"></div></div></form>'), {
+        addSelectors(compileHtml('<form name="userForm" af-submit><div af-feedback="user.other"><div af-message="user.name"></div></div></form>'), {
           feedback: '[data-test="feedback"]'
         });
-        validation();
+        validation.call(this);
       });
 
       it('should not show feedback', function () {

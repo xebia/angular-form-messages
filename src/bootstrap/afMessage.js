@@ -24,18 +24,19 @@ angular.module('angularFormMessagesBootstrap')
 
     return {
       restrict: 'A',
-      require: ['?^afFeedback', '^form'],
+      require: ['?^afFeedback', '^afSubmit', '^form'],
       templateUrl: 'templates/bootstrap/messageDirective.html',
       link: function ($scope, elem, attrs, ctrls) {
         var
           afFeedbackCtrl = ctrls[0],
-          formCtrl = ctrls[1],
+          afSubmit = ctrls[1],
+          formCtrl = ctrls[2],
           messageId = attrs.afMessage || attrs.afMessageId;
 
         MessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.messageId === attrs.afMessage) {
-            $scope.messageType = messageType || MESSAGE_TYPES[0];
+            $scope.messageType = messageType || (afSubmit.showSuccess ? MESSAGE_TYPES[0] : undefined);
             $scope.icon = feedbackIcons[$scope.messageType];
           }
 
