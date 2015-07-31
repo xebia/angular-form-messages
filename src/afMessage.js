@@ -4,8 +4,10 @@ angular.module('angularFormMessages')
   ) {
     return {
       scope: true,
-      link: function linkFn($scope, elem, attrs) {
-        MessageService.validation(attrs.afMessage || attrs.afMessageId, function (messages) {
+      require: '^form',
+      link: function linkFn($scope, elem, attrs, formCtrl) {
+        var messageId = attrs.afMessage || attrs.afMessageId;
+        MessageService.validation(formCtrl.$name + '.' + messageId, function (messages) {
           $scope.messages = messages;
         });
       }

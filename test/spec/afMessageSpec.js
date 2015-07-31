@@ -25,22 +25,24 @@ describe('afMessage', function () {
         { message: 'Initial message', type: 'error' } // Directive has no isolate scope, so we can set values on the parent scope initially
       ]
     });
-    compileHtml('<div af-message="user.name"></div>');
+    addSelectors(compileHtml('<form name="userForm"><div af-message="user.name"></div></form>'), {
+      message: '[af-message]'
+    });
   });
 
   describe('on initialization', function () {
     it('should register the validation event listener via the MessageService', function () {
-      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
         mox.get.MessageService.validation.calls.reset();
-        compileHtml('<div af-message af-message-id="user.name"></div>');
+        compileHtml('<form name="userForm"><div af-message af-message-id="user.name"></div></form>');
       });
 
       it('should register the validation event listener via the MessageService', function () {
-        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
       });
     });
   });
@@ -48,21 +50,21 @@ describe('afMessage', function () {
   describe('when a validation event is broadcasted', function () {
     describe('when the field is valid', function () {
       beforeEach(function () {
-        $rootScope.$broadcast('validation', 'user.name', []);
+        $rootScope.$broadcast('validation', 'userForm.user.name', []);
       });
 
       it('should remove the message', function () {
-        expect(this.element.scope().messages).toEqual([]);
+        expect(this.element.message().scope().messages).toEqual([]);
       });
     });
 
     describe('when the field is invalid', function () {
       beforeEach(function () {
-        $rootScope.$broadcast('validation', 'user.name', [{ message: 'New error', type: 'error' }]);
+        $rootScope.$broadcast('validation', 'userForm.user.name', [{ message: 'New error', type: 'error' }]);
       });
 
       it('should set the message on the scope', function () {
-        expect(this.element.scope().messages).toEqual([{ message: 'New error', type: 'error' }]);
+        expect(this.element.message().scope().messages).toEqual([{ message: 'New error', type: 'error' }]);
       });
     });
   });

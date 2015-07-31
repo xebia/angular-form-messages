@@ -48,7 +48,7 @@ describe('afField', function () {
 
       it('should validate the field and set the default (error) message', function () {
         expect(ngModel.$validate).toHaveBeenCalled();
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
       });
     });
   });
@@ -72,7 +72,7 @@ describe('afField', function () {
       beforeEach(_.partial(makeFieldEmpty));
 
       it('should clear validation errors and do not a revalidation', function () {
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', []);
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', []);
       });
     });
   });
@@ -100,13 +100,13 @@ describe('afField', function () {
     });
 
     it('should send validation "valid" to the ngSubmitController', function () {
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [], MESSAGE_TYPES[0]);
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [], MESSAGE_TYPES[0]);
     });
 
     it('should send validation "invalid" to the ngSubmitController', function () {
       // Make field invalid to trigger a second validation event via the model watch
       makeFieldEmpty.call(this);
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
     });
   });
 
@@ -114,13 +114,13 @@ describe('afField', function () {
     function expectMessage(type) {
       $rootScope.$broadcast.calls.reset();
       this.$scope.$digest();
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'required', type: type }], MESSAGE_TYPES[0]);
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: type }], MESSAGE_TYPES[0]);
     }
 
     it('should validate the field and set the default message with the type that has been set via afField methods', function () {
       afField.setError('required');
       makeFieldEmpty.call(this);
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
 
       afField.setWarning('required');
       this.$scope.triggerValue = 'something-else';

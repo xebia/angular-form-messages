@@ -48,7 +48,7 @@ describe('messageDirective', function () {
     createScope({
       messageId: 'user.name'
     });
-    this.element = addSelectors(compileHtml('<div af-message="user.name"></div>'), {
+    this.element = addSelectors(compileHtml('<form name="userForm"><div af-message="user.name"></div></form>'), {
       feedbackIcon: '.form-control-feedback',
       feedbackScreenreader: '.form-control-feedback + .sr-only',
       alerts: '.alert',
@@ -74,17 +74,17 @@ describe('messageDirective', function () {
     });
 
     it('should register the validation event listener via the MessageService', function () {
-      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
         mox.get.MessageService.validation.calls.reset();
-        compileHtml('<div af-message af-message-id="user.name"></div>');
+        compileHtml('<form name="userForm"><div af-message af-message-id="user.name"></div></form>');
       });
 
       it('should register the validation event listener via the MessageService', function () {
-        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
       });
     });
   });
@@ -92,7 +92,7 @@ describe('messageDirective', function () {
   describe('when a validation event is fired', function () {
 
     function validation(messageType) {
-      inj.$rootScope.$broadcast('validation', 'user.name', messages, messageType);
+      inj.$rootScope.$broadcast('validation', 'userForm.user.name', messages, messageType);
       inj.$rootScope.$digest();
     }
 
@@ -128,7 +128,7 @@ describe('messageDirective', function () {
     describe('when there is a parent afFeedback directive with the same messageId', function () {
 
       beforeEach(function () {
-        this.element = addSelectors(compileHtml('<div af-feedback="user.name"><div af-message="user.name"></div></div>'), {
+        this.element = addSelectors(compileHtml('<form name="userForm"><div af-feedback="user.name"><div af-message="user.name"></div></div></form>'), {
           feedbackIcon: '.form-control-feedback',
           feedbackText: '.form-control-feedback + .sr-only'
         });
@@ -163,7 +163,7 @@ describe('messageDirective', function () {
 
     describe('when there is no parent afFeedback directive with the same messageId', function () {
       beforeEach(function () {
-        addSelectors(compileHtml('<div af-feedback="user.other"><div af-message="user.name"></div></div>'), {
+        addSelectors(compileHtml('<form name="userForm"><div af-feedback="user.other"><div af-message="user.name"></div></div></form>'), {
           feedback: '[data-test="feedback"]'
         });
         validation();

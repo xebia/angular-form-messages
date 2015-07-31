@@ -1,11 +1,6 @@
 describe('afFieldState', function () {
 
-  function sendValidation(fieldName, messages, messageType) {
-    inj.$rootScope.$broadcast('validation', fieldName, messages, messageType);
-    this.$scope.$digest();
-  }
-
-  function setup(messageType, messageCount, fieldName) {
+  function setup(messageType, messageCount) {
     if (messageType) {
       this.element.fieldState().removeClass('has-' + messageType.toLowerCase());
     }
@@ -17,7 +12,10 @@ describe('afFieldState', function () {
         type: inj.MESSAGE_TYPES[i]
       };
     });
-    sendValidation.call(this, fieldName, messages, messageType);
+
+    // The messageId is not checked because that is mocked away, so can be undefined
+    inj.$rootScope.$broadcast('validation', undefined, messages, messageType);
+    this.$scope.$digest();
   }
 
   function checkMessageClass(className, invert) {
@@ -68,7 +66,7 @@ describe('afFieldState', function () {
 
     inj = mox.inject('$rootScope', 'MESSAGE_TYPES');
     createScope();
-    addSelectors(compileHtml('<form af-submit><div af-field-state="user.name"></div></form>'), {
+    addSelectors(compileHtml('<form name="userForm" af-submit><div af-field-state="user.name"></div></form>'), {
       fieldState: '[af-field-state]'
     });
   });
@@ -80,17 +78,17 @@ describe('afFieldState', function () {
     }
 
     it('should register the validation event listener via the MessageService', function () {
-      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
         mox.get.MessageService.validation.calls.reset();
-        compileHtml('<form af-submit><div af-field-state af-message-id="user.name"></div></form>');
+        compileHtml('<form name="userForm" af-submit><div af-field-state af-message-id="user.name"></div></form>');
       });
 
       it('should register the validation event listener via the MessageService', function () {
-        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
       });
     });
 
@@ -98,7 +96,7 @@ describe('afFieldState', function () {
       beforeEach(_.partial(showSuccess, true));
 
       describe('when the validation is "valid"', function () {
-        beforeEach(_.partial(noMessageSetup, 'user.name'));
+        beforeEach(noMessageSetup);
 
         it('should add the "has-success" class to the element', expectHasSuccess);
         it('should remove the "has-error" class from the element', expectHasNoError);
@@ -107,7 +105,7 @@ describe('afFieldState', function () {
       });
 
       describe('when the validation is "error"', function () {
-        beforeEach(_.partial(errorSetup, 'user.name'));
+        beforeEach(errorSetup);
 
         it('should add the "has-error" class to the element', expectHasError);
         it('should remove the "has-warning" class from the element', expectHasNoWarning);
@@ -116,7 +114,7 @@ describe('afFieldState', function () {
       });
 
       describe('when the validation is "warning"', function () {
-        beforeEach(_.partial(warningSetup, 'user.name'));
+        beforeEach(warningSetup);
 
         it('should add the "has-warning" class to the element', expectHasWarning);
         it('should remove the "has-error" class from the element', expectHasNoError);
@@ -125,7 +123,7 @@ describe('afFieldState', function () {
       });
 
       describe('when the validation is "info"', function () {
-        beforeEach(_.partial(infoSetup, 'user.name'));
+        beforeEach(infoSetup);
 
         it('should add the "has-info" class to the element', expectHasInfo);
         it('should remove the "has-error" class from the element', expectHasNoError);
@@ -134,7 +132,7 @@ describe('afFieldState', function () {
       });
 
       describe('when the validation is "success"', function () {
-        beforeEach(_.partial(successSetup, 'user.name'));
+        beforeEach(successSetup);
 
         it('should add the "has-success" class to the element', expectHasSuccess);
         it('should remove the "has-error" class from the element', expectHasNoError);
@@ -143,7 +141,7 @@ describe('afFieldState', function () {
       });
 
       describe('when there are multiple validations', function () {
-        beforeEach(_.partial(successInfoSetup, 'user.name'));
+        beforeEach(successInfoSetup);
 
         it('should remove the "has-warning" class from the element', expectHasNoInfo);
         it('should remove the "has-error" class from the element', expectHasNoError);
@@ -156,13 +154,13 @@ describe('afFieldState', function () {
       beforeEach(_.partial(showSuccess, false));
 
       describe('when the validation is "valid"', function () {
-        beforeEach(_.partial(noMessageSetup, 'user.name'));
+        beforeEach(noMessageSetup);
 
         it('should not add the "has-success" class', expectHasNoSuccess);
       });
 
       describe('when the validation is "error"', function () {
-        beforeEach(_.partial(errorSetup, 'user.name'));
+        beforeEach(errorSetup);
 
         it('should add the "has-error" class', expectHasError);
         it('should remove the "has-success" class', expectHasNoSuccess);
@@ -171,7 +169,7 @@ describe('afFieldState', function () {
       });
 
       describe('when the validation is "success"', function () {
-        beforeEach(_.partial(successSetup, 'user.name'));
+        beforeEach(successSetup);
 
         it('should add the "has-success" class', expectHasSuccess);
         it('should remove the "has-info" class', expectHasNoInfo);

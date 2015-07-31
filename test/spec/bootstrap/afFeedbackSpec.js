@@ -1,11 +1,6 @@
 describe('afFeedback', function () {
 
-  function sendValidation(fieldName, messages) {
-    inj.$rootScope.$broadcast('validation', fieldName, messages);
-    this.$scope.$digest();
-  }
-
-  function setup(messageType, messageCount, fieldName) {
+  function setup(messageType, messageCount) {
     this.element.feedback()[(messageType ? 'remove' : 'add') + 'Class']('has-feedback');
 
     var messages = _.map(_.range(messageCount), function (i) {
@@ -14,7 +9,9 @@ describe('afFeedback', function () {
         type: inj.MESSAGE_TYPES[i]
       };
     });
-    sendValidation.call(this, fieldName, messages);
+
+    inj.$rootScope.$broadcast('validation', undefined, messages);
+    this.$scope.$digest();
   }
 
   function checkMessageClass(className, invert) {
@@ -55,7 +52,7 @@ describe('afFeedback', function () {
 
     inj = mox.inject('$rootScope', 'MESSAGE_TYPES');
     createScope();
-    addSelectors(compileHtml('<form af-submit><div af-feedback="user.name"></div></form>'), {
+    addSelectors(compileHtml('<form name="userForm" af-submit><div af-feedback="user.name"></div></form>'), {
       feedback: '[af-feedback]'
     });
   });
@@ -67,17 +64,17 @@ describe('afFeedback', function () {
     }
 
     it('should register the validation event listener via the MessageService', function () {
-      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
         mox.get.MessageService.validation.calls.reset();
-        compileHtml('<form af-submit><div af-feedback af-message-id="user.name"></div></form>');
+        compileHtml('<form name="userForm" af-submit><div af-feedback af-message-id="user.name"></div></form>');
       });
 
       it('should register the validation event listener via the MessageService', function () {
-        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('user.name', jasmine.any(Function));
+        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
       });
     });
 
@@ -85,19 +82,19 @@ describe('afFeedback', function () {
       beforeEach(_.partial(showSuccess, true));
 
       describe('when the validation is "valid"', function () {
-        beforeEach(_.partial(noMessageSetup, 'user.name'));
+        beforeEach(noMessageSetup);
 
         it('should add the "has-feedback" class to the element"', expectHasFeedback);
       });
 
       describe('when the validation is "error"', function () {
-        beforeEach(_.partial(errorSetup, 'user.name'));
+        beforeEach(errorSetup);
 
         it('should add the "has-feedback" class to the element"', expectHasFeedback);
       });
 
       describe('when there are multiple validations', function () {
-        beforeEach(_.partial(successInfoSetup, 'user.name'));
+        beforeEach(successInfoSetup);
 
         it('should add the "has-feedback" class to the element"', expectHasFeedback);
       });
@@ -107,19 +104,19 @@ describe('afFeedback', function () {
       beforeEach(_.partial(showSuccess, false));
 
       describe('when the validation is "valid"', function () {
-        beforeEach(_.partial(noMessageSetup, 'user.name'));
+        beforeEach(noMessageSetup);
 
         it('should remove the "has-feedback" class', expectHasNoFeedback);
       });
 
       describe('when the validation is "error"', function () {
-        beforeEach(_.partial(errorSetup, 'user.name'));
+        beforeEach(errorSetup);
 
         it('should add the "has-feedback" class', expectHasFeedback);
       });
 
       describe('when there are multiple validations', function () {
-        beforeEach(_.partial(successInfoSetup, 'user.name'));
+        beforeEach(successInfoSetup);
 
         it('should add the "has-feedback" class', expectHasFeedback);
       });

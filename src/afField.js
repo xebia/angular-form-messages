@@ -51,14 +51,14 @@ angular.module('angularFormMessages').directive('afField', function (
 
         angular.forEach(errorKeys, function (key) {
           // For now, the message is just the key
-          // The message type is stored in afField.$messages when for example afField.setError has been called, additionally to ngModel.$setValidity
+          // The message type is stored in afField.$messages when for example afField.setError has been called, additional to ngModel.$setValidity
           messages.push({
             message: key,
             type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
           });
         });
 
-        $rootScope.$broadcast('validation', attrs.name, messages, MessageService.determineMessageType(messages));
+        $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, MessageService.determineMessageType(messages));
       }
 
       /**
@@ -66,7 +66,7 @@ angular.module('angularFormMessages').directive('afField', function (
        */
       function cleanValidation(viewValue) {
         if (submit.triggerOn === 'submit') {
-          $rootScope.$broadcast('validation', attrs.name, []);
+          $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, []);
         }
         return viewValue;
       }
