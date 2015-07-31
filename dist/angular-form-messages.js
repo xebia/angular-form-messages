@@ -9,49 +9,42 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
     priority: 100,
     require: ['ngModel', 'afField', '^afSubmit', '^form'],
     controller: function () {
-      function setMessage(type) {
+      function setMessageDetails(type) {
         return function (key) {
-          this.$messages[key] = {
+          ctrl.$messages[key] = {
             type: type
           };
         };
       }
 
+      var ctrl = this;
+
       // Object for storing extra message data such as message type
       this.$messages = {};
 
-      this.setError = setMessage(MESSAGE_TYPES[3]);
-      this.setWarning = setMessage(MESSAGE_TYPES[2]);
-      this.setInfo = setMessage(MESSAGE_TYPES[1]);
-      this.setSuccess = setMessage(MESSAGE_TYPES[0]);
+      this.setMessageDetails = function (key, type) {
+        setMessageDetails(type)(key);
+      };
+      this.setErrorDetails = setMessageDetails(MESSAGE_TYPES[3]);
+      this.setWarningDetails = setMessageDetails(MESSAGE_TYPES[2]);
+      this.setInfoDetails = setMessageDetails(MESSAGE_TYPES[1]);
+      this.setSuccessDetails = setMessageDetails(MESSAGE_TYPES[0]);
     },
     link: function linkFn($scope, elem, attrs, ctrls) {
-      var ngModel = ctrls[0];
-      var afField = ctrls[1];
-      var submit = ctrls[2];
-      var form = ctrls[3];
+      var
+        ngModel = ctrls[0],
+        afField = ctrls[1],
+        submit = ctrls[2],
+        form = ctrls[3],
+        isPristineAfterSubmit;
 
-      function hasValidationChangedAndDirty() {
-        if (ngModel.$dirty && submit.triggerOn === 'change') {
-          updateValidation();
-        }
-      }
-
-      function validationTrigger(newVal, oldVal) {
-        if (oldVal !== newVal) {
-          updateValidation();
-        }
-      }
-
-      /*
-       * Collects validation info from ngModel and afField and passes it to submit.validate()
+      /**
+       * Collects validation info from ngModel and afField and broadcasts a validation event
        */
       function updateValidation() {
-        ngModel.$validate();
         var messages = [];
-        var errorKeys = Object.keys(ngModel.$error);
 
-        angular.forEach(errorKeys, function (key) {
+        angular.forEach(ngModel.$error, function (isValid, key) {
           // For now, the message is just the key
           // The message type is stored in afField.$messages when for example afField.setError has been called, additional to ngModel.$setValidity
           messages.push({
@@ -64,20 +57,63 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
       }
 
       /**
-       * Clears validation after submit has been called when trigger is "submit"
+       * Make this field clean again
        */
-      function cleanValidation(viewValue) {
-        if (submit.triggerOn === 'submit') {
-          $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, []);
-        }
-        return viewValue;
+      function clearErrors() {
+        angular.forEach(ngModel.$error, function (isValid, validator) {
+          ngModel.$setValidity(validator, true);
+        });
       }
 
-      $scope.$watchCollection(form.$name + '["' + ngModel.$name + '"].$error', hasValidationChangedAndDirty);
-      $scope.$watch(attrs.afTrigger, validationTrigger);
-      ngModel.$parsers.push(cleanValidation);
+      /**
+       * Update validation on change
+       */
+      $scope.$watchCollection(form.$name + '["' + ngModel.$name + '"].$error', function hasValidationChangedAndDirty() {
+        if (ngModel.$dirty && submit.triggerOn === 'change') {
+          updateValidation();
+        }
+      });
 
-      $scope.$on('validate', updateValidation);
+      /**
+       * Update validation on defined trigger
+       */
+      $scope.$watch(attrs.afTrigger, function validationTrigger(newVal, oldVal) {
+        if (oldVal !== newVal) {
+          updateValidation();
+        }
+      });
+
+      /**
+       * Clears validation after submit has been called and the user edits the field
+       */
+      ngModel.$viewChangeListeners.push(function cleanValidationAfterSubmitChange() {
+        if (isPristineAfterSubmit) {
+          isPristineAfterSubmit = false;
+          clearErrors();
+        }
+      });
+
+      /**
+       * Validate the field before submitting
+       */
+      $scope.$on('validate', function () {
+        clearErrors();
+        ngModel.$validate();
+        updateValidation();
+      });
+
+      /**
+       * Set validity of this field after submitting
+       */
+      $scope.$on('setValidity', function setValidity(event, messageId, messages) {
+        if (messageId === form.$name + '.' + ngModel.$name) {
+          isPristineAfterSubmit = true;
+          angular.forEach(messages, function (message) {
+            afField.setMessageDetails(message.message, message.type);
+            ngModel.$setValidity(message.message, false);
+          });
+        }
+      });
     }
   };
 }]);
@@ -98,9 +134,8 @@ angular.module('angularFormMessages')
     };
   }]);
 
-angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "MessageService", function (
-  $rootScope,
-  MessageService
+angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", function (
+  $rootScope
 ) {
 
   return {
@@ -123,9 +158,10 @@ angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "Mess
         $scope.$apply(function () {
 
           function processErrors(result) {
-            angular.forEach(result.validation, function (messages, messageId) {
-              // FIXME: set validity of fields, and let them broadcast validation
-              $rootScope.$broadcast('validation', messageId, messages, MessageService.determineMessageType(messages));
+            angular.forEach(result.validation, function (validations, formName) {
+              angular.forEach(validations, function (messages, messageId) {
+                $rootScope.$broadcast('setValidity', formName + '.' + messageId, messages);
+              });
             });
           }
 

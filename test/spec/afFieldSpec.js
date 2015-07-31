@@ -113,14 +113,14 @@ describe('afField', function () {
 
     describe('when it is addressed to this field', function () {
       beforeEach(function () {
-        spyOn(afField, 'setMessage').and.callThrough();
+        spyOn(afField, 'setMessageDetails').and.callThrough();
         // set isPristineAfterSubmit to true
         $rootScope.$broadcast('setValidity', 'userForm.user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
       });
 
       it('should set the validity and message type for the field', function () {
         expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', false);
-        expect(afField.setMessage).toHaveBeenCalledWith('User name server side error', MESSAGE_TYPES[3]);
+        expect(afField.setMessageDetails).toHaveBeenCalledWith('User name server side error', MESSAGE_TYPES[3]);
       });
 
       describe('and the user changes the field thereafter', function () {
@@ -156,23 +156,23 @@ describe('afField', function () {
     }
 
     it('should validate the field and set the default message with the type that has been set via afField methods', function () {
-      afField.setError('required');
+      afField.setErrorDetails('required');
       makeFieldEmpty.call(this);
       expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
 
-      afField.setWarning('required');
+      afField.setWarningDetails('required');
       this.$scope.triggerValue = 'something-else';
       expectMessage.call(this, MESSAGE_TYPES[2]);
 
-      afField.setInfo('required');
+      afField.setInfoDetails('required');
       this.$scope.triggerValue = 'another-value';
       expectMessage.call(this, MESSAGE_TYPES[1]);
 
-      afField.setSuccess('required');
+      afField.setSuccessDetails('required');
       this.$scope.triggerValue = 'trigger-again';
       expectMessage.call(this, MESSAGE_TYPES[0]);
 
-      afField.setMessage('required', MESSAGE_TYPES[3]);
+      afField.setMessageDetails('required', MESSAGE_TYPES[3]);
       this.$scope.triggerValue = 'trigger';
       expectMessage.call(this, MESSAGE_TYPES[3]);
     });
