@@ -209,6 +209,15 @@ module.exports = function (grunt) {
       all: {
         'pre-commit': 'default'
       }
+    },
+
+    bump: {
+      options: {
+        files: ['package.json', 'bower.json'],
+        commitFiles: ['package.json', 'bower.json'],
+        commitMessage: 'Bump version to v%VERSION%',
+        push: false
+      }
     }
 
   });
