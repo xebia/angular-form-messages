@@ -27,6 +27,7 @@ describe('afSubmit', function () {
           MessageService: { determineMessageType: MESSAGE_TYPES[0] }
         };
       })
+      .mockDirectives('afField')
       .run();
 
     createScope({
@@ -114,9 +115,9 @@ describe('afSubmit', function () {
             this.element.submit();
           });
 
-          it('sends a validation event per server side validation', function () {
-            expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'address', [], MESSAGE_TYPES[0]);
-            expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+          it('sends a setValidity event per server side validation', function () {
+            expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'address', []);
+            expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }]);
           });
 
           it('should set $scope.isSubmitting to false', function () {

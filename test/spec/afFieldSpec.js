@@ -88,7 +88,7 @@ describe('afField', function () {
     });
   });
 
-  describe('when a request for validation event is fired', function () {
+  describe('when a request for validation event is received', function () {
 
     // These are the same expectations as the case where the trigger is change and the model changes
     beforeEach(function () {
@@ -107,6 +107,21 @@ describe('afField', function () {
       // Make field invalid to trigger a second validation event via the model watch
       makeFieldEmpty.call(this);
       expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+    });
+  });
+
+  describe('when a setValidity event is received', function () {
+    describe('when it is addressed to this field', function () {
+      beforeEach(function () {
+        spyOn(ngModel, '$setValidity');
+        spyOn(afField, 'setMessage').and.callThrough();
+        $rootScope.$broadcast('setValidity', 'user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }]);
+      });
+
+      it('should set the validity and message type for the field', function () {
+        expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', false);
+        expect(afField.setMessage).toHaveBeenCalledWith('User name server side error', MESSAGE_TYPES[3]);
+      });
     });
   });
 
@@ -133,6 +148,10 @@ describe('afField', function () {
       afField.setSuccess('required');
       this.$scope.triggerValue = 'trigger-again';
       expectMessage.call(this, MESSAGE_TYPES[0]);
+
+      afField.setMessage('required', MESSAGE_TYPES[3]);
+      this.$scope.triggerValue = 'trigger';
+      expectMessage.call(this, MESSAGE_TYPES[3]);
     });
   });
 

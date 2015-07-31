@@ -9,15 +9,20 @@ angular.module('angularFormMessages').directive('afField', function (
     controller: function () {
       function setMessage(type) {
         return function (key) {
-          this.$messages[key] = {
+          ctrl.$messages[key] = {
             type: type
           };
         };
       }
 
+      var ctrl = this;
+
       // Object for storing extra message data such as message type
       this.$messages = {};
 
+      this.setMessage = function (key, type) {
+        setMessage(type)(key);
+      };
       this.setError = setMessage(MESSAGE_TYPES[3]);
       this.setWarning = setMessage(MESSAGE_TYPES[2]);
       this.setInfo = setMessage(MESSAGE_TYPES[1]);
@@ -61,8 +66,19 @@ angular.module('angularFormMessages').directive('afField', function (
         $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, MessageService.determineMessageType(messages));
       }
 
+      function setValidity(event, messageId, messages) {
+        // TODO: also include the form name
+        if (messageId === ngModel.$name) {
+          angular.forEach(messages, function (message) {
+            afField.setMessage(message.message, message.type);
+            ngModel.$setValidity(message.message, false);
+          });
+        }
+      }
+
       /**
        * Clears validation after submit has been called when trigger is "submit"
+       * TODO: also clear validation for other triggers
        */
       function cleanValidation(viewValue) {
         if (submit.triggerOn === 'submit') {
@@ -76,6 +92,7 @@ angular.module('angularFormMessages').directive('afField', function (
       ngModel.$parsers.push(cleanValidation);
 
       $scope.$on('validate', updateValidation);
+      $scope.$on('setValidity', setValidity);
     }
   };
 });

@@ -24,7 +24,7 @@ angular.module('angularFormMessages').directive('afSubmit', function (
 
           function processErrors(result) {
             angular.forEach(result.validation, function (messages, messageId) {
-              $rootScope.$broadcast('validation', messageId, messages, MessageService.determineMessageType(messages));
+              $rootScope.$broadcast('setValidity', messageId, messages);
             });
           }
 
