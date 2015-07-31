@@ -36,12 +36,18 @@ angular.module('angularFormMessages').directive('afField', function (
         form = ctrls[3],
         isPristineAfterSubmit;
 
+      /**
+       * Update validation on change
+       */
       function hasValidationChangedAndDirty() {
         if (ngModel.$dirty && submit.triggerOn === 'change') {
           updateValidation();
         }
       }
 
+      /**
+       * Update validation on defined trigger
+       */
       function validationTrigger(newVal, oldVal) {
         if (oldVal !== newVal) {
           updateValidation();
@@ -52,11 +58,9 @@ angular.module('angularFormMessages').directive('afField', function (
        * Collects validation info from ngModel and afField and passes it to submit.validate()
        */
       function updateValidation() {
-        ngModel.$validate();
         var messages = [];
-        var errorKeys = Object.keys(ngModel.$error);
 
-        angular.forEach(errorKeys, function (key) {
+        angular.forEach(ngModel.$error, function (isValid, key) {
           // For now, the message is just the key
           // The message type is stored in afField.$messages when for example afField.setError has been called, additional to ngModel.$setValidity
           messages.push({
@@ -68,9 +72,24 @@ angular.module('angularFormMessages').directive('afField', function (
         $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, MessageService.determineMessageType(messages));
       }
 
+      function clearErrors() {
+        angular.forEach(ngModel.$error, function (isValid, validator) {
+          ngModel.$setValidity(validator, true);
+        });
+      }
+
       /**
-       * Set messages etc on the fields, without setting the validity.
-       * This is to make sure that we can resubmit the form without client side invalidation
+       * Clears validation after submit has been called and the user edits the field
+       */
+      function cleanValidationAfterSubmitChange() {
+        if (isPristineAfterSubmit) {
+          isPristineAfterSubmit = false;
+          clearErrors();
+        }
+      }
+
+      /**
+       * Set server side validity of this field
        */
       function setValidity(event, messageId, messages) {
         if (messageId === form.$name + '.' + ngModel.$name) {
@@ -83,22 +102,17 @@ angular.module('angularFormMessages').directive('afField', function (
       }
 
       /**
-       * Clears validation after submit has been called and the user edits the field
+       *
        */
-      function cleanValidationAfterSubmitChange() {
-        if (isPristineAfterSubmit) {
-          isPristineAfterSubmit = false;
-          angular.forEach(ngModel.$error, function (validation, validator) {
-            ngModel.$setValidity(validator, true);
-          });
-        }
-      }
-
       $scope.$watchCollection(form.$name + '["' + ngModel.$name + '"].$error', hasValidationChangedAndDirty);
       $scope.$watch(attrs.afTrigger, validationTrigger);
       ngModel.$viewChangeListeners.push(cleanValidationAfterSubmitChange);
 
-      $scope.$on('validate', updateValidation);
+      $scope.$on('validate', function () {
+        clearErrors();
+        ngModel.$validate();
+        updateValidation();
+      });
       $scope.$on('setValidity', setValidity);
     }
   };

@@ -47,7 +47,6 @@ describe('afField', function () {
       beforeEach(_.partial(makeFieldEmpty));
 
       it('should validate the field and set the default (error) message', function () {
-        expect(ngModel.$validate).toHaveBeenCalled();
         expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
       });
     });
@@ -62,7 +61,6 @@ describe('afField', function () {
       beforeEach(_.partial(makeFieldEmpty));
 
       it('should not validate the field', function () {
-        expect(ngModel.$validate).not.toHaveBeenCalled();
         expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation');
       });
     });
@@ -75,7 +73,7 @@ describe('afField', function () {
     });
 
     it('should validate the field', function () {
-      expect(ngModel.$validate).toHaveBeenCalled();
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [], MESSAGE_TYPES[0]);
     });
   });
 
@@ -83,7 +81,14 @@ describe('afField', function () {
 
     // These are the same expectations as the case where the trigger is change and the model changes
     beforeEach(function () {
+      spyOn(ngModel, '$setValidity').and.callThrough();
+      ngModel.$error = { required: true, other: true };
       $rootScope.$broadcast('validate');
+    });
+
+    it('should clear all current validations', function () {
+      expect(ngModel.$setValidity).toHaveBeenCalledWith('required', true);
+      expect(ngModel.$setValidity).toHaveBeenCalledWith('other', true);
     });
 
     it('should validate the field', function () {
