@@ -23,8 +23,10 @@ angular.module('angularFormMessages').directive('afSubmit', function (
         $scope.$apply(function () {
 
           function processErrors(result) {
-            angular.forEach(result.validation, function (messages, messageId) {
-              $rootScope.$broadcast('setValidity', messageId, messages);
+            angular.forEach(result.validation, function (validations, formName) {
+              angular.forEach(validations, function (messages, messageId) {
+                $rootScope.$broadcast('setValidity', formName + '.' + messageId, messages);
+              });
             });
           }
 

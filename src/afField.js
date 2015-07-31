@@ -67,8 +67,7 @@ angular.module('angularFormMessages').directive('afField', function (
       }
 
       function setValidity(event, messageId, messages) {
-        // TODO: also include the form name
-        if (messageId === ngModel.$name) {
+        if (messageId === form.$name + '.' + ngModel.$name) {
           angular.forEach(messages, function (message) {
             afField.setMessage(message.message, message.type);
             ngModel.$setValidity(message.message, false);

@@ -2,11 +2,15 @@ describe('afSubmit', function () {
   var
     callbackResult = {
       validation: {
-        address: [],
-        'user.name': [{
-          message: 'User name server side error',
-          type: 'ERROR'
-        }]
+        userForm: {
+          address: [],
+          'user.name': [
+            {
+              message: 'User name server side error',
+              type: 'ERROR'
+            }
+          ]
+        }
       }
     },
     form,
@@ -116,8 +120,8 @@ describe('afSubmit', function () {
           });
 
           it('sends a setValidity event per server side validation', function () {
-            expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'address', []);
-            expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }]);
+            expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm.address', []);
+            expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm.user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }]);
           });
 
           it('should set $scope.isSubmitting to false', function () {
