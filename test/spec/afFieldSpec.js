@@ -66,15 +66,6 @@ describe('afField', function () {
         expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation');
       });
     });
-
-    describe('and the user changes the field', function () {
-      // this would normally make the field invalid 'required'
-      beforeEach(_.partial(makeFieldEmpty));
-
-      it('should clear validation errors and do not a revalidation', function () {
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', []);
-      });
-    });
   });
 
   describe('when the trigger value changes', function () {
@@ -111,16 +102,33 @@ describe('afField', function () {
   });
 
   describe('when a setValidity event is received', function () {
+    beforeEach(function () {
+      spyOn(ngModel, '$setValidity').and.callThrough();
+    });
+
     describe('when it is addressed to this field', function () {
       beforeEach(function () {
-        spyOn(ngModel, '$setValidity');
         spyOn(afField, 'setMessage').and.callThrough();
-        $rootScope.$broadcast('setValidity', 'user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }]);
+        $rootScope.$broadcast('setValidity', 'userForm.user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }]);
       });
 
       it('should set the validity and message type for the field', function () {
         expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', false);
         expect(afField.setMessage).toHaveBeenCalledWith('User name server side error', MESSAGE_TYPES[3]);
+      });
+    });
+
+    describe('and the user changes the field thereafter', function () {
+      beforeEach(function () {
+        // set isPristineAfterSubmit to true
+        $rootScope.$broadcast('setValidity', 'userForm.user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
+        ngModel.$setValidity.calls.reset();
+        this.element.field().val('make valid').trigger('input');
+      });
+
+      it('should clear validation errors and do not a revalidation', function () {
+        expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', true);
+        expect(ngModel.$setValidity).toHaveBeenCalledWith('Warning', true);
       });
     });
   });

@@ -29,10 +29,12 @@ angular.module('angularFormMessages').directive('afField', function (
       this.setSuccess = setMessage(MESSAGE_TYPES[0]);
     },
     link: function linkFn($scope, elem, attrs, ctrls) {
-      var ngModel = ctrls[0];
-      var afField = ctrls[1];
-      var submit = ctrls[2];
-      var form = ctrls[3];
+      var
+        ngModel = ctrls[0],
+        afField = ctrls[1],
+        submit = ctrls[2],
+        form = ctrls[3],
+        isPristineAfterSubmit;
 
       function hasValidationChangedAndDirty() {
         if (ngModel.$dirty && submit.triggerOn === 'change') {
@@ -66,8 +68,13 @@ angular.module('angularFormMessages').directive('afField', function (
         $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, MessageService.determineMessageType(messages));
       }
 
+      /**
+       * Set messages etc on the fields, without setting the validity.
+       * This is to make sure that we can resubmit the form without client side invalidation
+       */
       function setValidity(event, messageId, messages) {
         if (messageId === form.$name + '.' + ngModel.$name) {
+          isPristineAfterSubmit = true;
           angular.forEach(messages, function (message) {
             afField.setMessage(message.message, message.type);
             ngModel.$setValidity(message.message, false);
@@ -76,19 +83,20 @@ angular.module('angularFormMessages').directive('afField', function (
       }
 
       /**
-       * Clears validation after submit has been called when trigger is "submit"
-       * TODO: also clear validation for other triggers
+       * Clears validation after submit has been called and the user edits the field
        */
-      function cleanValidation(viewValue) {
-        if (submit.triggerOn === 'submit') {
-          $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, []);
+      function cleanValidationAfterSubmitChange() {
+        if (isPristineAfterSubmit) {
+          isPristineAfterSubmit = false;
+          angular.forEach(ngModel.$error, function (validation, validator) {
+            ngModel.$setValidity(validator, true);
+          });
         }
-        return viewValue;
       }
 
       $scope.$watchCollection(form.$name + '["' + ngModel.$name + '"].$error', hasValidationChangedAndDirty);
       $scope.$watch(attrs.afTrigger, validationTrigger);
-      ngModel.$parsers.push(cleanValidation);
+      ngModel.$viewChangeListeners.push(cleanValidationAfterSubmitChange);
 
       $scope.$on('validate', updateValidation);
       $scope.$on('setValidity', setValidity);
