@@ -3,6 +3,32 @@ describe('afField', function () {
     this.element.field().val('').trigger('input');
   }
 
+  function compile(trigger, fieldTrigger) {
+    var element = addSelectors(compileHtml(
+      '<form name="userForm" af-submit ' + (trigger ? 'af-trigger-on="' + trigger + '"' : '') + '>' +
+        '<input af-field name="user.name" ng-model="user.name" af-trigger="triggerValue"' + (fieldTrigger ? 'af-trigger-on="' + fieldTrigger + '"' : '') + ' required />' +
+      '</form>',
+      this.$scope
+    ), {
+      field: '[af-field]'
+    });
+
+    $rootScope.$broadcast.calls.reset();
+    // Setup spies on parent controllers
+    afSubmit = element.controller('afSubmit');
+    ngModel = element.field().controller('ngModel');
+    afField = element.field().controller('afField');
+    spyOn(ngModel, '$validate');
+  }
+
+  function expectValidEvent() {
+    expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [], MESSAGE_TYPES[0]);
+  }
+
+  function expectErrorEvent() {
+    expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+  }
+
   var
     $rootScope,
     afField,
@@ -23,46 +49,89 @@ describe('afField', function () {
       .run();
 
     $rootScope = mox.inject('$rootScope');
-    createScope({ user: { name: 'Misko' } });
-    addSelectors(compileHtml('<form name="userForm" af-submit>' +
-                  '<input af-field name="user.name" ng-model="user.name" af-trigger="triggerValue" required />' +
-                '</form>', this.$scope), {
-      field: '[af-field]'
-    });
-
-    // Setup spies on parent controllers
-    afSubmit = this.element.controller('afSubmit');
-    ngModel = this.element.field().controller('ngModel');
-    afField = this.element.field().controller('afField');
-    spyOn(ngModel, '$validate');
     spyOn($rootScope, '$broadcast').and.callThrough();
+    createScope({ user: { name: 'Misko' } });
+    compile('change');
   });
 
-  describe('when the form should be validated on change', function () {
+  describe('when the field should be validated on change', function () {
     beforeEach(function () {
-      afSubmit.triggerOn = 'change';
+      compile('change');
     });
 
-    describe('and the user changes the field to an invalid value', function () {
-      beforeEach(_.partial(makeFieldEmpty));
+    describe('and the user changes the field', function () {
+      it('should validate the field as "valid"', function () {
+        this.element.field().val('another valid value').trigger('input');
+        expectValidEvent();
+      });
 
       it('should validate the field and set the default (error) message', function () {
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+        makeFieldEmpty.call(this);
+        expectErrorEvent();
+      });
+
+      it('should not validate the field on blur', function () {
+        this.element.field().trigger('blur');
+        expect($rootScope.$broadcast).not.toHaveBeenCalled();
       });
     });
   });
 
-  describe('when the form should be validated on submit', function () {
+  describe('when the field should be validated on blur', function () {
     beforeEach(function () {
-      afSubmit.triggerOn = 'submit';
+      compile('blur');
     });
 
-    describe('and the model changes', function () {
-      beforeEach(_.partial(makeFieldEmpty));
+    describe('and the user changes the field without blurring', function () {
+      it('should not validate the field', function () {
+        this.element.field().val('new value').trigger('input');
+        expect($rootScope.$broadcast).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('and the user blurs the field', function () {
+      it('should validate the field', function () {
+        this.element.field().trigger('blur');
+        expectValidEvent();
+      });
+    });
+  });
+
+  describe('when the field should be validated on submit', function () {
+    beforeEach(function () {
+      compile('submit');
+    });
+
+    describe('and the user changes and blurs the field', function () {
+      beforeEach(function () {
+        this.element.field().val('').trigger('input').trigger('blur');
+      });
 
       it('should not validate the field', function () {
-        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation');
+        expect($rootScope.$broadcast).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('when no triggerOn value is defined on the afSubmit directive and field', function () {
+    beforeEach(function () {
+      compile();
+    });
+
+    it('should use "change" as default', function () {
+      this.element.field().val('new value').trigger('input');
+      expectValidEvent();
+    });
+  });
+
+  describe('when the field has a triggerOn attribute', function () {
+    beforeEach(function () {
+      compile('change', 'blur');
+    });
+
+    it('should override the triggerOn value of the afSubmit directive', function () {
+      this.element.field().trigger('blur');
+      expectValidEvent();
     });
   });
 
@@ -73,7 +142,7 @@ describe('afField', function () {
     });
 
     it('should validate the field', function () {
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [], MESSAGE_TYPES[0]);
+      expectValidEvent();
     });
   });
 

@@ -34,6 +34,7 @@ angular.module('angularFormMessages').directive('afField', function (
         afField = ctrls[1],
         submit = ctrls[2],
         form = ctrls[3],
+        triggerOn = attrs.afTriggerOn || submit.triggerOn || 'change',
         isPristineAfterSubmit;
 
       /**
@@ -64,13 +65,16 @@ angular.module('angularFormMessages').directive('afField', function (
       }
 
       /**
-       * Update validation on change
+       * Update validation on change / blur
        */
-      $scope.$watchCollection(form.$name + '["' + ngModel.$name + '"].$error', function hasValidationChangedAndDirty() {
-        if (ngModel.$dirty && submit.triggerOn === 'change') {
-          updateValidation();
-        }
-      });
+      if (triggerOn === 'change') {
+        // This also triggers custom directives which may not be able to listen to events
+        ngModel.$viewChangeListeners.push(updateValidation);
+      } else if (triggerOn === 'blur') {
+        elem.on('blur', function () {
+          $scope.$apply(updateValidation);
+        });
+      }
 
       /**
        * Update validation on defined trigger

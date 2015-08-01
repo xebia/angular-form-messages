@@ -6,7 +6,7 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
   MessageService
 ) {
   return {
-    priority: 100,
+    //priority: 100,
     require: ['ngModel', 'afField', '^afSubmit', '^form'],
     controller: function () {
       function setMessageDetails(type) {
@@ -36,6 +36,7 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
         afField = ctrls[1],
         submit = ctrls[2],
         form = ctrls[3],
+        triggerOn = attrs.afTriggerOn || submit.triggerOn || 'change',
         isPristineAfterSubmit;
 
       /**
@@ -66,13 +67,16 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
       }
 
       /**
-       * Update validation on change
+       * Update validation on change / blur
        */
-      $scope.$watchCollection(form.$name + '["' + ngModel.$name + '"].$error', function hasValidationChangedAndDirty() {
-        if (ngModel.$dirty && submit.triggerOn === 'change') {
-          updateValidation();
-        }
-      });
+      if (triggerOn === 'change') {
+        // This also triggers custom directives which may not be able to listen to events
+        ngModel.$viewChangeListeners.push(updateValidation);
+      } else if (triggerOn === 'blur') {
+        elem.on('blur', function () {
+          $scope.$apply(updateValidation);
+        });
+      }
 
       /**
        * Update validation on defined trigger
@@ -140,57 +144,57 @@ angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", funct
 
   return {
     require: ['form', 'afSubmit'],
-    controller: function afSubmitController() {
-    },
-    link: function ($scope, elem, attrs, ctrls) {
-      var
-        form = ctrls[0],
-        submit = ctrls[1];
+    controller: angular.noop,
+    link: {
+      pre: function ($scope, elem, attrs, ctrls) {
+        var submit = ctrls[1];
 
-      function isPromise(obj) {
-        return angular.isObject(obj) && typeof (obj.then) === 'function';
-      }
+        // Settings
+        submit.triggerOn = attrs.afTriggerOn;
+        $scope.$watch(attrs.afShowSuccess, function (newVal) {
+          submit.showSuccess = !!newVal;
+        });
+      }, post: function ($scope, elem, attrs, ctrls) {
+        var form = ctrls[0];
 
-      function doSubmit(event) {
-        event.preventDefault();
+        function isPromise(obj) {
+          return angular.isObject(obj) && typeof (obj.then) === 'function';
+        }
 
-        $scope.$broadcast('validate');
-        $scope.$apply(function () {
+        function doSubmit(event) {
+          event.preventDefault();
 
-          function processErrors(result) {
-            angular.forEach(result.validation, function (validations, formName) {
-              angular.forEach(validations, function (messages, messageId) {
-                $rootScope.$broadcast('setValidity', formName + '.' + messageId, messages);
+          $scope.$broadcast('validate');
+          $scope.$apply(function () {
+
+            function processErrors(result) {
+              angular.forEach(result.validation, function (validations, formName) {
+                angular.forEach(validations, function (messages, messageId) {
+                  $rootScope.$broadcast('setValidity', formName + '.' + messageId, messages);
+                });
               });
-            });
-          }
+            }
 
-          if (!form.$valid) {
-            return;
-          }
+            if (!form.$valid) {
+              return;
+            }
 
-          var callbackResult = $scope.$eval(attrs.afSubmit);
-          if (isPromise(callbackResult)) {
-            $scope.isSubmitting = true;
-            callbackResult
-              .catch(processErrors)
-              ['finally'](function () {
+            var callbackResult = $scope.$eval(attrs.afSubmit);
+            if (isPromise(callbackResult)) {
+              $scope.isSubmitting = true;
+              callbackResult
+                .catch(processErrors)
+                ['finally'](function () {
                 $scope.isSubmitting = false;
               });
-          }
-        });
+            }
+          });
+        }
+
+        elem.on('submit', doSubmit);
       }
-
-      elem.on('submit', doSubmit);
-
-      // Settings
-      submit.triggerOn = attrs.afTriggerOn || 'change';
-      $scope.$watch(attrs.afShowSuccess, function (newVal) {
-        submit.showSuccess = !!newVal;
-      });
     }
   };
-
 }]);
 
 angular.module('angularFormMessages').directive('afSubmitButton', function () {
