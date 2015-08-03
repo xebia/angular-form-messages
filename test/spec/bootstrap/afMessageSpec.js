@@ -10,19 +10,27 @@ describe('messageDirective', function () {
         'angularFormMessagesBootstrap',
         'templates/bootstrap/messageDirective.html'
       )
-      .mockServices('MessageService')
-      .mockDirectives({
-        name: 'afFeedback',
-        require: 'afFeedback',
-        controller: angular.noop,
-        compile: function () {
-          return {
-            pre: function ($scope, elem, attrs, afFeedbackCtrl) {
-              afFeedbackCtrl.messageId = attrs.afFeedback;
-            }
-          };
+      .mockServices(
+        'MessageService',
+        'translateFilter',
+        'TranslateService'
+    )
+      .mockDirectives(
+        'afMessageLabel',
+        {
+          name: 'afFeedback',
+          require: 'afFeedback',
+          controller: angular.noop,
+          compile: function () {
+            return {
+              pre: function ($scope, elem, attrs, afFeedbackCtrl) {
+                afFeedbackCtrl.messageId = attrs.afFeedback;
+              }
+            };
+          }
         }
-      })
+      )
+      //.disableDirectives('afMessageLabel')
       .setupResults(function () {
         return {
           MessageService: {
@@ -56,7 +64,8 @@ describe('messageDirective', function () {
         selector: '.alert:eq({0})',
         sub: {
           icon: '.glyphicon',
-          prefix: '.sr-only'
+          prefix: '.sr-only',
+          label: '[af-message-label]'
         }
       }
     });
@@ -107,8 +116,8 @@ describe('messageDirective', function () {
     it('should the message text and type', function () {
       expect(this.element.alert(0).prefix()).toHaveText(messages[0].type + ':');
       expect(this.element.alert(1).prefix()).toHaveText(messages[1].type + ':');
-      expect(this.element.alert(0)).toContainText(messages[0].message);
-      expect(this.element.alert(1)).toContainText(messages[1].message);
+      expect(this.element.alert(0).label()).toHaveAttr('af-message-label', messages[0].message);
+      expect(this.element.alert(1).label()).toHaveAttr('af-message-label', messages[1].message);
     });
 
     it('should show an alert class for messages with type error, warning, info and success', function () {
