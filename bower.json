@@ -1,7 +1,7 @@
 {
   "name": "angular-form-messages",
   "main": "afModule.js",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "authors": [
     "Frank van Wijk <fvanwijk@xebia.com",
     "Albert Brand <abrand@xebia.com>"
