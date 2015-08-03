@@ -40,7 +40,6 @@
     "disallowTrailingComma": true,
     "disallowKeywordsOnNewLine": ["else"],
     "requireCapitalizedConstructors": true,
-    "safeContextKeyword": ["self"],
     "validateJSDoc": {
       "checkParamNames": true,
       "checkRedundantParams": true,

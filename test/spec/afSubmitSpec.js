@@ -2,11 +2,15 @@ describe('afSubmit', function () {
   var
     callbackResult = {
       validation: {
-        address: [],
-        'user.name': [{
-          message: 'User name server side error',
-          type: 'ERROR'
-        }]
+        userForm: {
+          address: [],
+          'user.name': [
+            {
+              message: 'User name server side error',
+              type: 'ERROR'
+            }
+          ]
+        }
       }
     },
     form,
@@ -14,25 +18,21 @@ describe('afSubmit', function () {
     submit;
 
   function compileWithTrigger($scope, trigger) {
-    compileHtml('<form af-submit="submit()" af-trigger-on="' + trigger + '" af-show-success="showSuccess"></form>', $scope);
+    compileHtml('<form af-submit="submit()" ' + (trigger ? 'af-trigger-on="' + trigger + '"' : '') + ' af-show-success="showSuccess"></form>', $scope);
   }
 
   beforeEach(function () {
     mox
       .module('angularFormMessages')
-      .mockServices('MessageService')
-      .setupResults(function () {
-        MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
-        return {
-          MessageService: { determineMessageType: MESSAGE_TYPES[0] }
-        };
-      })
+      .mockDirectives('afField')
       .run();
 
     createScope({
       submit: jasmine.createSpy('submit callback')
     });
     compileWithTrigger(this.$scope, 'change');
+
+    MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
     submit = this.element.controller('afSubmit');
     form = this.element.controller('form');
     this.$scope.submit.and.returnValue(reject(callbackResult));
@@ -46,9 +46,9 @@ describe('afSubmit', function () {
         expect(submit.triggerOn).toBe('change');
       });
 
-      it('should be saved in the controller with a default value', function () {
-        compileWithTrigger(this.$scope, undefined);
-        expect(submit.triggerOn).toBe('change');
+      it('should be saved in the controller without a default value', function () {
+        compileWithTrigger(this.$scope);
+        expect(this.element.controller('afSubmit').triggerOn).toBeUndefined();
       });
     });
 
@@ -114,9 +114,9 @@ describe('afSubmit', function () {
             this.element.submit();
           });
 
-          it('sends a validation event per server side validation', function () {
-            expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'address', [], MESSAGE_TYPES[0]);
-            expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+          it('sends a setValidity event per server side validation', function () {
+            expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm.address', []);
+            expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm.user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }]);
           });
 
           it('should set $scope.isSubmitting to false', function () {
