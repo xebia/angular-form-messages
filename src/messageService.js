@@ -3,6 +3,12 @@ angular.module('angularFormMessages')
   .provider('MessageService', function (
     MESSAGE_TYPES
   ) {
+    var triggerOn = 'change';
+
+    this.setTriggerOn = function (newValue) {
+      triggerOn = newValue;
+    };
+
     this.$get = function ($injector) {
       return {
         /**
@@ -27,6 +33,10 @@ angular.module('angularFormMessages')
               callback(messages, messageType);
             }
           });
+        },
+
+        triggerOn: function () {
+          return triggerOn;
         }
       };
     };

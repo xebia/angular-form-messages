@@ -43,7 +43,10 @@ describe('afField', function () {
       .setupResults(function () {
         MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
         return {
-          MessageService: { determineMessageType: MESSAGE_TYPES[0] }
+          MessageService: {
+            determineMessageType: MESSAGE_TYPES[0],
+            triggerOn: 'change'
+          }
         };
       })
       .run();
@@ -118,7 +121,7 @@ describe('afField', function () {
       compile();
     });
 
-    it('should use "change" as default', function () {
+    it('should use the value of MessageService.triggerOn() as default', function () {
       this.element.field().val('new value').trigger('input');
       expectValidEvent();
     });

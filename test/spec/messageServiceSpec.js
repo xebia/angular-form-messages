@@ -1,7 +1,15 @@
 describe('MessageService', function () {
-  var inj;
+  var
+    inj,
+    messageServiceProvider;
 
   beforeEach(function () {
+    angular
+      .module('angularFormMessages')
+      .config(function (MessageServiceProvider) {
+        messageServiceProvider = MessageServiceProvider;
+      });
+
     mox
       .module('angularFormMessages')
       .run();
@@ -11,6 +19,16 @@ describe('MessageService', function () {
       'MESSAGE_TYPES',
       'MessageService'
     );
+  });
+
+  describe('triggerOn', function () {
+    it('should return the configured triggerOn value', function () {
+      expect(inj.MessageService.triggerOn()).toBe('change');
+
+      messageServiceProvider.setTriggerOn('newValue');
+      expect(inj.MessageService.triggerOn()).toBe('newValue');
+    });
+
   });
 
   describe('determineMessageType()', function () {

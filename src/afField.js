@@ -34,7 +34,7 @@ angular.module('angularFormMessages').directive('afField', function (
         afField = ctrls[1],
         submit = ctrls[2],
         form = ctrls[3],
-        triggerOn = attrs.afTriggerOn || submit.triggerOn || 'change',
+        triggerOn = attrs.afTriggerOn || submit.triggerOn || MessageService.triggerOn(),
         isPristineAfterSubmit;
 
       /**
