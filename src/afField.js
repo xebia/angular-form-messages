@@ -37,9 +37,7 @@ angular.module('angularFormMessages').directive('afField', function (
         triggerOn = attrs.afTriggerOn || submit.triggerOn || MessageService.triggerOn(),
         isPristineAfterSubmit;
 
-      /**
-       * Collects validation info from ngModel and afField and broadcasts a validation event
-       */
+      // Collects validation info from ngModel and afField and broadcasts a validation event
       function updateValidation() {
         var messages = [];
 
@@ -55,18 +53,14 @@ angular.module('angularFormMessages').directive('afField', function (
         $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, MessageService.determineMessageType(messages));
       }
 
-      /**
-       * Make this field clean again
-       */
+      // Make this field clean again
       function clearErrors() {
         angular.forEach(ngModel.$error, function (isValid, validator) {
           ngModel.$setValidity(validator, true);
         });
       }
 
-      /**
-       * Update validation on change / blur
-       */
+      // Update validation on change / blur
       if (triggerOn === 'change') {
         // This also triggers custom directives which may not be able to listen to events
         ngModel.$viewChangeListeners.push(updateValidation);
@@ -76,18 +70,14 @@ angular.module('angularFormMessages').directive('afField', function (
         });
       }
 
-      /**
-       * Update validation on defined trigger
-       */
+      // Update validation on defined trigger
       $scope.$watch(attrs.afTrigger, function validationTrigger(newVal, oldVal) {
         if (oldVal !== newVal) {
           updateValidation();
         }
       });
 
-      /**
-       * Clears validation after submit has been called and the user edits the field
-       */
+      // Clears validation after submit has been called and the user edits the field
       ngModel.$viewChangeListeners.push(function cleanValidationAfterSubmitChange() {
         if (isPristineAfterSubmit) {
           isPristineAfterSubmit = false;
@@ -95,18 +85,14 @@ angular.module('angularFormMessages').directive('afField', function (
         }
       });
 
-      /**
-       * Validate the field before submitting
-       */
+      // Validate the field before submitting
       $scope.$on('validate', function () {
         clearErrors();
         ngModel.$validate();
         updateValidation();
       });
 
-      /**
-       * Set validity of this field after submitting
-       */
+      // Set validity of this field after submitting
       $scope.$on('setValidity', function setValidity(event, messageId, messages) {
         if (messageId === form.$name + '.' + ngModel.$name) {
           isPristineAfterSubmit = true;
