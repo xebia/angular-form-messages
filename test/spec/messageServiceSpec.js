@@ -21,6 +21,15 @@ describe('MessageService', function () {
     );
   });
 
+  describe('showSuccess', function () {
+    it('should return the configured showSuccess value', function () {
+      expect(inj.MessageService.showSuccess()).toBe(false);
+
+      messageServiceProvider.setShowSuccess(true);
+      expect(inj.MessageService.showSuccess()).toBe(true);
+    });
+
+  });
   describe('triggerOn', function () {
     it('should return the configured triggerOn value', function () {
       expect(inj.MessageService.triggerOn()).toBe('change');

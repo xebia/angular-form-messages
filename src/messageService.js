@@ -3,7 +3,13 @@ angular.module('angularFormMessages')
   .provider('MessageService', function (
     MESSAGE_TYPES
   ) {
-    var triggerOn = 'change';
+    var
+      showSuccess = false,
+      triggerOn = 'change';
+
+    this.setShowSuccess = function (newValue) {
+      showSuccess = newValue;
+    };
 
     this.setTriggerOn = function (newValue) {
       triggerOn = newValue;
@@ -33,6 +39,10 @@ angular.module('angularFormMessages')
               callback(messages, messageType);
             }
           });
+        },
+
+        showSuccess: function () {
+          return showSuccess;
         },
 
         triggerOn: function () {
