@@ -17,53 +17,60 @@ describe('afSubmit', function () {
     MESSAGE_TYPES,
     submit;
 
-  function compileWithTrigger($scope, trigger) {
-    compileHtml('<form af-submit="submit()" ' + (trigger ? 'af-trigger-on="' + trigger + '"' : '') + ' af-show-success="showSuccess"></form>', $scope);
+  function compile(trigger, showSuccess) {
+    compileHtml('<form af-submit="submit()" ' + (trigger ? 'af-trigger-on="' + trigger + '"' : '') + (showSuccess === undefined ? '' : 'af-show-success="' + showSuccess + '"') + '></form>', this.$scope);
+    submit = this.element.controller('afSubmit');
+    form = this.element.controller('form');
   }
 
   beforeEach(function () {
     mox
       .module('angularFormMessages')
+      .mockServices('MessageService')
       .mockDirectives('afField')
+      .setupResults(function () {
+        return {
+          MessageService: { showSuccess: false }
+        };
+      })
       .run();
 
     createScope({
       submit: jasmine.createSpy('submit callback')
     });
-    compileWithTrigger(this.$scope, 'change');
+    compile.call(this);
 
     MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
-    submit = this.element.controller('afSubmit');
-    form = this.element.controller('form');
     this.$scope.submit.and.returnValue(reject(callbackResult));
   });
 
   describe('the form settings', function () {
 
     describe('the trigger setting', function () {
-
-      it('should be saved in the controller with value from the af-trigger attribute', function () {
-        expect(submit.triggerOn).toBe('change');
+      it('should be saved in the controller without a default value', function () {
+        expect(this.element.controller('afSubmit').triggerOn).toBeUndefined();
       });
 
-      it('should be saved in the controller without a default value', function () {
-        compileWithTrigger(this.$scope);
-        expect(this.element.controller('afSubmit').triggerOn).toBeUndefined();
+      it('should be saved in the controller with value from the af-trigger-on attribute', function () {
+        compile.call(this, 'blur');
+        expect(submit.triggerOn).toBe('blur');
       });
     });
 
     describe('the showSuccess setting', function () {
-      it('should be saved in the controller with boolean value from the af-show-success attribute', function () {
-        this.$scope.showSuccess = true;
-        this.$scope.$digest();
-        expect(submit.showSuccess).toBe(true);
-
-        this.$scope.showSuccess = false;
-        this.$scope.$digest();
+      it('should be saved in the controller with a default value from MessageService.showSuccess()', function () {
         expect(submit.showSuccess).toBe(false);
+
+        mox.get.MessageService.showSuccess.and.returnValue('truthy value');
+        compile.call(this);
+        expect(submit.showSuccess).toBe(true);
       });
 
-      it('should be saved in the controller with a default value', function () {
+      it('should be saved in the controller with boolean value from the af-show-success attribute', function () {
+        compile.call(this, undefined, '\'truthy value as string\'');
+        expect(submit.showSuccess).toBe(true);
+
+        compile.call(this, undefined, false);
         expect(submit.showSuccess).toBe(false);
       });
     });

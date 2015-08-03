@@ -1,5 +1,6 @@
 angular.module('angularFormMessages').directive('afSubmit', function (
-  $rootScope
+  $rootScope,
+  MessageService
 ) {
 
   return {
@@ -11,9 +12,8 @@ angular.module('angularFormMessages').directive('afSubmit', function (
 
         // Settings
         submit.triggerOn = attrs.afTriggerOn;
-        $scope.$watch(attrs.afShowSuccess, function (newVal) {
-          submit.showSuccess = !!newVal;
-        });
+        var showSuccess = $scope.$eval(attrs.afShowSuccess);
+        submit.showSuccess = !!(showSuccess === undefined ? MessageService.showSuccess() : showSuccess);
       }, post: function ($scope, elem, attrs, ctrls) {
         var form = ctrls[0];
 
