@@ -4,8 +4,13 @@ angular.module('angularFormMessages')
     MESSAGE_TYPES
   ) {
     var
+      genericLabelPrefix,
       showSuccess = false,
       triggerOn = 'change';
+
+    this.setGenericLabelPrefix = function (newValue) {
+      genericLabelPrefix = newValue;
+    };
 
     this.setShowSuccess = function (newValue) {
       showSuccess = newValue;
@@ -16,6 +21,7 @@ angular.module('angularFormMessages')
     };
 
     this.$get = function ($injector) {
+
       return {
         /**
          * Determine the message type with the highest severity from a list of messages
@@ -39,6 +45,10 @@ angular.module('angularFormMessages')
               callback(messages, messageType);
             }
           });
+        },
+
+        getGenericLabelPrefix: function () {
+          return genericLabelPrefix ? genericLabelPrefix + '.' : '';
         },
 
         showSuccess: function () {

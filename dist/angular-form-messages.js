@@ -129,7 +129,9 @@ angular.module('angularFormMessages')
   }]);
 
 angular.module('angularFormMessages')
-  .directive('afMessageLabel', ["translateFilter", "TranslateService", function (
+  .directive('afMessageLabel', ["$log", "MessageService", "translateFilter", "TranslateService", function (
+    $log,
+    MessageService,
     translateFilter,
     TranslateService
   ) {
@@ -140,9 +142,12 @@ angular.module('angularFormMessages')
         attrs.$observe('afMessageLabel', function (newVal) {
           var
             specificLabel = afMessageCtrl.messageId + '.' + newVal,
-            genericLabel = newVal,
+            genericLabel = MessageService.getGenericLabelPrefix() + newVal,
             translation = TranslateService.hasLabel(specificLabel) ? translateFilter(specificLabel) : translateFilter(genericLabel);
 
+          if (translation === undefined) {
+            $log.warn('Missing label: \'' + specificLabel + '\' (specific) or \'' + genericLabel + '\' (generic)');
+          }
           elem.html(translation === undefined ? newVal : translation);
         });
       }
@@ -224,8 +229,13 @@ angular.module('angularFormMessages')
     MESSAGE_TYPES
   ) {
     var
+      genericLabelPrefix,
       showSuccess = false,
       triggerOn = 'change';
+
+    this.setGenericLabelPrefix = function (newValue) {
+      genericLabelPrefix = newValue;
+    };
 
     this.setShowSuccess = function (newValue) {
       showSuccess = newValue;
@@ -236,6 +246,7 @@ angular.module('angularFormMessages')
     };
 
     this.$get = ["$injector", function ($injector) {
+
       return {
         /**
          * Determine the message type with the highest severity from a list of messages
@@ -259,6 +270,10 @@ angular.module('angularFormMessages')
               callback(messages, messageType);
             }
           });
+        },
+
+        getGenericLabelPrefix: function () {
+          return genericLabelPrefix ? genericLabelPrefix + '.' : '';
         },
 
         showSuccess: function () {

@@ -21,6 +21,16 @@ describe('MessageService', function () {
     );
   });
 
+  describe('genericLabelPrefix', function () {
+    it('should return the configured genericLabelPrefix value with a dot', function () {
+      expect(inj.MessageService.getGenericLabelPrefix()).toBeFalsy();
+
+      messageServiceProvider.setGenericLabelPrefix('prefix');
+      expect(inj.MessageService.getGenericLabelPrefix()).toBe('prefix.');
+    });
+
+  });
+
   describe('showSuccess', function () {
     it('should return the configured showSuccess value', function () {
       expect(inj.MessageService.showSuccess()).toBe(false);
@@ -28,8 +38,8 @@ describe('MessageService', function () {
       messageServiceProvider.setShowSuccess(true);
       expect(inj.MessageService.showSuccess()).toBe(true);
     });
-
   });
+
   describe('triggerOn', function () {
     it('should return the configured triggerOn value', function () {
       expect(inj.MessageService.triggerOn()).toBe('change');
@@ -37,7 +47,6 @@ describe('MessageService', function () {
       messageServiceProvider.setTriggerOn('newValue');
       expect(inj.MessageService.triggerOn()).toBe('newValue');
     });
-
   });
 
   describe('determineMessageType()', function () {

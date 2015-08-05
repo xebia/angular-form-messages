@@ -5,16 +5,20 @@ describe('the afMessageLabel directive', function () {
     mox
       .module('angularFormMessages')
       .mockServices(
+        'MessageService',
         'translateFilter',
         'TranslateService'
       )
       .setupResults(function () {
         return {
+          MessageService: {
+            getGenericLabelPrefix: 'prefix.'
+          },
           TranslateService: { hasLabel: true },
           translateFilter: function (key) {
             return {
               'userForm.user.email.email': 'E-mail translation',
-              required: 'Required translation'
+              'prefix.required': 'Required translation'
             }[key];
           }
         };
@@ -55,6 +59,6 @@ describe('the afMessageLabel directive', function () {
   it('should log a warning when the translations do not exist', function () {
     this.$scope.key = 'not-existing';
     this.$scope.$digest();
-    expect($log.warn).toHaveBeenCalledWith('Missing label: \'userForm.user.email.not-existing\' (specific) or \'not-existing\' (generic)');
+    expect($log.warn).toHaveBeenCalledWith('Missing label: \'userForm.user.email.not-existing\' (specific) or \'prefix.not-existing\' (generic)');
   });
 });
