@@ -1,4 +1,6 @@
 describe('the afMessageLabel directive', function () {
+  var $log;
+
   beforeEach(function () {
     mox
       .module('angularFormMessages')
@@ -21,6 +23,8 @@ describe('the afMessageLabel directive', function () {
 
     createScope();
     compileHtml('<form name="userForm"><div af-message="user.email"><span af-message-label="{{key}}"></span></div></form>');
+    $log = mox.inject('$log');
+    spyOn($log, 'warn');
   });
 
   it('should replace the contents of the element with the field specific translation if this exists', function () {
@@ -46,5 +50,11 @@ describe('the afMessageLabel directive', function () {
     this.$scope.key = 'generic not existing';
     this.$scope.$digest();
     expect(this.element).toHaveText('generic not existing');
+  });
+
+  it('should log a warning when the translations do not exist', function () {
+    this.$scope.key = 'not-existing';
+    this.$scope.$digest();
+    expect($log.warn).toHaveBeenCalledWith('Missing label: \'userForm.user.email.not-existing\' (specific) or \'not-existing\' (generic)');
   });
 });

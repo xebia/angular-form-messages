@@ -1,5 +1,6 @@
 angular.module('angularFormMessages')
   .directive('afMessageLabel', function (
+    $log,
     translateFilter,
     TranslateService
   ) {
@@ -13,6 +14,9 @@ angular.module('angularFormMessages')
             genericLabel = newVal,
             translation = TranslateService.hasLabel(specificLabel) ? translateFilter(specificLabel) : translateFilter(genericLabel);
 
+          if (translation === undefined) {
+            $log.warn('Missing label: \'' + specificLabel + '\' (specific) or \'' + genericLabel + '\' (generic)');
+          }
           elem.html(translation === undefined ? newVal : translation);
         });
       }
