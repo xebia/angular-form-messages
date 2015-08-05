@@ -31,6 +31,10 @@ describe('afMessage', function () {
   });
 
   describe('on initialization', function () {
+    it('should store the message id including the form name on the controller', function () {
+      expect(this.element.message().controller('afMessage').messageId).toBe('userForm.user.name');
+    });
+
     it('should register the validation event listener via the MessageService', function () {
       expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
     });

@@ -114,18 +114,49 @@ angular.module('angularFormMessages')
   ) {
     return {
       scope: true,
-      require: '^form',
-      link: function linkFn($scope, elem, attrs, formCtrl) {
-        var messageId = attrs.afMessage || attrs.afMessageId;
-        MessageService.validation(formCtrl.$name + '.' + messageId, function (messages) {
+      require: ['^form', 'afMessage'],
+      controller: angular.noop,
+      link: function linkFn($scope, elem, attrs, ctrls) {
+        var formCtrl = ctrls[0];
+        var afMessageCtrl = ctrls[1];
+
+        afMessageCtrl.messageId = formCtrl.$name + '.' +  (attrs.afMessage || attrs.afMessageId);
+        MessageService.validation(afMessageCtrl.messageId, function (messages) {
           $scope.messages = messages;
         });
       }
     };
   }]);
 
-angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", function (
-  $rootScope
+angular.module('angularFormMessages')
+  .directive('afMessageLabel', ["$log", "MessageService", "translateFilter", "TranslateService", function (
+    $log,
+    MessageService,
+    translateFilter,
+    TranslateService
+  ) {
+    return {
+      restrict: 'A',
+      require: '^afMessage',
+      link: function ($scope, elem, attrs, afMessageCtrl) {
+        attrs.$observe('afMessageLabel', function (newVal) {
+          var
+            specificLabel = afMessageCtrl.messageId + '.' + newVal,
+            genericLabel = MessageService.getGenericLabelPrefix() + newVal,
+            translation = TranslateService.hasLabel(specificLabel) ? translateFilter(specificLabel) : translateFilter(genericLabel);
+
+          if (translation === undefined) {
+            $log.warn('Missing label: \'' + specificLabel + '\' (specific) or \'' + genericLabel + '\' (generic)');
+          }
+          elem.html(translation === undefined ? newVal : translation);
+        });
+      }
+    };
+  }]);
+
+angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "MessageService", function (
+  $rootScope,
+  MessageService
 ) {
 
   return {
@@ -137,9 +168,8 @@ angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", funct
 
         // Settings
         submit.triggerOn = attrs.afTriggerOn;
-        $scope.$watch(attrs.afShowSuccess, function (newVal) {
-          submit.showSuccess = !!newVal;
-        });
+        var showSuccess = $scope.$eval(attrs.afShowSuccess);
+        submit.showSuccess = !!(showSuccess === undefined ? MessageService.showSuccess() : showSuccess);
       }, post: function ($scope, elem, attrs, ctrls) {
         var form = ctrls[0];
 
@@ -198,13 +228,25 @@ angular.module('angularFormMessages')
   .provider('MessageService', ["MESSAGE_TYPES", function (
     MESSAGE_TYPES
   ) {
-    var triggerOn = 'change';
+    var
+      genericLabelPrefix,
+      showSuccess = false,
+      triggerOn = 'change';
+
+    this.setGenericLabelPrefix = function (newValue) {
+      genericLabelPrefix = newValue;
+    };
+
+    this.setShowSuccess = function (newValue) {
+      showSuccess = newValue;
+    };
 
     this.setTriggerOn = function (newValue) {
       triggerOn = newValue;
     };
 
     this.$get = ["$injector", function ($injector) {
+
       return {
         /**
          * Determine the message type with the highest severity from a list of messages
@@ -228,6 +270,14 @@ angular.module('angularFormMessages')
               callback(messages, messageType);
             }
           });
+        },
+
+        getGenericLabelPrefix: function () {
+          return genericLabelPrefix ? genericLabelPrefix + '.' : '';
+        },
+
+        showSuccess: function () {
+          return showSuccess;
         },
 
         triggerOn: function () {
