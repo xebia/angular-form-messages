@@ -100,6 +100,7 @@ angular.module('angularFormMessages').directive('afField', function (
             afField.setMessageDetails(message.message, message.type);
             ngModel.$setValidity(message.message, false);
           });
+          updateValidation();
         }
       });
     }
