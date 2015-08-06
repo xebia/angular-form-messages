@@ -195,6 +195,10 @@ describe('afField', function () {
         expect(afField.setMessageDetails).toHaveBeenCalledWith('User name server side error', MESSAGE_TYPES[3]);
       });
 
+      it('should broadcast the validation events', function () {
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }], MESSAGE_TYPES[0]);
+      });
+
       describe('and the user changes the field thereafter', function () {
         beforeEach(function () {
           ngModel.$setValidity.calls.reset();
