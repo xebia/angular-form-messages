@@ -1,5 +1,6 @@
 describe('afSubmit', function () {
   var
+    $timeout,
     callbackResult = {
       validation: {
         userForm: {
@@ -17,8 +18,13 @@ describe('afSubmit', function () {
     MESSAGE_TYPES,
     submit;
 
-  function compile(trigger, showSuccess) {
-    compileHtml('<form af-submit="submit()" ' + (trigger ? 'af-trigger-on="' + trigger + '"' : '') + (showSuccess === undefined ? '' : 'af-show-success="' + showSuccess + '"') + '></form>', this.$scope);
+  function compile(trigger, scrollToError, showSuccess) {
+    compileHtml('<form af-submit="submit()" name="userForm" ' +
+                (trigger ? 'af-trigger-on="' + trigger + '"' : '') +
+                (scrollToError === undefined ? '' : 'af-scroll-to-error="' + scrollToError + '"') +
+                (showSuccess === undefined ? '' : 'af-show-success="' + showSuccess + '"') + '>' +
+                  '<input af-field name="first" ng-model="first"><input af-field name="user.name" ng-model="user.name">' +
+                '</form>', this.$scope);
     submit = this.element.controller('afSubmit');
     form = this.element.controller('form');
   }
@@ -30,10 +36,15 @@ describe('afSubmit', function () {
       .mockDirectives('afField')
       .setupResults(function () {
         return {
-          MessageService: { showSuccess: false }
+          MessageService: {
+            scrollToError: true,
+            showSuccess: false
+          }
         };
       })
       .run();
+
+    $timeout = mox.inject('$timeout');
 
     createScope({
       submit: jasmine.createSpy('submit callback')
@@ -57,6 +68,24 @@ describe('afSubmit', function () {
       });
     });
 
+    describe('the scrollToError setting', function () {
+      it('should be saved in the controller with a default value from MessageService.scrollToError()', function () {
+        expect(submit.scrollToError).toBe(true);
+
+        mox.get.MessageService.scrollToError.and.returnValue(false);
+        compile.call(this);
+        expect(submit.scrollToError).toBe(false);
+      });
+
+      it('should be saved in the controller with boolean value from the af-scroll-to-error attribute', function () {
+        compile.call(this, undefined, '\'truthy value as string\'');
+        expect(submit.scrollToError).toBe(true);
+
+        compile.call(this, undefined, false);
+        expect(submit.scrollToError).toBe(false);
+      });
+    });
+
     describe('the showSuccess setting', function () {
       it('should be saved in the controller with a default value from MessageService.showSuccess()', function () {
         expect(submit.showSuccess).toBe(false);
@@ -67,10 +96,10 @@ describe('afSubmit', function () {
       });
 
       it('should be saved in the controller with boolean value from the af-show-success attribute', function () {
-        compile.call(this, undefined, '\'truthy value as string\'');
+        compile.call(this, undefined, undefined, '\'truthy value as string\'');
         expect(submit.showSuccess).toBe(true);
 
-        compile.call(this, undefined, false);
+        compile.call(this, undefined, undefined, false);
         expect(submit.showSuccess).toBe(false);
       });
     });
@@ -83,7 +112,7 @@ describe('afSubmit', function () {
     beforeEach(function () {
       $rootScope = mox.inject('$rootScope');
       // Warning: since all child scopes inherit from $rootScope, the child scopes are also watched
-      spyOn(mox.inject('$rootScope'), '$broadcast');
+      spyOn(mox.inject('$rootScope'), '$broadcast').and.callThrough();
     });
 
     it('should request validation from all form elements', function () {
@@ -117,8 +146,14 @@ describe('afSubmit', function () {
 
         describe('which rejects', function () {
 
+          var nameField;
+
           beforeEach(function () {
             this.element.submit();
+
+            nameField = this.element.find('[name="user.name"]');
+            nameField.controller('ngModel').$setValidity('required', false);
+            this.$scope.$digest();
           });
 
           it('sends a setValidity event per server side validation', function () {
@@ -128,6 +163,26 @@ describe('afSubmit', function () {
 
           it('should set $scope.isSubmitting to false', function () {
             expect(this.$scope.isSubmitting).toBe(false);
+          });
+
+          describe('when afSubmit.scrollToError is true', function () {
+            it('should autofocus the first field that contains a message', function () {
+
+              $timeout.flush(1000);
+              expect(nameField).toBeFocused();
+              expect(this.element.find('[name="first"]')).not.toBeFocused();
+            });
+          });
+
+          describe('when afSubmit.scrollToError is false', function () {
+            beforeEach(function () {
+              submit.scrollToError = false;
+            });
+
+            it('should not autofocus', function () {
+              $timeout.flush(1000);
+              expect(nameField).not.toBeFocused();
+            });
           });
         });
       });
@@ -152,6 +207,7 @@ describe('afSubmit', function () {
       beforeEach(function () {
         form.$valid = false;
         this.element.submit();
+        console.log(this.element[0].outerHTML);
       });
 
       it('should stop further processing', function () {

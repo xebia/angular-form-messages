@@ -28,7 +28,15 @@ describe('MessageService', function () {
       messageServiceProvider.setGenericLabelPrefix('prefix');
       expect(inj.MessageService.getGenericLabelPrefix()).toBe('prefix.');
     });
+  });
 
+  describe('scrollToError', function () {
+    it('should return the configured scrollToError value', function () {
+      expect(inj.MessageService.scrollToError()).toBe(true);
+
+      messageServiceProvider.setScrollToError(false);
+      expect(inj.MessageService.scrollToError()).toBe(false);
+    });
   });
 
   describe('showSuccess', function () {

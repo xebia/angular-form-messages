@@ -5,11 +5,16 @@ angular.module('angularFormMessages')
   ) {
     var
       genericLabelPrefix,
+      scrollToError = true,
       showSuccess = false,
       triggerOn = 'change';
 
     this.setGenericLabelPrefix = function (newValue) {
       genericLabelPrefix = newValue;
+    };
+
+    this.setScrollToError = function (newValue) {
+      scrollToError = newValue;
     };
 
     this.setShowSuccess = function (newValue) {
@@ -49,6 +54,10 @@ angular.module('angularFormMessages')
 
         getGenericLabelPrefix: function () {
           return genericLabelPrefix ? genericLabelPrefix + '.' : '';
+        },
+
+        scrollToError: function () {
+          return scrollToError;
         },
 
         showSuccess: function () {

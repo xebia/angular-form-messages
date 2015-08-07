@@ -29,6 +29,10 @@ describe('afField', function () {
     expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
   }
 
+  function expectNoValidEvent() {
+    expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', 'userForm.user.name', [], MESSAGE_TYPES[0]);
+  }
+
   var
     $rootScope,
     afField,
@@ -75,7 +79,7 @@ describe('afField', function () {
 
       it('should not validate the field on blur', function () {
         this.element.field().trigger('blur');
-        expect($rootScope.$broadcast).not.toHaveBeenCalled();
+        expectNoValidEvent();
       });
     });
   });
@@ -88,7 +92,7 @@ describe('afField', function () {
     describe('and the user changes the field without blurring', function () {
       it('should not validate the field', function () {
         this.element.field().val('new value').trigger('input');
-        expect($rootScope.$broadcast).not.toHaveBeenCalled();
+        expectNoValidEvent();
       });
     });
 
@@ -111,7 +115,7 @@ describe('afField', function () {
       });
 
       it('should not validate the field', function () {
-        expect($rootScope.$broadcast).not.toHaveBeenCalled();
+        expectNoValidEvent();
       });
     });
   });
@@ -168,13 +172,13 @@ describe('afField', function () {
     });
 
     it('should send validation "valid" to the ngSubmitController', function () {
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [], MESSAGE_TYPES[0]);
+      expectValidEvent();
     });
 
     it('should send validation "invalid" to the ngSubmitController', function () {
       // Make field invalid to trigger a second validation event via the model watch
       makeFieldEmpty.call(this);
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.name', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+      expectErrorEvent();
     });
   });
 
