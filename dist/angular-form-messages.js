@@ -65,7 +65,12 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
       // Update validation on change / blur
       if (triggerOn === 'change') {
         // This also triggers custom directives which may not be able to listen to events
-        ngModel.$viewChangeListeners.push(updateValidation);
+        var ngModelPath = form.$name + '["' + ngModel.$name + '"]';
+        $scope.$watch('[' + ngModelPath + '.$error, ' + ngModelPath + '.$dirty]', function (newVal, oldVal) {
+          if ((newVal[0] !== oldVal[0]) || newVal[1]) {
+            updateValidation();
+          }
+        }, true);
       } else if (triggerOn === 'blur') {
         elem.on('blur', function () {
           $scope.$apply(updateValidation);
