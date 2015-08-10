@@ -8,7 +8,6 @@
   ],
   "description": "Angular Form Messages lets you show custom serverside and clientside validation messages in your forms, not only on fields but also on groups of fields.",
   "dependencies": {
-    "angular-messages": "1"
   },
   "devDependencies": {
     "angular-mocks": "1",
@@ -19,6 +18,8 @@
   "ignore": [
     "test",
     ".bowerrc",
+    ".codeclimate",
+    ".editorconfig",
     ".gitignore",
     ".jscsrc",
     ".jshintrc",
@@ -26,6 +27,7 @@
     "bower.json",
     "Gruntfile.js",
     "package.json",
+    "src/*",
     "wallaby.conf.js"
   ],
   "overrides": {

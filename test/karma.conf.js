@@ -17,7 +17,6 @@ module.exports = function(config) {
       // bower:js
       'bower_components/jquery/dist/jquery.js',
       'bower_components/angular/angular.js',
-      'bower_components/angular-messages/angular-messages.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/jasmine-jquery/lib/jasmine-jquery.js',
       'bower_components/mox/dist/mox.js',
