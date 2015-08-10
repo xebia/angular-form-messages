@@ -1,7 +1,7 @@
 angular.module('angularFormMessagesBootstrap')
   .directive('afFeedback', function (
     MESSAGE_TYPES,
-    MessageService
+    AfMessageService
   ) {
     return {
       require: ['afFeedback', '^afSubmit', '^form'],
@@ -14,7 +14,7 @@ angular.module('angularFormMessagesBootstrap')
 
         afFeedbackCtrl.messageId = attrs.afFeedback || attrs.afMessageId;
 
-        MessageService.validation(formCtrl.$name + '.' + afFeedbackCtrl.messageId, function (messages) {
+        AfMessageService.validation(formCtrl.$name + '.' + afFeedbackCtrl.messageId, function (messages) {
           if (messages.length || afSubmitCtrl.showSuccess) {
             attrs.$addClass('has-feedback');
           } else {

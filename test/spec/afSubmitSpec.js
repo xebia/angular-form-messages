@@ -32,11 +32,11 @@ describe('afSubmit', function () {
   beforeEach(function () {
     mox
       .module('angularFormMessages')
-      .mockServices('MessageService')
+      .mockServices('AfMessageService')
       .mockDirectives('afField')
       .setupResults(function () {
         return {
-          MessageService: {
+          AfMessageService: {
             scrollToError: true,
             showSuccess: false
           }
@@ -69,10 +69,10 @@ describe('afSubmit', function () {
     });
 
     describe('the scrollToError setting', function () {
-      it('should be saved in the controller with a default value from MessageService.scrollToError()', function () {
+      it('should be saved in the controller with a default value from AfMessageService.scrollToError()', function () {
         expect(submit.scrollToError).toBe(true);
 
-        mox.get.MessageService.scrollToError.and.returnValue(false);
+        mox.get.AfMessageService.scrollToError.and.returnValue(false);
         compile.call(this);
         expect(submit.scrollToError).toBe(false);
       });
@@ -87,10 +87,10 @@ describe('afSubmit', function () {
     });
 
     describe('the showSuccess setting', function () {
-      it('should be saved in the controller with a default value from MessageService.showSuccess()', function () {
+      it('should be saved in the controller with a default value from AfMessageService.showSuccess()', function () {
         expect(submit.showSuccess).toBe(false);
 
-        mox.get.MessageService.showSuccess.and.returnValue('truthy value');
+        mox.get.AfMessageService.showSuccess.and.returnValue('truthy value');
         compile.call(this);
         expect(submit.showSuccess).toBe(true);
       });

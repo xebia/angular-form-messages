@@ -1,7 +1,7 @@
 angular.module('angularFormMessagesBootstrap')
   .directive('afMessage', function (
     MESSAGE_TYPES,
-    MessageService
+    AfMessageService
   ) {
     var icons = {
       ERROR: 'glyphicon-exclamation-sign',
@@ -33,7 +33,7 @@ angular.module('angularFormMessagesBootstrap')
           formCtrl = ctrls[2],
           messageId = attrs.afMessage || attrs.afMessageId;
 
-        MessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
+        AfMessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.messageId === attrs.afMessage) {
             $scope.messageType = messageType || (afSubmit.showSuccess ? MESSAGE_TYPES[0] : undefined);

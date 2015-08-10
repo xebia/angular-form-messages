@@ -6,7 +6,7 @@ angular.module('angularFormMessagesBootstrap')
  */
   .directive('afFieldState', function (
     MESSAGE_TYPES,
-    MessageService
+    AfMessageService
   ) {
     return {
       require: ['^afSubmit', '^form'],
@@ -16,7 +16,7 @@ angular.module('angularFormMessagesBootstrap')
           formCtrl = ctrls[1],
           messageId = attrs.afFieldState || attrs.afMessageId;
 
-        MessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
+        AfMessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
           angular.forEach(MESSAGE_TYPES, function (type) {
             attrs.$removeClass('has-' + type.toLowerCase());
           });

@@ -1,6 +1,6 @@
 angular.module('angularFormMessages')
   .constant('MESSAGE_TYPES', ['SUCCESS', 'INFO', 'WARNING', 'ERROR'])
-  .provider('MessageService', function (
+  .provider('AfMessageService', function (
     MESSAGE_TYPES
   ) {
     var

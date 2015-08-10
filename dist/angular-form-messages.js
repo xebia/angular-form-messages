@@ -1,9 +1,9 @@
 angular.module('angularFormMessages', []);
 
-angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSAGE_TYPES", "MessageService", function (
+angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSAGE_TYPES", "AfMessageService", function (
   $rootScope,
   MESSAGE_TYPES,
-  MessageService
+  AfMessageService
 ) {
   return {
     priority: 100,
@@ -36,7 +36,7 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
         afField = ctrls[1],
         submit = ctrls[2],
         form = ctrls[3],
-        triggerOn = attrs.afTriggerOn || submit.triggerOn || MessageService.triggerOn(),
+        triggerOn = attrs.afTriggerOn || submit.triggerOn || AfMessageService.triggerOn(),
         isPristineAfterSubmit;
 
       // Collects validation info from ngModel and afField and broadcasts a validation event
@@ -52,7 +52,7 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
           });
         });
 
-        $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, MessageService.determineMessageType(messages));
+        $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, AfMessageService.determineMessageType(messages));
       }
 
       // Make this field clean again
@@ -115,8 +115,8 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
 }]);
 
 angular.module('angularFormMessages')
-  .directive('afMessage', ["MessageService", function (
-    MessageService
+  .directive('afMessage', ["AfMessageService", function (
+    AfMessageService
   ) {
     return {
       scope: true,
@@ -127,7 +127,7 @@ angular.module('angularFormMessages')
         var afMessageCtrl = ctrls[1];
 
         afMessageCtrl.messageId = formCtrl.$name + '.' +  (attrs.afMessage || attrs.afMessageId);
-        MessageService.validation(afMessageCtrl.messageId, function (messages) {
+        AfMessageService.validation(afMessageCtrl.messageId, function (messages) {
           $scope.messages = messages;
         });
       }
@@ -135,9 +135,9 @@ angular.module('angularFormMessages')
   }]);
 
 angular.module('angularFormMessages')
-  .directive('afMessageLabel', ["$log", "MessageService", "translateFilter", "TranslateService", function (
+  .directive('afMessageLabel', ["$log", "AfMessageService", "translateFilter", "TranslateService", function (
     $log,
-    MessageService,
+    AfMessageService,
     translateFilter,
     TranslateService
   ) {
@@ -148,7 +148,7 @@ angular.module('angularFormMessages')
         attrs.$observe('afMessageLabel', function (newVal) {
           var
             specificLabel = afMessageCtrl.messageId + '.' + newVal,
-            genericLabel = MessageService.getGenericLabelPrefix() + newVal,
+            genericLabel = AfMessageService.getGenericLabelPrefix() + newVal,
             translation = TranslateService.hasLabel(specificLabel) ? translateFilter(specificLabel) : translateFilter(genericLabel);
 
           if (translation === undefined) {
@@ -160,90 +160,9 @@ angular.module('angularFormMessages')
     };
   }]);
 
-angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "$timeout", "MessageService", function (
-  $rootScope,
-  $timeout,
-  MessageService
-) {
-
-  return {
-    require: ['form', 'afSubmit'],
-    controller: angular.noop,
-    link: {
-      pre: function ($scope, elem, attrs, ctrls) {
-        var afSubmit = ctrls[1];
-
-        // Settings
-        var scrollToError = $scope.$eval(attrs.afScrollToError);
-        afSubmit.scrollToError = !!(scrollToError === undefined ? MessageService.scrollToError() : scrollToError);
-        var showSuccess = $scope.$eval(attrs.afShowSuccess);
-        afSubmit.showSuccess = !!(showSuccess === undefined ? MessageService.showSuccess() : showSuccess);
-        afSubmit.triggerOn = attrs.afTriggerOn;
-      }, post: function ($scope, elem, attrs, ctrls) {
-        var
-          afSubmit = ctrls[1],
-          form = ctrls[0];
-
-        function isPromise(obj) {
-          return angular.isObject(obj) && typeof (obj.then) === 'function';
-        }
-
-        function doSubmit(event) {
-          event.preventDefault();
-
-          $scope.$broadcast('validate');
-          $scope.$apply(function () {
-
-            function processErrors(result) {
-              angular.forEach(result.validation, function (validations, formName) {
-                angular.forEach(validations, function (messages, messageId) {
-                  $rootScope.$broadcast('setValidity', formName + '.' + messageId, messages);
-                });
-              });
-
-              $timeout(function autoFocusFirstMessage() {
-                var firstMessageField = elem[0].querySelector('.ng-invalid[af-field]');
-                if (afSubmit.scrollToError && firstMessageField) {
-                  firstMessageField.focus();
-                }
-              });
-            }
-
-            if (!form.$valid) {
-              return;
-            }
-
-            var callbackResult = $scope.$eval(attrs.afSubmit);
-            if (isPromise(callbackResult)) {
-              $scope.isSubmitting = true;
-              callbackResult
-                .catch(processErrors)
-                ['finally'](function () {
-                $scope.isSubmitting = false;
-              });
-            }
-          });
-        }
-
-        elem.on('submit', doSubmit);
-      }
-    }
-  };
-}]);
-
-angular.module('angularFormMessages').directive('afSubmitButton', function () {
-  return {
-    link: function linkFn($scope, elem, attrs) {
-      $scope.$watch('isSubmitting', function (newValue) {
-        attrs.$set('disabled', newValue ? 'disabled' : undefined);
-      });
-    }
-  };
-});
-
 angular.module('angularFormMessages')
   .constant('MESSAGE_TYPES', ['SUCCESS', 'INFO', 'WARNING', 'ERROR'])
-  .provider('MessageService', ["MESSAGE_TYPES", function (
+  .provider('AfMessageService', ["MESSAGE_TYPES", function (
     MESSAGE_TYPES
   ) {
     var
@@ -313,3 +232,84 @@ angular.module('angularFormMessages')
       };
     }];
   }]);
+
+angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "$timeout", "AfMessageService", function (
+  $rootScope,
+  $timeout,
+  AfMessageService
+) {
+
+  return {
+    require: ['form', 'afSubmit'],
+    controller: angular.noop,
+    link: {
+      pre: function ($scope, elem, attrs, ctrls) {
+        var afSubmit = ctrls[1];
+
+        // Settings
+        var scrollToError = $scope.$eval(attrs.afScrollToError);
+        afSubmit.scrollToError = !!(scrollToError === undefined ? AfMessageService.scrollToError() : scrollToError);
+        var showSuccess = $scope.$eval(attrs.afShowSuccess);
+        afSubmit.showSuccess = !!(showSuccess === undefined ? AfMessageService.showSuccess() : showSuccess);
+        afSubmit.triggerOn = attrs.afTriggerOn;
+      }, post: function ($scope, elem, attrs, ctrls) {
+        var
+          afSubmit = ctrls[1],
+          form = ctrls[0];
+
+        function isPromise(obj) {
+          return angular.isObject(obj) && typeof (obj.then) === 'function';
+        }
+
+        function doSubmit(event) {
+          event.preventDefault();
+
+          $scope.$broadcast('validate');
+          $scope.$apply(function () {
+
+            function processErrors(result) {
+              angular.forEach(result.validation, function (validations, formName) {
+                angular.forEach(validations, function (messages, messageId) {
+                  $rootScope.$broadcast('setValidity', formName + '.' + messageId, messages);
+                });
+              });
+
+              $timeout(function autoFocusFirstMessage() {
+                var firstMessageField = elem[0].querySelector('.ng-invalid[af-field]');
+                if (afSubmit.scrollToError && firstMessageField) {
+                  firstMessageField.focus();
+                }
+              });
+            }
+
+            if (!form.$valid) {
+              return;
+            }
+
+            var callbackResult = $scope.$eval(attrs.afSubmit);
+            if (isPromise(callbackResult)) {
+              $scope.isSubmitting = true;
+              callbackResult
+                .catch(processErrors)
+                ['finally'](function () {
+                $scope.isSubmitting = false;
+              });
+            }
+          });
+        }
+
+        elem.on('submit', doSubmit);
+      }
+    }
+  };
+}]);
+
+angular.module('angularFormMessages').directive('afSubmitButton', function () {
+  return {
+    link: function linkFn($scope, elem, attrs) {
+      $scope.$watch('isSubmitting', function (newValue) {
+        attrs.$set('disabled', newValue ? 'disabled' : undefined);
+      });
+    }
+  };
+});

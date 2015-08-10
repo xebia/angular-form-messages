@@ -4,11 +4,11 @@ describe('afMessage', function () {
   beforeEach(function () {
     mox
       .module('angularFormMessages')
-      .mockServices('MessageService')
+      .mockServices('AfMessageService')
       .setupResults(function () {
         $rootScope = mox.inject('$rootScope');
         return {
-          MessageService: {
+          AfMessageService: {
             validation: function (messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
               $rootScope.$on('validation', function (event, validationMessageId, messages, messageType) {
@@ -35,18 +35,18 @@ describe('afMessage', function () {
       expect(this.element.message().controller('afMessage').messageId).toBe('userForm.user.name');
     });
 
-    it('should register the validation event listener via the MessageService', function () {
-      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
+    it('should register the validation event listener via the AfMessageService', function () {
+      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
-        mox.get.MessageService.validation.calls.reset();
+        mox.get.AfMessageService.validation.calls.reset();
         compileHtml('<form name="userForm"><div af-message af-message-id="user.name"></div></form>');
       });
 
-      it('should register the validation event listener via the MessageService', function () {
-        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
+      it('should register the validation event listener via the AfMessageService', function () {
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
       });
     });
   });

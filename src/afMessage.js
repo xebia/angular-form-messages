@@ -1,6 +1,6 @@
 angular.module('angularFormMessages')
   .directive('afMessage', function (
-    MessageService
+    AfMessageService
   ) {
     return {
       scope: true,
@@ -11,7 +11,7 @@ angular.module('angularFormMessages')
         var afMessageCtrl = ctrls[1];
 
         afMessageCtrl.messageId = formCtrl.$name + '.' +  (attrs.afMessage || attrs.afMessageId);
-        MessageService.validation(afMessageCtrl.messageId, function (messages) {
+        AfMessageService.validation(afMessageCtrl.messageId, function (messages) {
           $scope.messages = messages;
         });
       }

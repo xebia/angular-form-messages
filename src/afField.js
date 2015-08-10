@@ -1,7 +1,7 @@
 angular.module('angularFormMessages').directive('afField', function (
   $rootScope,
   MESSAGE_TYPES,
-  MessageService
+  AfMessageService
 ) {
   return {
     priority: 100,
@@ -34,7 +34,7 @@ angular.module('angularFormMessages').directive('afField', function (
         afField = ctrls[1],
         submit = ctrls[2],
         form = ctrls[3],
-        triggerOn = attrs.afTriggerOn || submit.triggerOn || MessageService.triggerOn(),
+        triggerOn = attrs.afTriggerOn || submit.triggerOn || AfMessageService.triggerOn(),
         isPristineAfterSubmit;
 
       // Collects validation info from ngModel and afField and broadcasts a validation event
@@ -50,7 +50,7 @@ angular.module('angularFormMessages').directive('afField', function (
           });
         });
 
-        $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, MessageService.determineMessageType(messages));
+        $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, AfMessageService.determineMessageType(messages));
       }
 
       // Make this field clean again

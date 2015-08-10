@@ -1,7 +1,7 @@
 angular.module('angularFormMessages')
   .directive('afMessageLabel', function (
     $log,
-    MessageService,
+    AfMessageService,
     translateFilter,
     TranslateService
   ) {
@@ -12,7 +12,7 @@ angular.module('angularFormMessages')
         attrs.$observe('afMessageLabel', function (newVal) {
           var
             specificLabel = afMessageCtrl.messageId + '.' + newVal,
-            genericLabel = MessageService.getGenericLabelPrefix() + newVal,
+            genericLabel = AfMessageService.getGenericLabelPrefix() + newVal,
             translation = TranslateService.hasLabel(specificLabel) ? translateFilter(specificLabel) : translateFilter(genericLabel);
 
           if (translation === undefined) {

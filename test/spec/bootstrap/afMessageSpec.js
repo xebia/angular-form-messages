@@ -11,7 +11,7 @@ describe('messageDirective', function () {
         'templates/bootstrap/messageDirective.html'
       )
       .mockServices(
-        'MessageService',
+        'AfMessageService',
         'translateFilter',
         'TranslateService'
     )
@@ -33,7 +33,7 @@ describe('messageDirective', function () {
       //.disableDirectives('afMessageLabel')
       .setupResults(function () {
         return {
-          MessageService: {
+          AfMessageService: {
             validation: function (messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
               mox.inject('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
@@ -82,18 +82,18 @@ describe('messageDirective', function () {
       expect(this.element.feedbackScreenreader()).not.toExist();
     });
 
-    it('should register the validation event listener via the MessageService', function () {
-      expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
+    it('should register the validation event listener via the AfMessageService', function () {
+      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
-        mox.get.MessageService.validation.calls.reset();
+        mox.get.AfMessageService.validation.calls.reset();
         compileHtml('<form name="userForm" af-submit><div af-message af-message-id="user.name"></div></form>');
       });
 
-      it('should register the validation event listener via the MessageService', function () {
-        expect(mox.get.MessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
+      it('should register the validation event listener via the AfMessageService', function () {
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
       });
     });
   });

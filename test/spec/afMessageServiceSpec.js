@@ -1,13 +1,13 @@
-describe('MessageService', function () {
+describe('AfMessageService', function () {
   var
     inj,
-    messageServiceProvider;
+    afMessageServiceProvider;
 
   beforeEach(function () {
     angular
       .module('angularFormMessages')
-      .config(function (MessageServiceProvider) {
-        messageServiceProvider = MessageServiceProvider;
+      .config(function (AfMessageServiceProvider) {
+        afMessageServiceProvider = AfMessageServiceProvider;
       });
 
     mox
@@ -17,74 +17,74 @@ describe('MessageService', function () {
     inj = mox.inject(
       '$rootScope',
       'MESSAGE_TYPES',
-      'MessageService'
+      'AfMessageService'
     );
   });
 
   describe('genericLabelPrefix', function () {
     it('should return the configured genericLabelPrefix value with a dot', function () {
-      expect(inj.MessageService.getGenericLabelPrefix()).toBeFalsy();
+      expect(inj.AfMessageService.getGenericLabelPrefix()).toBeFalsy();
 
-      messageServiceProvider.setGenericLabelPrefix('prefix');
-      expect(inj.MessageService.getGenericLabelPrefix()).toBe('prefix.');
+      afMessageServiceProvider.setGenericLabelPrefix('prefix');
+      expect(inj.AfMessageService.getGenericLabelPrefix()).toBe('prefix.');
     });
   });
 
   describe('scrollToError', function () {
     it('should return the configured scrollToError value', function () {
-      expect(inj.MessageService.scrollToError()).toBe(true);
+      expect(inj.AfMessageService.scrollToError()).toBe(true);
 
-      messageServiceProvider.setScrollToError(false);
-      expect(inj.MessageService.scrollToError()).toBe(false);
+      afMessageServiceProvider.setScrollToError(false);
+      expect(inj.AfMessageService.scrollToError()).toBe(false);
     });
   });
 
   describe('showSuccess', function () {
     it('should return the configured showSuccess value', function () {
-      expect(inj.MessageService.showSuccess()).toBe(false);
+      expect(inj.AfMessageService.showSuccess()).toBe(false);
 
-      messageServiceProvider.setShowSuccess(true);
-      expect(inj.MessageService.showSuccess()).toBe(true);
+      afMessageServiceProvider.setShowSuccess(true);
+      expect(inj.AfMessageService.showSuccess()).toBe(true);
     });
   });
 
   describe('triggerOn', function () {
     it('should return the configured triggerOn value', function () {
-      expect(inj.MessageService.triggerOn()).toBe('change');
+      expect(inj.AfMessageService.triggerOn()).toBe('change');
 
-      messageServiceProvider.setTriggerOn('newValue');
-      expect(inj.MessageService.triggerOn()).toBe('newValue');
+      afMessageServiceProvider.setTriggerOn('newValue');
+      expect(inj.AfMessageService.triggerOn()).toBe('newValue');
     });
   });
 
   describe('determineMessageType()', function () {
     it('should return the message type that has the highest severity', function () {
-      expect(inj.MessageService.determineMessageType([
+      expect(inj.AfMessageService.determineMessageType([
         { type: inj.MESSAGE_TYPES[0] },
         { type: inj.MESSAGE_TYPES[1] }
       ])).toBe(inj.MESSAGE_TYPES[1]);
 
-      expect(inj.MessageService.determineMessageType([
+      expect(inj.AfMessageService.determineMessageType([
         { type: inj.MESSAGE_TYPES[1] },
         { type: inj.MESSAGE_TYPES[1] }
       ])).toBe(inj.MESSAGE_TYPES[1]);
 
-      expect(inj.MessageService.determineMessageType([
+      expect(inj.AfMessageService.determineMessageType([
         { type: inj.MESSAGE_TYPES[2] },
         { type: inj.MESSAGE_TYPES[0] }
       ])).toBe(inj.MESSAGE_TYPES[2]);
     });
 
     it('should return undefined when there are no messages', function () {
-      expect(inj.MessageService.determineMessageType()).toBeUndefined();
-      expect(inj.MessageService.determineMessageType([])).toBeUndefined();
+      expect(inj.AfMessageService.determineMessageType()).toBeUndefined();
+      expect(inj.AfMessageService.determineMessageType([])).toBeUndefined();
     });
   });
 
   describe('validation()', function () {
     beforeEach(function () {
       this.cb = jasmine.createSpy('validation');
-      inj.MessageService.validation('name', this.cb);
+      inj.AfMessageService.validation('name', this.cb);
     });
 
     describe('when the message type is the same as the messageType passed to the validation registrer', function () {

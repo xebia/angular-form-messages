@@ -1,9 +1,9 @@
 angular.module('angularFormMessagesBootstrap', ['angularFormMessages']);
 
 angular.module('angularFormMessagesBootstrap')
-  .directive('afFeedback', ["MESSAGE_TYPES", "MessageService", function (
+  .directive('afFeedback', ["MESSAGE_TYPES", "AfMessageService", function (
     MESSAGE_TYPES,
-    MessageService
+    AfMessageService
   ) {
     return {
       require: ['afFeedback', '^afSubmit', '^form'],
@@ -16,7 +16,7 @@ angular.module('angularFormMessagesBootstrap')
 
         afFeedbackCtrl.messageId = attrs.afFeedback || attrs.afMessageId;
 
-        MessageService.validation(formCtrl.$name + '.' + afFeedbackCtrl.messageId, function (messages) {
+        AfMessageService.validation(formCtrl.$name + '.' + afFeedbackCtrl.messageId, function (messages) {
           if (messages.length || afSubmitCtrl.showSuccess) {
             attrs.$addClass('has-feedback');
           } else {
@@ -33,9 +33,9 @@ angular.module('angularFormMessagesBootstrap')
  * Where there are multiple messages, no class is added.
  * When there is no message (the field is valid) and showSuccess is true, show the 'has-success' class.
  */
-  .directive('afFieldState', ["MESSAGE_TYPES", "MessageService", function (
+  .directive('afFieldState', ["MESSAGE_TYPES", "AfMessageService", function (
     MESSAGE_TYPES,
-    MessageService
+    AfMessageService
   ) {
     return {
       require: ['^afSubmit', '^form'],
@@ -45,7 +45,7 @@ angular.module('angularFormMessagesBootstrap')
           formCtrl = ctrls[1],
           messageId = attrs.afFieldState || attrs.afMessageId;
 
-        MessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
+        AfMessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
           angular.forEach(MESSAGE_TYPES, function (type) {
             attrs.$removeClass('has-' + type.toLowerCase());
           });
@@ -61,9 +61,9 @@ angular.module('angularFormMessagesBootstrap')
   }]);
 
 angular.module('angularFormMessagesBootstrap')
-  .directive('afMessage', ["MESSAGE_TYPES", "MessageService", function (
+  .directive('afMessage', ["MESSAGE_TYPES", "AfMessageService", function (
     MESSAGE_TYPES,
-    MessageService
+    AfMessageService
   ) {
     var icons = {
       ERROR: 'glyphicon-exclamation-sign',
@@ -95,7 +95,7 @@ angular.module('angularFormMessagesBootstrap')
           formCtrl = ctrls[2],
           messageId = attrs.afMessage || attrs.afMessageId;
 
-        MessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
+        AfMessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.messageId === attrs.afMessage) {
             $scope.messageType = messageType || (afSubmit.showSuccess ? MESSAGE_TYPES[0] : undefined);

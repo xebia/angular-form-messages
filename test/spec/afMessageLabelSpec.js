@@ -5,13 +5,13 @@ describe('the afMessageLabel directive', function () {
     mox
       .module('angularFormMessages')
       .mockServices(
-        'MessageService',
+        'AfMessageService',
         'translateFilter',
         'TranslateService'
       )
       .setupResults(function () {
         return {
-          MessageService: {
+          AfMessageService: {
             getGenericLabelPrefix: 'prefix.'
           },
           TranslateService: { hasLabel: true },

@@ -43,11 +43,11 @@ describe('afField', function () {
   beforeEach(function () {
     mox
       .module('angularFormMessages')
-      .mockServices('MessageService')
+      .mockServices('AfMessageService')
       .setupResults(function () {
         MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
         return {
-          MessageService: {
+          AfMessageService: {
             determineMessageType: MESSAGE_TYPES[0],
             triggerOn: 'change'
           }
@@ -130,7 +130,7 @@ describe('afField', function () {
       compile();
     });
 
-    it('should use the value of MessageService.triggerOn() as default', function () {
+    it('should use the value of AfMessageService.triggerOn() as default', function () {
       this.element.field().val('other@address').trigger('input');
       expectValidEvent();
     });
