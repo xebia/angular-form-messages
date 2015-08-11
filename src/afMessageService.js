@@ -51,9 +51,9 @@ angular.module('angularFormMessages')
           return mostSevereMessage;
         },
 
-        validation: function (messageId, callback) {
-          $injector.get('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
-            if (validationMessageId === messageId) {
+        validation: function (form, messageId, callback) {
+          $injector.get('$rootScope').$on('validation', function (event, validationForm, validationMessageId, messages, messageType) {
+            if (form === validationForm && validationMessageId === messageId) {
               callback(messages, messageType);
             }
           });

@@ -10,7 +10,7 @@ describe('afFeedback', function () {
       };
     });
 
-    inj.$rootScope.$broadcast('validation', undefined, messages);
+    inj.$rootScope.$broadcast('validation', this.element.controller('form'), undefined, messages);
     this.$scope.$digest();
   }
 
@@ -39,9 +39,9 @@ describe('afFeedback', function () {
       .setupResults(function () {
         return {
           AfMessageService: {
-            validation: function (messageId, callback) {
+            validation: function (formCtrl, messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
-              mox.inject('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
+              mox.inject('$rootScope').$on('validation', function (event, validationFormCtrl, validationMessageId, messages, messageType) {
                 callback(messages, messageType);
               });
             }
@@ -64,7 +64,7 @@ describe('afFeedback', function () {
     }
 
     it('should register the validation event listener via the AfMessageService', function () {
-      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
+      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.element.controller('form'), 'userForm.user.name', jasmine.any(Function));
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
@@ -74,7 +74,7 @@ describe('afFeedback', function () {
       });
 
       it('should register the validation event listener via the AfMessageService', function () {
-        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.element.controller('form'), 'userForm.user.name', jasmine.any(Function));
       });
     });
 

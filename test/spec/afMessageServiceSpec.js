@@ -1,7 +1,8 @@
 describe('AfMessageService', function () {
   var
-    inj,
-    afMessageServiceProvider;
+    formCtrl = {},
+    afMessageServiceProvider,
+    inj;
 
   beforeEach(function () {
     angular
@@ -98,19 +99,26 @@ describe('AfMessageService', function () {
   describe('validation()', function () {
     beforeEach(function () {
       this.cb = jasmine.createSpy('validation');
-      inj.AfMessageService.validation('formName.name', this.cb);
+      inj.AfMessageService.validation(formCtrl, 'formName.name', this.cb);
     });
 
     describe('when the message type is the same as the messageType passed to the validation registrer', function () {
       it('should call the callback with passed messages and messageType arguments', function () {
-        inj.$rootScope.$broadcast('validation', 'formName.name', [], 'messageType');
+        inj.$rootScope.$broadcast('validation', formCtrl, 'formName.name', [], 'messageType');
         expect(this.cb).toHaveBeenCalledWith([], 'messageType');
       });
     });
 
-    describe('when the message type is the same as the messageType passed to the validation registrer', function () {
+    describe('when the message type is not the same as the messageType passed to the validation registrer', function () {
       it('should call the callback with passed messages and messageType arguments', function () {
-        inj.$rootScope.$broadcast('validation', 'formName.other', [], 'messageType');
+        inj.$rootScope.$broadcast('validation', formCtrl, 'formName.other', [], 'messageType');
+        expect(this.cb).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when the form controller is not the same as the form controller passed to the validation registrer', function () {
+      it('should call the callback with passed messages and messageType arguments', function () {
+        inj.$rootScope.$broadcast('validation', { other: 'ctrl' }, 'formName.name', [], 'messageType');
         expect(this.cb).not.toHaveBeenCalled();
       });
     });
