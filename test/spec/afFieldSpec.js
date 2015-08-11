@@ -22,7 +22,7 @@ describe('afField', function () {
   }
 
   function expectValidEvent() {
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.email', [], MESSAGE_TYPES[0]);
+    expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.email', [], undefined);
   }
 
   function expectErrorEvent() {
@@ -30,7 +30,7 @@ describe('afField', function () {
   }
 
   function expectNoValidEvent() {
-    expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', 'userForm.user.email', [], MESSAGE_TYPES[0]);
+    expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', 'userForm.user.email', [], undefined);
   }
 
   var
@@ -48,7 +48,9 @@ describe('afField', function () {
         MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
         return {
           AfMessageService: {
-            determineMessageType: MESSAGE_TYPES[0],
+            getMostSevereMessage: function (messages) {
+              return messages.length ? { type: MESSAGE_TYPES[0] } : undefined;
+            },
             triggerOn: 'change'
           }
         };

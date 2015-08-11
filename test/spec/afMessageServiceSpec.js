@@ -66,27 +66,32 @@ describe('AfMessageService', function () {
     });
   });
 
-  describe('determineMessageType()', function () {
-    it('should return the message type that has the highest severity', function () {
-      expect(inj.AfMessageService.determineMessageType([
-        { type: inj.MESSAGE_TYPES[0] },
-        { type: inj.MESSAGE_TYPES[1] }
-      ])).toBe(inj.MESSAGE_TYPES[1]);
+  describe('getMostSevereMessage()', function () {
+    it('should return the message that has the highest severity', function () {
+      var messages = {
+        success: { type: inj.MESSAGE_TYPES[0] },
+        info: { type: inj.MESSAGE_TYPES[1] },
+        warning: { type: inj.MESSAGE_TYPES[2] }
+      };
+      expect(inj.AfMessageService.getMostSevereMessage([
+        messages.success,
+        messages.info
+      ])).toBe(messages.info);
 
-      expect(inj.AfMessageService.determineMessageType([
-        { type: inj.MESSAGE_TYPES[1] },
-        { type: inj.MESSAGE_TYPES[1] }
-      ])).toBe(inj.MESSAGE_TYPES[1]);
+      expect(inj.AfMessageService.getMostSevereMessage([
+        messages.info,
+        messages.info
+      ])).toBe(messages.info);
 
-      expect(inj.AfMessageService.determineMessageType([
-        { type: inj.MESSAGE_TYPES[2] },
-        { type: inj.MESSAGE_TYPES[0] }
-      ])).toBe(inj.MESSAGE_TYPES[2]);
+      expect(inj.AfMessageService.getMostSevereMessage([
+        messages.warning,
+        messages.success
+      ])).toBe(messages.warning);
     });
 
     it('should return undefined when there are no messages', function () {
-      expect(inj.AfMessageService.determineMessageType()).toBeUndefined();
-      expect(inj.AfMessageService.determineMessageType([])).toBeUndefined();
+      expect(inj.AfMessageService.getMostSevereMessage()).toBeUndefined();
+      expect(inj.AfMessageService.getMostSevereMessage([])).toBeUndefined();
     });
   });
 

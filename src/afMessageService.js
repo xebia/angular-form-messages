@@ -34,19 +34,21 @@ angular.module('angularFormMessages')
 
       return {
         /**
-         * Determine the message type with the highest severity from a list of messages
+         * Determine the message with the highest severity from a list of messages
          * @param {Object[]} messages
-         * @returns {string} message type with the highest severity
+         * @returns {Object} message with the highest severity
          */
-        determineMessageType: function (messages) {
+        getMostSevereMessage: function (messages) {
           var severityIndex = -1;
+          var mostSevereMessage;
           angular.forEach(messages, function (message) {
             var index = MESSAGE_TYPES.indexOf(message.type);
             if (index > severityIndex) {
               severityIndex = index;
+              mostSevereMessage = message;
             }
           });
-          return severityIndex === -1 ? undefined : MESSAGE_TYPES[severityIndex];
+          return mostSevereMessage;
         },
 
         validation: function (messageId, callback) {

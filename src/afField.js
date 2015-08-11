@@ -50,7 +50,8 @@ angular.module('angularFormMessages').directive('afField', function (
           });
         });
 
-        $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, AfMessageService.determineMessageType(messages));
+        var message = AfMessageService.getMostSevereMessage(messages);
+        $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, message ? message.type : undefined);
       }
 
       // Make this field clean again
