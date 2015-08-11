@@ -1,7 +1,7 @@
 angular.module('angularFormMessagesBootstrap')
   .directive('afMessage', function (
-    MESSAGE_TYPES,
-    AfMessageService
+    AfMessageService,
+    MESSAGE_TYPES
   ) {
     var icons = {
       ERROR: 'glyphicon-exclamation-sign',
@@ -24,23 +24,28 @@ angular.module('angularFormMessagesBootstrap')
 
     return {
       restrict: 'A',
-      require: ['?^afFeedback', '^afSubmit', '^form'],
+      priority: 1, // Link function needs to run after non-Bootstrap afMessage
+      require: ['?^afFeedback', 'afMessage', '^afSubmit', '^form'],
       templateUrl: 'templates/bootstrap/messageDirective.html',
       link: function ($scope, elem, attrs, ctrls) {
         var
           afFeedbackCtrl = ctrls[0],
-          afSubmit = ctrls[1],
-          formCtrl = ctrls[2],
-          messageId = attrs.afMessage || attrs.afMessageId;
+          afMessageCtrl = ctrls[1],
+          afSubmitCtrl = ctrls[2],
+          formCtrl = ctrls[3];
 
-        AfMessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
+        AfMessageService.validation(formCtrl.$name + '.' + afMessageCtrl.messageId, function (messages, messageType) {
           // Feedback
-          if (afFeedbackCtrl && afFeedbackCtrl.messageId === attrs.afMessage) {
-            $scope.messageType = messageType || (afSubmit.showSuccess ? MESSAGE_TYPES[0] : undefined);
+          if (afFeedbackCtrl && afFeedbackCtrl.messageId === afMessageCtrl.messageId) {
+            $scope.messageType = messageType || (afSubmitCtrl.showSuccess ? MESSAGE_TYPES[0] : undefined);
             $scope.icon = feedbackIcons[$scope.messageType];
           }
 
           // Messages
+          if (!AfMessageService.showMultiple()) {
+            messages = [AfMessageService.getMostSevereMessage(messages)];
+          }
+
           angular.forEach(messages, function (message) {
             message.alertClass = alertClasses[message.type];
             message.icon = icons[message.type];

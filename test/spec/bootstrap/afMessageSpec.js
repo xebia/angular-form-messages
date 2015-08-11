@@ -33,6 +33,10 @@ describe('messageDirective', function () {
       .setupResults(function () {
         return {
           AfMessageService: {
+            getMostSevereMessage: function (messages) {
+              return messages[1];
+            },
+            showMultiple: true,
             validation: function (messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
               mox.inject('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
@@ -55,7 +59,7 @@ describe('messageDirective', function () {
     createScope({
       messageId: 'user.name'
     });
-    this.element = addSelectors(compileHtml('<form name="userForm" af-submit><div af-message="user.name"></div></form>'), {
+    addSelectors(compileHtml('<form name="userForm" af-submit><div af-message="user.name"></div></form>'), {
       feedbackIcon: '.form-control-feedback',
       feedbackScreenreader: '.form-control-feedback + .sr-only',
       alerts: '.alert',
@@ -68,7 +72,6 @@ describe('messageDirective', function () {
         }
       }
     });
-
   });
 
   describe('on initialization', function () {
@@ -108,8 +111,22 @@ describe('messageDirective', function () {
       validation(inj.MESSAGE_TYPES[0]);
     });
 
-    it('should show the messages', function () {
-      expect(this.element.alerts()).toHaveLength(messages.length);
+    describe('when we allow to show multiple messages', function () {
+      it('should show the messages', function () {
+        expect(this.element.alerts()).toHaveLength(messages.length);
+      });
+    });
+
+    describe('when we only allow to show the message with the highest severity', function () {
+      beforeEach(function () {
+        mox.get.AfMessageService.showMultiple.and.returnValue(false);
+        validation(inj.MESSAGE_TYPES[0]);
+      });
+
+      it('should show the message with highest severity', function () {
+        expect(this.element.alerts()).toHaveLength(1);
+        expect(this.element.alert(0).label()).toHaveAttr('af-message-label', messages[1].message);
+      });
     });
 
     it('should the message text and type', function () {
