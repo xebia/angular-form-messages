@@ -3,11 +3,17 @@ describe('the afMessageLabel directive', function () {
 
   beforeEach(function () {
     mox
-      .module('angularFormMessages')
+      .module('angularFormMessagesBootstrap')
       .mockServices(
         'AfMessageService',
         '$translate'
       )
+      .mockDirectives({
+        name: 'afMessage',
+        controller: function () {
+          this.messageId = 'user.email';
+        }
+      })
       .setupResults(function () {
         return {
           AfMessageService: {
@@ -25,9 +31,13 @@ describe('the afMessageLabel directive', function () {
       .run();
 
     createScope();
-    compileHtml('<form name="userForm"><div af-message="user.email"><span af-message-label="{{key}}"></span></div></form>');
+    compileHtml('<form name="userForm"><div af-message><span af-message-label="{{key}}">Content</span></div></form>');
     $log = mox.inject('$log');
     spyOn($log, 'warn');
+  });
+
+  it('should do nothing when the key is empty', function () {
+    expect(this.element).toHaveText('Content');
   });
 
   it('should replace the contents of the element with the field specific translation if this exists', function () {
