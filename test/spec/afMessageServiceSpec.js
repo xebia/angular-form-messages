@@ -39,6 +39,15 @@ describe('AfMessageService', function () {
     });
   });
 
+  describe('showMultiple', function () {
+    it('should return the configured showMultiple value', function () {
+      expect(inj.AfMessageService.showMultiple()).toBe(true);
+
+      afMessageServiceProvider.setShowMultiple(false);
+      expect(inj.AfMessageService.showMultiple()).toBe(false);
+    });
+  });
+
   describe('showSuccess', function () {
     it('should return the configured showSuccess value', function () {
       expect(inj.AfMessageService.showSuccess()).toBe(false);

@@ -6,6 +6,7 @@ angular.module('angularFormMessages')
     var
       genericLabelPrefix,
       scrollToError = true,
+      showMultiple = true,
       showSuccess = false,
       triggerOn = 'change';
 
@@ -15,6 +16,10 @@ angular.module('angularFormMessages')
 
     this.setScrollToError = function (newValue) {
       scrollToError = newValue;
+    };
+
+    this.setShowMultiple = function (newValue) {
+      showMultiple = newValue;
     };
 
     this.setShowSuccess = function (newValue) {
@@ -58,6 +63,10 @@ angular.module('angularFormMessages')
 
         scrollToError: function () {
           return scrollToError;
+        },
+
+        showMultiple: function () {
+          return showMultiple;
         },
 
         showSuccess: function () {
