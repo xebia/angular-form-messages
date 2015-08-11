@@ -6,20 +6,19 @@ describe('the afMessageLabel directive', function () {
       .module('angularFormMessages')
       .mockServices(
         'AfMessageService',
-        'translateFilter',
-        'TranslateService'
+        '$translate'
       )
       .setupResults(function () {
         return {
           AfMessageService: {
             getGenericLabelPrefix: 'prefix.'
           },
-          TranslateService: { hasLabel: true },
-          translateFilter: function (key) {
-            return {
+          $translate: function (key) {
+            var translations = {
               'userForm.user.email.email': 'E-mail translation',
               'prefix.required': 'Required translation'
-            }[key];
+            };
+            return key in translations ? promise(translations[key]) : reject(key);
           }
         };
       })
@@ -38,7 +37,6 @@ describe('the afMessageLabel directive', function () {
   });
 
   it('should replace the contents of the element with the generic translation if this exists', function () {
-    mox.get.TranslateService.hasLabel.and.returnValue(false);
     this.$scope.key = 'required';
     this.$scope.$digest();
     expect(this.element).toHaveText('Required translation');
@@ -48,8 +46,6 @@ describe('the afMessageLabel directive', function () {
     this.$scope.key = 'specific not existing';
     this.$scope.$digest();
     expect(this.element).toHaveText('specific not existing');
-
-    mox.get.TranslateService.hasLabel.and.returnValue(false);
 
     this.$scope.key = 'generic not existing';
     this.$scope.$digest();

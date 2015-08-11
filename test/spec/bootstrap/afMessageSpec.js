@@ -12,9 +12,8 @@ describe('messageDirective', function () {
       )
       .mockServices(
         'AfMessageService',
-        'translateFilter',
-        'TranslateService'
-    )
+        '$translate'
+      )
       .mockDirectives(
         'afMessageLabel',
         {
