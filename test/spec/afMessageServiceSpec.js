@@ -98,19 +98,19 @@ describe('AfMessageService', function () {
   describe('validation()', function () {
     beforeEach(function () {
       this.cb = jasmine.createSpy('validation');
-      inj.AfMessageService.validation('name', this.cb);
+      inj.AfMessageService.validation('formName.name', this.cb);
     });
 
     describe('when the message type is the same as the messageType passed to the validation registrer', function () {
       it('should call the callback with passed messages and messageType arguments', function () {
-        inj.$rootScope.$broadcast('validation', 'name', [], 'messageType');
+        inj.$rootScope.$broadcast('validation', 'formName.name', [], 'messageType');
         expect(this.cb).toHaveBeenCalledWith([], 'messageType');
       });
     });
 
     describe('when the message type is the same as the messageType passed to the validation registrer', function () {
       it('should call the callback with passed messages and messageType arguments', function () {
-        inj.$rootScope.$broadcast('validation', 'other', [], 'messageType');
+        inj.$rootScope.$broadcast('validation', 'formName.other', [], 'messageType');
         expect(this.cb).not.toHaveBeenCalled();
       });
     });
