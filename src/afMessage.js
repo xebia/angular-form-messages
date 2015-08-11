@@ -1,19 +1,11 @@
 angular.module('angularFormMessages')
-  .directive('afMessage', function (
-    AfMessageService
-  ) {
+  .directive('afMessage', function () {
     return {
       scope: true,
-      require: ['^form', 'afMessage'],
+      require: 'afMessage',
       controller: angular.noop,
-      link: function linkFn($scope, elem, attrs, ctrls) {
-        var formCtrl = ctrls[0];
-        var afMessageCtrl = ctrls[1];
-
-        afMessageCtrl.messageId = formCtrl.$name + '.' +  (attrs.afMessage || attrs.afMessageId);
-        AfMessageService.validation(afMessageCtrl.messageId, function (messages) {
-          $scope.messages = messages;
-        });
+      link: function linkFn($scope, elem, attrs, afMessageCtrl) {
+        afMessageCtrl.messageId = attrs.afMessage || attrs.afMessageId;
       }
     };
   });
