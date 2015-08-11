@@ -34,7 +34,7 @@ describe('afFieldState', function () {
     infoSetup = _.partial(setup, 'INFO', 1),
     successSetup = _.partial(setup, 'SUCCESS', 1),
     noMessageSetup = _.partial(setup, false, 0),
-    successInfoSetup = _.partial(setup, false, 2),
+    successInfoSetup = _.partial(setup, 'INFO', 2),
 
     expectHasError = _.partial(checkMessageClass, 'has-error'),
     expectHasWarning = _.partial(checkMessageClass, 'has-warning'),
@@ -53,6 +53,7 @@ describe('afFieldState', function () {
       .setupResults(function () {
         return {
           AfMessageService: {
+            showMultiple: true,
             validation: function (messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
               mox.inject('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
@@ -141,12 +142,31 @@ describe('afFieldState', function () {
       });
 
       describe('when there are multiple validations', function () {
-        beforeEach(successInfoSetup);
 
-        it('should remove the "has-warning" class from the element', expectHasNoInfo);
-        it('should remove the "has-error" class from the element', expectHasNoError);
-        it('should remove the "has-warning" class from the element', expectHasNoWarning);
-        it('should remove the "has-success" class from the element', expectHasNoSuccess);
+        describe('when we allow to show multiple messages', function () {
+
+          beforeEach(function () {
+            mox.get.AfMessageService.showMultiple.and.returnValue(true);
+            successInfoSetup.call(this);
+          });
+
+          it('should remove the "has-warning" class from the element', expectHasNoInfo);
+          it('should remove the "has-error" class from the element', expectHasNoError);
+          it('should remove the "has-warning" class from the element', expectHasNoWarning);
+          it('should remove the "has-success" class from the element', expectHasNoSuccess);
+        });
+
+        describe('when we allow only the message with the highest severity', function () {
+          beforeEach(function () {
+            mox.get.AfMessageService.showMultiple.and.returnValue(false);
+            successInfoSetup.call(this);
+          });
+
+          it('should add the "has-info" class to the element', expectHasInfo);
+          it('should remove the "has-error" class from the element', expectHasNoError);
+          it('should remove the "has-warning" class from the element', expectHasNoWarning);
+          it('should remove the "has-success" class from the element', expectHasNoSuccess);
+        });
       });
     });
 
