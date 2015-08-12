@@ -14,7 +14,7 @@ describe('afFieldState', function () {
     });
 
     // The messageId is not checked because that is mocked away, so can be undefined
-    inj.$rootScope.$broadcast('validation', this.element.controller('form'), undefined, messages, messageType);
+    inj.$rootScope.$broadcast('validation', undefined, messages, messageType);
     this.$scope.$digest();
   }
 
@@ -54,9 +54,9 @@ describe('afFieldState', function () {
         return {
           AfMessageService: {
             showMultiple: true,
-            validation: function (formCtrl, messageId, callback) {
+            validation: function (messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
-              mox.inject('$rootScope').$on('validation', function (event, validationFormCtrl, validationMessageId, messages, messageType) {
+              mox.inject('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
                 callback(messages, messageType);
               });
             }
@@ -79,7 +79,7 @@ describe('afFieldState', function () {
     }
 
     it('should register the validation event listener via the AfMessageService', function () {
-      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.element.controller('form'), 'userForm.user.name', jasmine.any(Function));
+      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
@@ -89,7 +89,7 @@ describe('afFieldState', function () {
       });
 
       it('should register the validation event listener via the AfMessageService', function () {
-        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.element.controller('form'), 'userForm.user.name', jasmine.any(Function));
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
       });
     });
 

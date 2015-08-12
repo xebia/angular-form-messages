@@ -16,7 +16,6 @@ describe('afField', function () {
     $rootScope.$broadcast.calls.reset();
     // Setup spies on parent controllers
     afSubmit = element.controller('afSubmit');
-    formCtrl = element.controller('form');
     ngModel = element.field().controller('ngModel');
     afField = element.field().controller('afField');
     spyOn(ngModel, '$validate');
@@ -29,12 +28,12 @@ describe('afField', function () {
   }
 
   function expectEvent(messages, type) {
-    expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', formCtrl, 'userForm.user.email', messages, type);
+    expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.email', messages, type);
   }
 
 
   function expectNoValidEvent() {
-    expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', formCtrl, 'userForm.user.email', [], undefined);
+    expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation',  'userForm.user.email', [], undefined);
   }
 
   var
@@ -43,7 +42,6 @@ describe('afField', function () {
     afSubmit,
     expectErrorEvent,
     expectValidEvent,
-    formCtrl,
     MESSAGE_TYPES,
     ngModel;
 
@@ -158,10 +156,9 @@ describe('afField', function () {
     });
 
     it('should validate these as well', function () {
-      var ngForm = this.element.ngForm(0);
-      ngForm.field().val('').trigger('input');
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', ngForm.controller('form'), 'repeatForm0.user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
-      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', this.element.ngForm(1).controller('form'), 'repeatForm1.user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+      this.element.ngForm(0).field().val('').trigger('input');
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'repeatForm0.user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', 'repeatForm1.user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
     });
   });
 
@@ -249,7 +246,7 @@ describe('afField', function () {
       });
 
       it('should broadcast the validation events', function () {
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', this.element.controller('form'), 'userForm.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }], MESSAGE_TYPES[0]);
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }], MESSAGE_TYPES[0]);
       });
 
       describe('and the user changes the field thereafter', function () {
@@ -285,7 +282,7 @@ describe('afField', function () {
     it('should validate the field and set the default message with the type that has been set via afField methods', function () {
       afField.setErrorDetails('required');
       makeFieldEmpty.call(this);
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', this.element.controller('form'), 'userForm.user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
 
       afField.setWarningDetails('required');
       this.$scope.triggerValue = 'something-else';
