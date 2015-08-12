@@ -35,7 +35,8 @@ angular.module('angularFormMessagesBootstrap')
           afSubmitCtrl = ctrls[2],
           formCtrl = ctrls[3];
 
-        AfMessageService.validation(formCtrl.$name + '.' + afMessageCtrl.messageId, function (messages, messageType) {
+        var messageId = afMessageCtrl.messageIdPrefix || afMessageCtrl.messageId;
+        AfMessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.messageId === afMessageCtrl.messageId) {
             $scope.messageType = messageType || (afSubmitCtrl.showSuccess ? MESSAGE_TYPES[0] : undefined);
@@ -52,7 +53,7 @@ angular.module('angularFormMessagesBootstrap')
             message.icon = icons[message.type];
           });
           $scope.messages = messages;
-        });
+        }, !!afMessageCtrl.messageIdPrefix);
       }
     };
   });

@@ -84,8 +84,8 @@ describe('messageDirective', function () {
       expect(this.element.feedbackScreenreader()).not.toExist();
     });
 
-    it('should register the validation event listener via the AfMessageService', function () {
-      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
+    it('should register the validation event listener via the AfMessageService and allows partial messageIds', function () {
+      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function), false);
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
@@ -94,8 +94,19 @@ describe('messageDirective', function () {
         compileHtml('<form name="userForm" af-submit><div af-message af-message-id="user.name"></div></form>');
       });
 
-      it('should register the validation event listener via the AfMessageService', function () {
-        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
+      it('should register the validation event listener via the AfMessageService and allows partial messageIds', function () {
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function), false);
+      });
+    });
+
+    describe('when there is a messageIdStart passed', function () {
+      beforeEach(function () {
+        mox.get.AfMessageService.validation.calls.reset();
+        compileHtml('<form name="userForm" af-submit><div af-message af-message-id-prefix="user"></div></form>');
+      });
+
+      it('should register the validation event listener via the AfMessageService and allows partial messageIds', function () {
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user', jasmine.any(Function), true);
       });
     });
   });

@@ -6,7 +6,7 @@ describe('afMessage', function () {
       .run();
 
     createScope();
-    compileHtml('<div af-message="user.name" af-message-id-start="user"></div>');
+    compileHtml('<div af-message="user.name" af-message-id-prefix="user"></div>');
   });
 
   describe('on initialization', function () {
@@ -15,7 +15,7 @@ describe('afMessage', function () {
     });
 
     it('should store the message id start on the controller', function () {
-      expect(this.element.controller('afMessage').messageIdStart).toBe('user');
+      expect(this.element.controller('afMessage').messageIdPrefix).toBe('user');
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
