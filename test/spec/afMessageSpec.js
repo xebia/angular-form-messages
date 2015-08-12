@@ -6,12 +6,16 @@ describe('afMessage', function () {
       .run();
 
     createScope();
-    compileHtml('<div af-message="user.name"></div>');
+    compileHtml('<div af-message="user.name" af-message-id-start="user"></div>');
   });
 
   describe('on initialization', function () {
-    it('should store the message id including the form name on the controller', function () {
+    it('should store the message id on the controller', function () {
       expect(this.element.controller('afMessage').messageId).toBe('user.name');
+    });
+
+    it('should store the message id start on the controller', function () {
+      expect(this.element.controller('afMessage').messageIdStart).toBe('user');
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {

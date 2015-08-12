@@ -6,6 +6,7 @@ angular.module('angularFormMessages')
       controller: angular.noop,
       link: function linkFn($scope, elem, attrs, afMessageCtrl) {
         afMessageCtrl.messageId = attrs.afMessage || attrs.afMessageId;
+        afMessageCtrl.messageIdStart = attrs.afMessageIdStart;
       }
     };
   });
