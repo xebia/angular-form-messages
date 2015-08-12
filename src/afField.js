@@ -1,4 +1,5 @@
 angular.module('angularFormMessages').directive('afField', function (
+  $interpolate,
   $rootScope,
   MESSAGE_TYPES,
   AfMessageService
@@ -63,7 +64,7 @@ angular.module('angularFormMessages').directive('afField', function (
       // Update validation on change / blur
       if (triggerOn === 'change') {
         // This also triggers custom directives which may not be able to listen to events
-        var ngModelPath = form.$name + '["' + ngModel.$name + '"]';
+        var ngModelPath = $interpolate(form.$name)($scope) + '["' + ngModel.$name + '"]';
         $scope.$watch('[' + ngModelPath + '.$error, ' + ngModelPath + '.$dirty]', function (newVal, oldVal) {
           if ((newVal[0] !== oldVal[0]) || newVal[1]) {
             updateValidation();
@@ -99,7 +100,7 @@ angular.module('angularFormMessages').directive('afField', function (
 
       // Set validity of this field after submitting
       $scope.$on('setValidity', function setValidity(event, messageId, messages) {
-        if (messageId === form.$name + '.' + ngModel.$name) {
+        if (messageId === $interpolate(form.$name)($scope) + '.' + ngModel.$name) {
           isPristineAfterSubmit = true;
           angular.forEach(messages, function (message) {
             afField.setMessageDetails(message.message, message.type);

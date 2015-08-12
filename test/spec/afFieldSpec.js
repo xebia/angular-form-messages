@@ -136,6 +136,35 @@ describe('afField', function () {
     });
   });
 
+  describe('when there are repeated fields', function () {
+    // This test also passes when we do not use $interpolate, but it is necessary for angular 1.2
+    beforeEach(function () {
+      createScope({ user: {
+        email: 'email@address',
+        email2: undefined
+      } });
+      addSelectors(compileHtml('<form name="userForm" af-submit>' +
+          '<div ng-form name="repeatForm{{$index}}" ng-repeat="field in user">' +
+            '<input type="email" af-field name="user.email" ng-model="field" required />' +
+          '</div>' +
+        '</form>'), {
+        ngForm: {
+          selector: '[ng-form]:eq({0})',
+          sub: {
+            field: '[af-field]'
+          }
+        }
+      });
+    });
+
+    it('should validate these as well', function () {
+      var ngForm = this.element.ngForm(0);
+      ngForm.field().val('').trigger('input');
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', ngForm.controller('form'), 'repeatForm0.user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', this.element.ngForm(1).controller('form'), 'repeatForm1.user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+    });
+  });
+
   describe('when no triggerOn value is defined on the afSubmit directive and field', function () {
     beforeEach(function () {
       compile();
