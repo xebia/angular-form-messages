@@ -14,7 +14,7 @@ describe('afFieldState', function () {
     });
 
     // The messageId is not checked because that is mocked away, so can be undefined
-    inj.$rootScope.$broadcast('validation', undefined, messages, messageType);
+    this.$scope.$emit('validation', undefined, messages, messageType);
     this.$scope.$digest();
   }
 
@@ -54,9 +54,9 @@ describe('afFieldState', function () {
         return {
           AfMessageService: {
             showMultiple: true,
-            validation: function (messageId, callback) {
+            validation: function ($scope, messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
-              mox.inject('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
+              $scope.$on('validation', function (event, validationMessageId, messages, messageType) {
                 callback(messages, messageType);
               });
             }
@@ -79,23 +79,7 @@ describe('afFieldState', function () {
     }
 
     it('should register the validation event listener via the AfMessageService', function () {
-      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
-    });
-
-    describe('when the fieldState is in a form with dynamic name', function () {
-      beforeEach(function () {
-        mox.get.AfMessageService.validation.calls.reset();
-        compileHtml('<form name="userForm" af-submit>' +
-                      '<div ng-form name="subForm{{$index}}" ng-repeat="messageId in [0, 1]">' +
-                        '<div af-field-state="user.name"></div>' +
-                      '</div>' +
-                    '</form>');
-      });
-
-      it('should register the validation event listener via the AfMessageService with the interpolated form name in the messageId', function () {
-        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('subForm0.user.name', jasmine.any(Function));
-        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('subForm1.user.name', jasmine.any(Function));
-      });
+      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.$scope, 'user.name', jasmine.any(Function));
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
@@ -105,7 +89,7 @@ describe('afFieldState', function () {
       });
 
       it('should register the validation event listener via the AfMessageService', function () {
-        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.$scope, 'user.name', jasmine.any(Function));
       });
     });
 

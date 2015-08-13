@@ -1,6 +1,5 @@
 angular.module('angularFormMessages').directive('afField', function (
   $interpolate,
-  $rootScope,
   MESSAGE_TYPES,
   AfMessageService
 ) {
@@ -51,8 +50,8 @@ angular.module('angularFormMessages').directive('afField', function (
           }
         });
 
-        var message = AfMessageService.getMostSevereMessage(messages);
-        $rootScope.$broadcast('validation', formName + '.' + ngModel.$name, messages, message ? message.type : undefined);
+        var mostSevereMessage = AfMessageService.getMostSevereMessage(messages);
+        $scope.$emit('validation', ngModel.$name, messages, mostSevereMessage ? mostSevereMessage.type : undefined);
       }
 
       // Make this field clean again

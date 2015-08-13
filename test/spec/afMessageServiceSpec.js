@@ -14,8 +14,8 @@ describe('AfMessageService', function () {
       .module('angularFormMessages')
       .run();
 
+    createScope();
     inj = mox.inject(
-      '$rootScope',
       'MESSAGE_TYPES',
       'AfMessageService'
     );
@@ -103,36 +103,36 @@ describe('AfMessageService', function () {
 
     describe('when the messageId is the same as the messageId passed to the validation registrer', function () {
       beforeEach(function () {
-        inj.AfMessageService.validation('formName.name', this.cb);
+        inj.AfMessageService.validation(this.$scope, 'formName.name', this.cb);
       });
 
       it('should call the callback with passed messages and messageType arguments', function () {
-        inj.$rootScope.$broadcast('validation', 'formName.name', [], 'messageType');
+        this.$scope.$emit('validation', 'formName.name', [], 'messageType');
         expect(this.cb).toHaveBeenCalledWith([], 'messageType');
       });
     });
 
     describe('when the messageId is not the same as the messageId passed to the validation registrer', function () {
       beforeEach(function () {
-        inj.AfMessageService.validation('formName.name', this.cb);
+        inj.AfMessageService.validation(this.$scope, 'name', this.cb);
       });
 
-      it('should call the callback with passed messages and messageType arguments', function () {
-        inj.$rootScope.$broadcast('validation', 'formName.other', [], 'messageType');
+      it('should not call the callback with passed messages and messageType arguments', function () {
+        this.$scope.$emit('validation', 'other', [], 'messageType');
         expect(this.cb).not.toHaveBeenCalled();
       });
     });
 
     describe('when the passed messageId starts with the validation event messageId', function () {
       it('should not call the callback when we do not want partial matches', function () {
-        inj.AfMessageService.validation('formName', this.cb);
-        inj.$rootScope.$broadcast('validation', 'formName.name', [], 'messageType');
+        inj.AfMessageService.validation(this.$scope, 'user', this.cb);
+        this.$scope.$emit('validation', 'user.name', [], 'messageType');
         expect(this.cb).not.toHaveBeenCalled();
       });
 
       it('should call the callback with passed messages and messageType arguments', function () {
-        inj.AfMessageService.validation('formName', this.cb, true);
-        inj.$rootScope.$broadcast('validation', 'formName.name', [], 'messageType');
+        inj.AfMessageService.validation(this.$scope, 'user', this.cb, true);
+        this.$scope.$emit('validation', 'user.name', [], 'messageType');
         expect(this.cb).toHaveBeenCalledWith([], 'messageType');
       });
     });

@@ -1,6 +1,5 @@
 angular.module('angularFormMessagesBootstrap')
   .directive('afMessage', function (
-    $interpolate,
     AfMessageService,
     MESSAGE_TYPES
   ) {
@@ -27,7 +26,7 @@ angular.module('angularFormMessagesBootstrap')
       restrict: 'A',
       scope: true,
       priority: 1, // Link function needs to run after non-Bootstrap afMessage
-      require: ['?^afFeedback', 'afMessage', '^afSubmit', '^form'],
+      require: ['?^afFeedback', 'afMessage', '^afSubmit'],
       templateUrl: 'templates/bootstrap/messageDirective.html',
       link: function ($scope, elem, attrs, ctrls) {
         var
@@ -36,7 +35,7 @@ angular.module('angularFormMessagesBootstrap')
           afSubmitCtrl = ctrls[2];
 
         var messageId = afMessageCtrl.messageIdPrefix || afMessageCtrl.messageId;
-        AfMessageService.validation($interpolate(ctrls[3].$name)($scope) + '.' + messageId, function (messages, messageType) {
+        AfMessageService.validation($scope.$parent, messageId, function (messages, messageType) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.messageId === afMessageCtrl.messageId) {
             $scope.messageType = messageType || (afSubmitCtrl.showSuccess ? MESSAGE_TYPES[0] : undefined);

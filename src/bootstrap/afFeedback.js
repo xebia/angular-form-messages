@@ -14,7 +14,7 @@ angular.module('angularFormMessagesBootstrap')
 
         afFeedbackCtrl.messageId = attrs.afFeedback || attrs.afMessageId;
 
-        AfMessageService.validation(formCtrl.$name + '.' + afFeedbackCtrl.messageId, function (messages) {
+        AfMessageService.validation($scope, afFeedbackCtrl.messageId, function (messages) {
           if (messages.length || afSubmitCtrl.showSuccess) {
             attrs.$addClass('has-feedback');
           } else {

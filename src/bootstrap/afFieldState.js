@@ -5,19 +5,15 @@ angular.module('angularFormMessagesBootstrap')
  * When there is no message (the field is valid) and showSuccess is true, show the 'has-success' class.
  */
   .directive('afFieldState', function (
-    $interpolate,
     AfMessageService,
     MESSAGE_TYPES
   ) {
     return {
-      require: ['^afSubmit', '^form'],
-      link: function ($scope, elem, attrs, ctrls) {
-        var
-          afSubmitCtrl = ctrls[0],
-          formCtrl = ctrls[1],
-          messageId = attrs.afFieldState || attrs.afMessageId;
+      require: '^afSubmit',
+      link: function ($scope, elem, attrs, afSubmitCtrl) {
+        var messageId = attrs.afFieldState || attrs.afMessageId;
 
-        AfMessageService.validation($interpolate(formCtrl.$name)($scope) + '.' + messageId, function (messages, messageType) {
+        AfMessageService.validation($scope, messageId, function (messages, messageType) {
           angular.forEach(MESSAGE_TYPES, function (type) {
             attrs.$removeClass('has-' + type.toLowerCase());
           });

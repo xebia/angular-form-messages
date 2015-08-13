@@ -20,7 +20,7 @@ describe('messageDirective', function () {
   }
 
   var
-    inj,
+    MESSAGE_TYPES,
     messages;
 
   beforeEach(function () {
@@ -55,9 +55,9 @@ describe('messageDirective', function () {
               return messages[1];
             },
             showMultiple: true,
-            validation: function (messageId, callback) {
+            validation: function ($scope, messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
-              mox.inject('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
+              $scope.$on('validation', function (event, validationMessageId, messages, messageType) {
                 callback(messages, messageType);
               });
             }
@@ -66,15 +66,15 @@ describe('messageDirective', function () {
       })
       .run();
 
-    inj = mox.inject('$rootScope', 'MESSAGE_TYPES');
+    MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
     messages = [
-      { message: 'This is the first message', type: inj.MESSAGE_TYPES[0] },
-      { message: 'This is the second message', type: inj.MESSAGE_TYPES[1] },
-      { message: 'This is the third message', type: inj.MESSAGE_TYPES[2] },
-      { message: 'This is the fourth message', type: inj.MESSAGE_TYPES[3] }
+      { message: 'This is the first message', type: MESSAGE_TYPES[0] },
+      { message: 'This is the second message', type: MESSAGE_TYPES[1] },
+      { message: 'This is the third message', type: MESSAGE_TYPES[2] },
+      { message: 'This is the fourth message', type: MESSAGE_TYPES[3] }
     ];
 
-    compile();
+    compile.call(this);
   });
 
   describe('on initialization', function () {
@@ -88,43 +88,29 @@ describe('messageDirective', function () {
     });
 
     it('should register the validation event listener via the AfMessageService and not allows partial messageIds', function () {
-      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function), false);
+      // this.$scope is the scope outside the directive, which is the same scope as $scope.$parent which is called from inside the directive
+      expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.$scope, 'user.name', jasmine.any(Function), false);
     });
 
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
         mox.get.AfMessageService.validation.calls.reset();
-        compileHtml('<form name="userForm" af-submit><div af-message af-message-id="user.name"></div></form>');
+        compileHtml.call(this, '<form name="userForm" af-submit><div af-message af-message-id="user.name"></div></form>');
       });
 
       it('should register the validation event listener via the AfMessageService and not allows partial messageIds', function () {
-        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function), false);
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.$scope, 'user.name', jasmine.any(Function), false);
       });
     });
 
     describe('when there is a messageIdStart passed', function () {
       beforeEach(function () {
         mox.get.AfMessageService.validation.calls.reset();
-        compileHtml('<form name="userForm" af-submit><div af-message af-message-id-prefix="user"></div></form>');
+        compileHtml.call(this, '<form name="userForm" af-submit><div af-message af-message-id-prefix="user"></div></form>');
       });
 
       it('should register the validation event listener via the AfMessageService and allows partial messageIds', function () {
-        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user', jasmine.any(Function), true);
-      });
-    });
-
-    describe('when the afMessage is in a subform with dynamic name', function () {
-      beforeEach(function () {
-        compileHtml('<form name="userForm" af-submit>' +
-                      '<div ng-form name="subForm{{$index}}" ng-repeat="messageId in [0, 1]">' +
-                        '<div af-message="user.name"></div>' +
-                      '</div>' +
-                    '</form>');
-      });
-
-      it('should register the validation event listener via the AfMessageService', function () {
-        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('subForm0.user.name', jasmine.any(Function), false);
-        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('subForm1.user.name', jasmine.any(Function), false);
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.$scope, 'user', jasmine.any(Function), true);
       });
     });
   });
@@ -132,14 +118,14 @@ describe('messageDirective', function () {
   describe('when a validation event is fired', function () {
 
     function validation(messageType) {
-      inj.$rootScope.$broadcast('validation', 'userForm.user.name', messages, messageType);
-      inj.$rootScope.$digest();
+      this.$scope.$emit('validation', 'user.name', messages, messageType);
+      this.$scope.$digest();
     }
 
     beforeEach(function () {
       compile();
       mox.get.AfMessageService.validation.calls.reset();
-      validation(inj.MESSAGE_TYPES[0]);
+      validation.call(this, MESSAGE_TYPES[0]);
     });
 
     describe('when we allow to show multiple messages', function () {
@@ -151,7 +137,7 @@ describe('messageDirective', function () {
     describe('when we only allow to show the message with the highest severity', function () {
       beforeEach(function () {
         mox.get.AfMessageService.showMultiple.and.returnValue(false);
-        validation(inj.MESSAGE_TYPES[0]);
+        validation.call(this, MESSAGE_TYPES[0]);
       });
 
       it('should show the message with highest severity', function () {
@@ -161,7 +147,7 @@ describe('messageDirective', function () {
 
       describe('and there are no messages to show', function () {
         beforeEach(function () {
-          inj.$rootScope.$broadcast('validation', 'userForm.user.name', [], undefined);
+          this.$scope.$emit('validation', 'user.name', [], undefined);
           this.$scope.$digest();
         });
 
@@ -207,20 +193,20 @@ describe('messageDirective', function () {
       });
 
       it('should show a feedback icon in the input field', function () {
-        validation(inj.MESSAGE_TYPES[0]);
+        validation.call(this, MESSAGE_TYPES[0]);
         var feedback = this.element.feedback();
         expect(feedback.icon()).toHaveClass('glyphicon-ok');
         expect(feedback.label()).toHaveText('(SUCCESS)');
 
-        validation(inj.MESSAGE_TYPES[1]);
+        validation.call(this, MESSAGE_TYPES[1]);
         expect(feedback.icon()).toHaveClass('glyphicon-info-sign');
         expect(feedback.label()).toHaveText('(INFO)');
 
-        validation(inj.MESSAGE_TYPES[2]);
+        validation.call(this, MESSAGE_TYPES[2]);
         expect(feedback.icon()).toHaveClass('glyphicon-warning-sign');
         expect(feedback.label()).toHaveText('(WARNING)');
 
-        validation(inj.MESSAGE_TYPES[3]);
+        validation.call(this, MESSAGE_TYPES[3]);
         expect(feedback.icon()).toHaveClass('glyphicon-remove');
         expect(feedback.label()).toHaveText('(ERROR)');
       });
@@ -229,7 +215,7 @@ describe('messageDirective', function () {
         describe('when showSucces is true on the afSubmit', function () {
           beforeEach(function () {
             this.element.controller('afSubmit').showSuccess = true;
-            validation();
+            validation.call(this);
           });
 
           it('should show the success feedback icon', function () {
@@ -241,7 +227,7 @@ describe('messageDirective', function () {
         describe('when showSuccess is false on the afSubmit', function () {
           beforeEach(function () {
             this.element.controller('afSubmit').showSuccess = false;
-            validation();
+            validation.call(this);
           });
 
           it('should show the success feedback icon', function () {
@@ -253,10 +239,10 @@ describe('messageDirective', function () {
 
     describe('when there is no parent afFeedback directive with the same messageId', function () {
       beforeEach(function () {
-        addSelectors(compileHtml('<form name="userForm" af-submit><div af-feedback="user.other"><div af-message="user.name"></div></div></form>'), {
+        addSelectors(compileHtml.call(this, '<form name="userForm" af-submit><div af-feedback="user.other"><div af-message="user.name"></div></div></form>'), {
           feedback: '[data-test="feedback"]'
         });
-        validation();
+        validation.call(this);
       });
 
       it('should not show feedback', function () {

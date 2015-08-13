@@ -51,8 +51,8 @@ angular.module('angularFormMessages')
           return mostSevereMessage;
         },
 
-        validation: function (messageId, callback, isMessageIdPrefix) {
-          $injector.get('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
+        validation: function ($scope, messageId, callback, isMessageIdPrefix) {
+          $scope.$on('validation', function (event, validationMessageId, messages, messageType) {
             if (validationMessageId === messageId || (isMessageIdPrefix && validationMessageId.indexOf(messageId) === 0)) {
               callback(messages, messageType);
             }
