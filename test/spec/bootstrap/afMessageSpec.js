@@ -158,6 +158,17 @@ describe('messageDirective', function () {
         expect(this.element.alerts()).toHaveLength(1);
         expect(this.element.alert(0).label()).toHaveAttr('af-message-label', messages[1].message);
       });
+
+      describe('and there are no messages to show', function () {
+        beforeEach(function () {
+          inj.$rootScope.$broadcast('validation', 'userForm.user.name', [], undefined);
+          this.$scope.$digest();
+        });
+
+        it('should show no messages', function () {
+          expect(this.element.alerts()).toHaveLength(0);
+        });
+      });
     });
 
     it('should the message text and type', function () {

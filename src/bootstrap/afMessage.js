@@ -44,7 +44,7 @@ angular.module('angularFormMessagesBootstrap')
           }
 
           // Messages
-          if (!AfMessageService.showMultiple()) {
+          if (!AfMessageService.showMultiple() && messages.length) {
             messages = [AfMessageService.getMostSevereMessage(messages)];
           }
 
