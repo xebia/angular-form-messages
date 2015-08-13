@@ -50,7 +50,6 @@ describe('afField', function () {
     expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'userForm.user.email', messages, type);
   }
 
-
   function expectNoValidEvent() {
     expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation',  'userForm.user.email', [], undefined);
   }
