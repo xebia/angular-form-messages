@@ -67,4 +67,22 @@ describe('the afMessageLabel directive', function () {
     this.$scope.$digest();
     expect($log.warn).toHaveBeenCalledWith('Missing label: \'userForm.user.email.not-existing\' (specific) or \'prefix.not-existing\' (generic)');
   });
+
+  describe('when the field is in a sub form with dynamic name', function () {
+    // This test also passes when we do not use $interpolate, but it is necessary for angular 1.2
+    beforeEach(function () {
+      compileHtml('<form name="userForm">' +
+          '<div ng-form name="subForm{{$index}}" ng-repeat="messageId in [\'not-existing\', \'something-else\']">' +
+            '<div af-message><span af-message-label="{{messageId}}">Content</span></div>' +
+          '</div>' +
+        '</form>');
+    });
+
+    it('should validate these as well', function () {
+      this.$scope.key = 'not-existing';
+      this.$scope.$digest();
+      expect($log.warn).toHaveBeenCalledWith('Missing label: \'subForm0.user.email.not-existing\' (specific) or \'prefix.not-existing\' (generic)');
+      expect($log.warn).toHaveBeenCalledWith('Missing label: \'subForm1.user.email.something-else\' (specific) or \'prefix.something-else\' (generic)');
+    });
+  });
 });
