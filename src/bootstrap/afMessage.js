@@ -15,11 +15,11 @@ angular.module('angularFormMessagesBootstrap')
       INFO: 'glyphicon-info-sign',
       SUCCESS: 'glyphicon-ok'
     };
-    var alertClasses = {
-      ERROR: 'alert-danger',
-      WARNING: 'alert-warning',
-      INFO: 'alert-info',
-      SUCCESS: 'alert-success'
+    var alertTypes = {
+      ERROR: 'danger',
+      WARNING: 'warning',
+      INFO: 'info',
+      SUCCESS: 'success'
     };
 
     return {
@@ -48,7 +48,7 @@ angular.module('angularFormMessagesBootstrap')
           }
 
           angular.forEach(messages, function (message) {
-            message.alertClass = alertClasses[message.type];
+            message.alertType = alertTypes[message.type];
             message.icon = icons[message.type];
           });
           $scope.messages = messages;
