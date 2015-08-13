@@ -1,5 +1,6 @@
 angular.module('angularFormMessagesBootstrap')
   .directive('afMessage', function (
+    $interpolate,
     AfMessageService,
     MESSAGE_TYPES
   ) {
@@ -32,11 +33,10 @@ angular.module('angularFormMessagesBootstrap')
         var
           afFeedbackCtrl = ctrls[0],
           afMessageCtrl = ctrls[1],
-          afSubmitCtrl = ctrls[2],
-          formCtrl = ctrls[3];
+          afSubmitCtrl = ctrls[2];
 
         var messageId = afMessageCtrl.messageIdPrefix || afMessageCtrl.messageId;
-        AfMessageService.validation(formCtrl.$name + '.' + messageId, function (messages, messageType) {
+        AfMessageService.validation($interpolate(ctrls[3].$name)($scope) + '.' + messageId, function (messages, messageType) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.messageId === afMessageCtrl.messageId) {
             $scope.messageType = messageType || (afSubmitCtrl.showSuccess ? MESSAGE_TYPES[0] : undefined);

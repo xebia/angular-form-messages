@@ -82,6 +82,22 @@ describe('afFieldState', function () {
       expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function));
     });
 
+    describe('when the fieldState is in a form with dynamic name', function () {
+      beforeEach(function () {
+        mox.get.AfMessageService.validation.calls.reset();
+        compileHtml('<form name="userForm" af-submit>' +
+                      '<div ng-form name="subForm{{$index}}" ng-repeat="messageId in [0, 1]">' +
+                        '<div af-field-state="user.name"></div>' +
+                      '</div>' +
+                    '</form>');
+      });
+
+      it('should register the validation event listener via the AfMessageService with the interpolated form name in the messageId', function () {
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('subForm0.user.name', jasmine.any(Function));
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('subForm1.user.name', jasmine.any(Function));
+      });
+    });
+
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
         mox.get.AfMessageService.validation.calls.reset();

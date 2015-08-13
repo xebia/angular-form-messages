@@ -21,6 +21,25 @@ describe('afField', function () {
     spyOn(ngModel, '$validate');
   }
 
+  function compileWithSubform() {
+    createScope({ user: {
+      email: 'email@address',
+      email2: undefined
+    } });
+    addSelectors(compileHtml('<form name="userForm" af-submit>' +
+        '<div ng-form name="subForm{{$index}}" ng-repeat="field in user">' +
+          '<input type="email" af-field name="user.email" ng-model="field" />' +
+        '</div>' +
+      '</form>'), {
+      ngForm: {
+        selector: '[ng-form]:eq({0})',
+        sub: {
+          field: '[af-field]'
+        }
+      }
+    });
+  }
+
   function expectMessage(type) {
     $rootScope.$broadcast.calls.reset();
     this.$scope.$digest();
@@ -134,31 +153,16 @@ describe('afField', function () {
     });
   });
 
-  describe('when there are repeated fields', function () {
+  describe('when the field is in a subform with dynamic name', function () {
     // This test also passes when we do not use $interpolate, but it is necessary for angular 1.2
     beforeEach(function () {
-      createScope({ user: {
-        email: 'email@address',
-        email2: undefined
-      } });
-      addSelectors(compileHtml('<form name="userForm" af-submit>' +
-          '<div ng-form name="repeatForm{{$index}}" ng-repeat="field in user">' +
-            '<input type="email" af-field name="user.email" ng-model="field" required />' +
-          '</div>' +
-        '</form>'), {
-        ngForm: {
-          selector: '[ng-form]:eq({0})',
-          sub: {
-            field: '[af-field]'
-          }
-        }
-      });
+      compileWithSubform();
     });
 
     it('should validate these as well', function () {
-      this.element.ngForm(0).field().val('').trigger('input');
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'repeatForm0.user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
-      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', 'repeatForm1.user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+      this.element.ngForm(0).field().val('no-email').trigger('input');
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'subForm0.user.email', [{ message: 'email', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+      expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', 'subForm1.user.email', [{ message: 'email', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
     });
   });
 
@@ -234,7 +238,6 @@ describe('afField', function () {
 
     describe('when it is addressed to this field', function () {
       beforeEach(function () {
-        //afSubmit.triggerOn = 'change';
         spyOn(afField, 'setMessageDetails').and.callThrough();
         // set isPristineAfterSubmit to true
         $rootScope.$broadcast('setValidity', 'userForm.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
@@ -259,6 +262,19 @@ describe('afField', function () {
           expect(ngModel.$setValidity).not.toHaveBeenCalledWith('User name server side error', false);
           expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', true);
           expect(ngModel.$setValidity).toHaveBeenCalledWith('Warning', true);
+        });
+      });
+
+      describe('when the field in a subform with dynamic name', function () {
+        beforeEach(function () {
+          $rootScope.$broadcast.calls.reset();
+          compileWithSubform();
+          $rootScope.$broadcast('setValidity', 'subForm1.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
+        });
+
+        it('should also process', function () {
+          expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', 'subForm0.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }], MESSAGE_TYPES[0]);
+          expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'subForm1.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }], MESSAGE_TYPES[0]);
         });
       });
     });

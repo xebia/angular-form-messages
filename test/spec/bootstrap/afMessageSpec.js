@@ -1,5 +1,24 @@
 describe('messageDirective', function () {
 
+  function compile() {
+    createScope({
+      messageId: 'user.name'
+    });
+    addSelectors(compileHtml('<form name="userForm" af-submit><div af-message="user.name"></div></form>'), {
+      feedbackIcon: '.form-control-feedback',
+      feedbackScreenreader: '.form-control-feedback + .sr-only',
+      alerts: '.alert',
+      alert: {
+        selector: '.alert:eq({0})',
+        sub: {
+          icon: '.glyphicon',
+          prefix: '.sr-only',
+          label: '[af-message-label]'
+        }
+      }
+    });
+  }
+
   var
     inj,
     messages;
@@ -29,7 +48,6 @@ describe('messageDirective', function () {
           }
         }
       )
-      //.disableDirectives('afMessageLabel')
       .setupResults(function () {
         return {
           AfMessageService: {
@@ -56,22 +74,7 @@ describe('messageDirective', function () {
       { message: 'This is the fourth message', type: inj.MESSAGE_TYPES[3] }
     ];
 
-    createScope({
-      messageId: 'user.name'
-    });
-    addSelectors(compileHtml('<form name="userForm" af-submit><div af-message="user.name"></div></form>'), {
-      feedbackIcon: '.form-control-feedback',
-      feedbackScreenreader: '.form-control-feedback + .sr-only',
-      alerts: '.alert',
-      alert: {
-        selector: '.alert:eq({0})',
-        sub: {
-          icon: '.glyphicon',
-          prefix: '.sr-only',
-          label: '[af-message-label]'
-        }
-      }
-    });
+    compile();
   });
 
   describe('on initialization', function () {
@@ -84,7 +87,7 @@ describe('messageDirective', function () {
       expect(this.element.feedbackScreenreader()).not.toExist();
     });
 
-    it('should register the validation event listener via the AfMessageService and allows partial messageIds', function () {
+    it('should register the validation event listener via the AfMessageService and not allows partial messageIds', function () {
       expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function), false);
     });
 
@@ -94,7 +97,7 @@ describe('messageDirective', function () {
         compileHtml('<form name="userForm" af-submit><div af-message af-message-id="user.name"></div></form>');
       });
 
-      it('should register the validation event listener via the AfMessageService and allows partial messageIds', function () {
+      it('should register the validation event listener via the AfMessageService and not allows partial messageIds', function () {
         expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user.name', jasmine.any(Function), false);
       });
     });
@@ -109,6 +112,21 @@ describe('messageDirective', function () {
         expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('userForm.user', jasmine.any(Function), true);
       });
     });
+
+    describe('when the afMessage is in a subform with dynamic name', function () {
+      beforeEach(function () {
+        compileHtml('<form name="userForm" af-submit>' +
+                      '<div ng-form name="subForm{{$index}}" ng-repeat="messageId in [0, 1]">' +
+                        '<div af-message="user.name"></div>' +
+                      '</div>' +
+                    '</form>');
+      });
+
+      it('should register the validation event listener via the AfMessageService', function () {
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('subForm0.user.name', jasmine.any(Function), false);
+        expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith('subForm1.user.name', jasmine.any(Function), false);
+      });
+    });
   });
 
   describe('when a validation event is fired', function () {
@@ -119,6 +137,8 @@ describe('messageDirective', function () {
     }
 
     beforeEach(function () {
+      compile();
+      mox.get.AfMessageService.validation.calls.reset();
       validation(inj.MESSAGE_TYPES[0]);
     });
 
