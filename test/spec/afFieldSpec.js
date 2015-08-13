@@ -58,7 +58,7 @@ describe('afField', function () {
     $rootScope,
     afField,
     afSubmit,
-    expectErrorEvent,
+    expectRequiredErrorEvent,
     expectValidEvent,
     MESSAGE_TYPES,
     ngModel;
@@ -81,7 +81,7 @@ describe('afField', function () {
       .run();
 
     expectValidEvent = _.partial(expectEvent, [], undefined);
-    expectErrorEvent = _.partial(expectEvent, [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+    expectRequiredErrorEvent = _.partial(expectEvent, [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
     $rootScope = mox.inject('$rootScope');
     spyOn($rootScope, '$broadcast').and.callThrough();
   });
@@ -99,14 +99,14 @@ describe('afField', function () {
 
       it('should validate the field and set the default (error) message if it was initially valid', function () {
         makeFieldEmpty.call(this);
-        expectErrorEvent();
+        expectRequiredErrorEvent();
       });
 
       it('should validate the field and set the default (error) message if it was initially invalid', function () {
         this.element.field().val('email-invalid').trigger('input');
         $rootScope.$broadcast.calls.reset();
         makeFieldEmpty.call(this);
-        expectErrorEvent();
+        expectRequiredErrorEvent();
       });
 
       it('should not validate the field on blur', function () {
@@ -152,7 +152,7 @@ describe('afField', function () {
     });
   });
 
-  describe('when the field is in a subform with dynamic name', function () {
+  describe('when the field is in a sub form with dynamic name', function () {
     // This test also passes when we do not use $interpolate, but it is necessary for angular 1.2
     beforeEach(function () {
       compileWithSubform();
@@ -162,6 +162,24 @@ describe('afField', function () {
       this.element.ngForm(0).field().val('no-email').trigger('input');
       expect($rootScope.$broadcast).toHaveBeenCalledWith('validation', 'subForm0.user.email', [{ message: 'email', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
       expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation', 'subForm1.user.email', [{ message: 'email', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+    });
+  });
+
+  describe('when there are valid validators on the field and stored in $error', function () {
+    // in 1.2 the validators that become valid set the value of $error.key to true, while it is deleted in 1.3
+    // Since this test runs in 1.3, we have to set the $error object manually
+    beforeEach(function () {
+      compile();
+      ngModel.$error.email = false;
+      ngModel.$error.required = true;
+
+      // Use the trigger value because that triggers the validation event without evaluating the ngModel
+      this.$scope.triggerValue = 'changed';
+      this.$scope.$digest();
+    });
+
+    it('should only broadcast messages in the validation event for valid validators', function () {
+      expectRequiredErrorEvent();
     });
   });
 
@@ -225,7 +243,7 @@ describe('afField', function () {
     it('should send validation "invalid" to the ngSubmitController', function () {
       // Make field invalid to trigger a second validation event via the model watch
       makeFieldEmpty.call(this);
-      expectErrorEvent();
+      expectRequiredErrorEvent();
     });
   });
 

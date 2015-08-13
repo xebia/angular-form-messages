@@ -42,12 +42,13 @@ angular.module('angularFormMessages').directive('afField', function (
         var messages = [];
 
         angular.forEach(ngModel.$error, function (isValid, key) {
-          // For now, the message is just the key
           // The message type is stored in afField.$messages when for example afField.setError has been called, additional to ngModel.$setValidity
-          messages.push({
-            message: key,
-            type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
-          });
+          if (isValid) {
+            messages.push({
+              message: key,
+              type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
+            });
+          }
         });
 
         var message = AfMessageService.getMostSevereMessage(messages);
