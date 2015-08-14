@@ -7,7 +7,7 @@ angular.module('angularFormMessages')
   ) {
     return {
       restrict: 'A',
-      require: ['^form', '^afMessage'],
+      require: ['^form', '^afMessages'],
       link: function ($scope, elem, attrs, ctrls) {
         attrs.$observe('afMessageLabel', function (newVal) {
           function translate(translation) {
@@ -20,8 +20,8 @@ angular.module('angularFormMessages')
 
           var
             formCtrl = ctrls[0],
-            afMessageCtrl = ctrls[1],
-            specificLabel = $interpolate(formCtrl.$name)($scope) + '.' + (afMessageCtrl.messageId || afMessageCtrl.messageIdStart) + '.' + newVal,
+            afMessagesCtrl = ctrls[1],
+            specificLabel = $interpolate(formCtrl.$name)($scope) + '.' + (afMessagesCtrl.messageId || afMessagesCtrl.messageIdStart) + '.' + newVal,
             genericLabel = AfMessageService.getGenericLabelPrefix() + newVal;
 
           $translate(specificLabel)

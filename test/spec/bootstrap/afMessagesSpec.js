@@ -1,10 +1,10 @@
-describe('messageDirective', function () {
+describe('afMessages', function () {
 
   function compile() {
     createScope({
       messageId: 'user.name'
     });
-    addSelectors(compileHtml('<form name="userForm" af-submit><div af-message="user.name"></div></form>'), {
+    addSelectors(compileHtml('<form name="userForm" af-submit><div af-messages="user.name"></div></form>'), {
       feedbackIcon: '.form-control-feedback',
       feedbackScreenreader: '.form-control-feedback + .sr-only',
       alerts: '.alert',
@@ -95,7 +95,7 @@ describe('messageDirective', function () {
     describe('when the messageId is passed via the messageId attribute', function () {
       beforeEach(function () {
         mox.get.AfMessageService.validation.calls.reset();
-        compileHtml.call(this, '<form name="userForm" af-submit><div af-message af-message-id="user.name"></div></form>');
+        compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-message-id="user.name"></div></form>');
       });
 
       it('should register the validation event listener via the AfMessageService and not allows partial messageIds', function () {
@@ -106,7 +106,7 @@ describe('messageDirective', function () {
     describe('when there is a messageIdStart passed', function () {
       beforeEach(function () {
         mox.get.AfMessageService.validation.calls.reset();
-        compileHtml.call(this, '<form name="userForm" af-submit><div af-message af-message-id-prefix="user"></div></form>');
+        compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-message-id-prefix="user"></div></form>');
       });
 
       it('should register the validation event listener via the AfMessageService and allows partial messageIds', function () {
@@ -181,7 +181,7 @@ describe('messageDirective', function () {
     describe('when there is a parent afFeedback directive with the same messageId', function () {
 
       beforeEach(function () {
-        this.element = addSelectors(compileHtml('<form name="userForm" af-submit><div af-feedback="user.name" af-show-success="true"><div af-message="user.name"></div></div></form>'), {
+        this.element = addSelectors(compileHtml('<form name="userForm" af-submit><div af-feedback="user.name" af-show-success="true"><div af-messages="user.name"></div></div></form>'), {
           feedback: {
             selector: '[data-test="feedback"]',
             sub: {
@@ -239,7 +239,7 @@ describe('messageDirective', function () {
 
     describe('when there is no parent afFeedback directive with the same messageId', function () {
       beforeEach(function () {
-        addSelectors(compileHtml.call(this, '<form name="userForm" af-submit><div af-feedback="user.other"><div af-message="user.name"></div></div></form>'), {
+        addSelectors(compileHtml.call(this, '<form name="userForm" af-submit><div af-feedback="user.other"><div af-messages="user.name"></div></div></form>'), {
           feedback: '[data-test="feedback"]'
         });
         validation.call(this);

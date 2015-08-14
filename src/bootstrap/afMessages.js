@@ -1,5 +1,5 @@
 angular.module('angularFormMessagesBootstrap')
-  .directive('afMessage', function (
+  .directive('afMessages', function (
     AfMessageService,
     MESSAGE_TYPES
   ) {
@@ -26,18 +26,18 @@ angular.module('angularFormMessagesBootstrap')
       restrict: 'A',
       scope: true,
       priority: 1, // Link function needs to run after non-Bootstrap afMessage
-      require: ['?^afFeedback', 'afMessage', '^afSubmit'],
+      require: ['?^afFeedback', 'afMessages', '^afSubmit'],
       templateUrl: 'templates/bootstrap/messageDirective.html',
       link: function ($scope, elem, attrs, ctrls) {
         var
           afFeedbackCtrl = ctrls[0],
-          afMessageCtrl = ctrls[1],
+          afMessagesCtrl = ctrls[1],
           afSubmitCtrl = ctrls[2];
 
-        var messageId = afMessageCtrl.messageIdPrefix || afMessageCtrl.messageId;
+        var messageId = afMessagesCtrl.messageIdPrefix || afMessagesCtrl.messageId;
         AfMessageService.validation($scope.$parent, messageId, function (messages, messageType) {
           // Feedback
-          if (afFeedbackCtrl && afFeedbackCtrl.messageId === afMessageCtrl.messageId) {
+          if (afFeedbackCtrl && afFeedbackCtrl.messageId === afMessagesCtrl.messageId) {
             $scope.messageType = messageType || (afSubmitCtrl.showSuccess ? MESSAGE_TYPES[0] : undefined);
             $scope.icon = feedbackIcons[$scope.messageType];
           }
@@ -52,7 +52,7 @@ angular.module('angularFormMessagesBootstrap')
             message.icon = icons[message.type];
           });
           $scope.messages = messages;
-        }, !!afMessageCtrl.messageIdPrefix);
+        }, !!afMessagesCtrl.messageIdPrefix);
       }
     };
   });

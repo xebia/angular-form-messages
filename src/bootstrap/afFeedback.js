@@ -4,13 +4,12 @@ angular.module('angularFormMessagesBootstrap')
     AfMessageService
   ) {
     return {
-      require: ['afFeedback', '^afSubmit', '^form'],
+      require: ['afFeedback', '^afSubmit'],
       controller: angular.noop,
       link: function ($scope, elem, attrs, ctrls) {
         var
           afFeedbackCtrl = ctrls[0],
-          afSubmitCtrl = ctrls[1],
-          formCtrl = ctrls[2];
+          afSubmitCtrl = ctrls[1];
 
         afFeedbackCtrl.messageId = attrs.afFeedback || attrs.afMessageId;
 

@@ -9,7 +9,7 @@ describe('the afMessageLabel directive', function () {
         '$translate'
       )
       .mockDirectives({
-        name: 'afMessage',
+        name: 'afMessages',
         controller: function () {
           this.messageId = 'user.email';
         }
@@ -31,7 +31,7 @@ describe('the afMessageLabel directive', function () {
       .run();
 
     createScope();
-    compileHtml('<form name="userForm"><div af-message><span af-message-label="{{key}}">Content</span></div></form>');
+    compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>');
     $log = mox.inject('$log');
     spyOn($log, 'warn');
   });
@@ -73,7 +73,7 @@ describe('the afMessageLabel directive', function () {
     beforeEach(function () {
       compileHtml('<form name="userForm">' +
           '<div ng-form name="subForm{{$index}}" ng-repeat="messageId in [\'not-existing\', \'something-else\']">' +
-            '<div af-message><span af-message-label="{{messageId}}">Content</span></div>' +
+            '<div af-messages><span af-message-label="{{messageId}}">Content</span></div>' +
           '</div>' +
         '</form>');
     });
