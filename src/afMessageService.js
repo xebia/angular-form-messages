@@ -30,7 +30,7 @@ angular.module('angularFormMessages')
       triggerOn = newValue;
     };
 
-    this.$get = function ($injector) {
+    this.$get = function () {
 
       return {
         /**
