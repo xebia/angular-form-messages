@@ -1,5 +1,7 @@
 describe('the afMessageLabel directive', function () {
-  var $log;
+  var
+    $log,
+    afMessagesCtrl;
 
   beforeEach(function () {
     mox
@@ -21,8 +23,10 @@ describe('the afMessageLabel directive', function () {
           },
           $translate: function (key) {
             var translations = {
+              'prefix.required': 'Required translation',
               'userForm.user.email.email': 'E-mail translation',
-              'prefix.required': 'Required translation'
+              'subForm0.user.email.required': 'Required translation sub form',
+              'subForm1.user.email.email': 'E-mail translation sub form'
             };
             return key in translations ? promise(translations[key]) : reject(key);
           }
@@ -32,6 +36,7 @@ describe('the afMessageLabel directive', function () {
 
     createScope();
     compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>');
+    afMessagesCtrl = this.element.find('[af-messages]').controller('afMessages');
     $log = mox.inject('$log');
     spyOn($log, 'warn');
   });
@@ -41,6 +46,8 @@ describe('the afMessageLabel directive', function () {
   });
 
   it('should replace the contents of the element with the field specific translation if this exists', function () {
+    delete afMessagesCtrl.messageId;
+    afMessagesCtrl.messageIdPrefix = 'user.email';
     this.$scope.key = 'email';
     this.$scope.$digest();
     expect(this.element).toHaveText('E-mail translation');
@@ -68,21 +75,33 @@ describe('the afMessageLabel directive', function () {
     expect($log.warn).toHaveBeenCalledWith('Missing label: \'userForm.user.email.not-existing\' (specific) or \'prefix.not-existing\' (generic)');
   });
 
+  describe('when the messageId is passed as prefix', function () {
+    beforeEach(function () {
+      compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>');
+    });
+
+    it('should replace the contents of the element with the translation', function () {
+      this.$scope.key = 'email';
+      this.$scope.$digest();
+      expect(this.element).toHaveText('E-mail translation');
+    });
+  });
+
   describe('when the field is in a sub form with dynamic name', function () {
     // This test also passes when we do not use $interpolate, but it is necessary for angular 1.2
     beforeEach(function () {
-      compileHtml('<form name="userForm">' +
-          '<div ng-form name="subForm{{$index}}" ng-repeat="messageId in [\'not-existing\', \'something-else\']">' +
+      addSelectors(compileHtml('<form name="userForm">' +
+          '<div ng-form name="subForm{{$index}}" ng-repeat="messageId in [\'required\', \'email\']">' +
             '<div af-messages><span af-message-label="{{messageId}}">Content</span></div>' +
           '</div>' +
-        '</form>');
+        '</form>'), {
+        messages: '[ng-form]:eq({0}) [af-messages]'
+      });
     });
 
     it('should validate these as well', function () {
-      this.$scope.key = 'not-existing';
-      this.$scope.$digest();
-      expect($log.warn).toHaveBeenCalledWith('Missing label: \'subForm0.user.email.not-existing\' (specific) or \'prefix.not-existing\' (generic)');
-      expect($log.warn).toHaveBeenCalledWith('Missing label: \'subForm1.user.email.something-else\' (specific) or \'prefix.something-else\' (generic)');
+      expect(this.element.messages(0)).toHaveText('Required translation sub form');
+      expect(this.element.messages(1)).toHaveText('E-mail translation sub form');
     });
   });
 });

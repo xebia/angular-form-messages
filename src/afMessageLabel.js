@@ -21,7 +21,7 @@ angular.module('angularFormMessages')
           var
             formCtrl = ctrls[0],
             afMessagesCtrl = ctrls[1],
-            specificLabel = $interpolate(formCtrl.$name)($scope) + '.' + (afMessagesCtrl.messageId || afMessagesCtrl.messageIdStart) + '.' + newVal,
+            specificLabel = $interpolate(formCtrl.$name)($scope) + '.' + (afMessagesCtrl.messageId || afMessagesCtrl.messageIdPrefix) + '.' + newVal,
             genericLabel = AfMessageService.getGenericLabelPrefix() + newVal;
 
           $translate(specificLabel)
