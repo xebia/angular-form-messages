@@ -1,7 +1,7 @@
 angular.module('angularFormMessages').run(['$templateCache', function($templateCache) {
   'use strict';
 
-  $templateCache.put('templates/bootstrap/messageDirective.html',
+  $templateCache.put('templates/bootstrap/messages.html',
     "<span ng-if=\"messageType\" data-test=\"feedback\">\n" +
     "  <span class=\"glyphicon form-control-feedback\" ng-class=\"icon\" aria-hidden=\"true\"></span>\n" +
     "  <span class=\"sr-only\">({{messageType}})</span>\n" +

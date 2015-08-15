@@ -27,7 +27,7 @@ describe('afMessages', function () {
     mox
       .module(
         'angularFormMessagesBootstrap',
-        'templates/bootstrap/messageDirective.html'
+        'templates/bootstrap/messages.html'
       )
       .mockServices(
         'AfMessageService',

@@ -27,7 +27,7 @@ angular.module('angularFormMessagesBootstrap')
       scope: true,
       priority: 1, // Link function needs to run after non-Bootstrap afMessage
       require: ['?^afFeedback', 'afMessages', '^afSubmit'],
-      templateUrl: 'templates/bootstrap/messageDirective.html',
+      templateUrl: 'templates/bootstrap/messages.html',
       link: function ($scope, elem, attrs, ctrls) {
         var
           afFeedbackCtrl = ctrls[0],
