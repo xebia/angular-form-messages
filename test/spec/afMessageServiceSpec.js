@@ -1,7 +1,8 @@
 describe('AfMessageService', function () {
   var
     afMessageServiceProvider,
-    inj;
+    inj,
+    messages;
 
   beforeEach(function () {
     angular
@@ -16,9 +17,16 @@ describe('AfMessageService', function () {
 
     createScope();
     inj = mox.inject(
+      'AfMessageService',
       'MESSAGE_TYPES',
-      'AfMessageService'
+      'SHOW_MULTIPLE'
     );
+    messages = {
+      success: { type: inj.MESSAGE_TYPES[0] },
+      info: { type: inj.MESSAGE_TYPES[1] },
+      warning: { type: inj.MESSAGE_TYPES[2] },
+      error: { type: inj.MESSAGE_TYPES[3] }
+    };
   });
 
   describe('genericLabelPrefix', function () {
@@ -43,8 +51,8 @@ describe('AfMessageService', function () {
     it('should return the configured showMultiple value', function () {
       expect(inj.AfMessageService.showMultiple()).toBe(true);
 
-      afMessageServiceProvider.setShowMultiple(false);
-      expect(inj.AfMessageService.showMultiple()).toBe(false);
+      afMessageServiceProvider.setShowMultiple(inj.SHOW_MULTIPLE.ONE);
+      expect(inj.AfMessageService.showMultiple()).toBe(inj.SHOW_MULTIPLE.ONE);
     });
   });
 
@@ -68,11 +76,6 @@ describe('AfMessageService', function () {
 
   describe('getMostSevereMessage()', function () {
     it('should return the message that has the highest severity', function () {
-      var messages = {
-        success: { type: inj.MESSAGE_TYPES[0] },
-        info: { type: inj.MESSAGE_TYPES[1] },
-        warning: { type: inj.MESSAGE_TYPES[2] }
-      };
       expect(inj.AfMessageService.getMostSevereMessage([
         messages.success,
         messages.info
@@ -92,6 +95,53 @@ describe('AfMessageService', function () {
     it('should return undefined when there are no messages', function () {
       expect(inj.AfMessageService.getMostSevereMessage()).toBeUndefined();
       expect(inj.AfMessageService.getMostSevereMessage([])).toBeUndefined();
+    });
+  });
+
+  describe('getMessagesToShow', function () {
+    describe('when we want to show one message in total', function () {
+      beforeEach(function () {
+        afMessageServiceProvider.setShowMultiple(inj.SHOW_MULTIPLE.ONE);
+      });
+
+      it('should return the filtered object with one message', function () {
+        expect(inj.AfMessageService.getMessagesToShow({
+          name: [messages.success, messages.warning],
+          email: [messages.success]
+        })).toEqual({
+          name: [messages.warning]
+        })
+      });
+    });
+
+    describe('when we want to show one message per messageId', function () {
+      beforeEach(function () {
+        afMessageServiceProvider.setShowMultiple(inj.SHOW_MULTIPLE.ONE_PER_MESSAGE_ID);
+      });
+
+      it('should return the filtered object with one message per messageId', function () {
+        expect(inj.AfMessageService.getMessagesToShow({
+          name: [messages.warning, messages.success],
+          email: [messages.success]
+        })).toEqual({
+          name: [messages.warning],
+          email: [messages.success]
+        })
+      });
+    });
+
+    describe('when we want to show all messages', function () {
+      beforeEach(function () {
+        afMessageServiceProvider.setShowMultiple(inj.SHOW_MULTIPLE.ALL);
+      });
+
+      it('should return the same object', function () {
+        var allMessages = {
+          name: [messages.warning, messages.success],
+          email: [messages.success]
+        };
+        expect(inj.AfMessageService.getMessagesToShow(allMessages)).toBe(allMessages)
+      });
     });
   });
 
