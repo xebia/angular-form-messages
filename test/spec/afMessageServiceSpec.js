@@ -103,22 +103,22 @@ describe('AfMessageService', function () {
 
     describe('when the messageId is the same as the messageId passed to the validation registrer', function () {
       beforeEach(function () {
-        inj.AfMessageService.validation(this.$scope, 'formName.name', this.cb);
+        inj.AfMessageService.validation(this.$scope, 'user.name', this.cb);
       });
 
       it('should call the callback with passed messages and messageType arguments', function () {
-        this.$scope.$emit('validation', 'formName.name', [], 'messageType');
-        expect(this.cb).toHaveBeenCalledWith([], 'messageType');
+        this.$scope.$emit('validation', 'user.name', [], 'messageType');
+        expect(this.cb).toHaveBeenCalledWith('user.name', [], 'messageType');
       });
     });
 
     describe('when the messageId is not the same as the messageId passed to the validation registrer', function () {
       beforeEach(function () {
-        inj.AfMessageService.validation(this.$scope, 'name', this.cb);
+        inj.AfMessageService.validation(this.$scope, 'user.name', this.cb);
       });
 
       it('should not call the callback with passed messages and messageType arguments', function () {
-        this.$scope.$emit('validation', 'other', [], 'messageType');
+        this.$scope.$emit('validation', 'user.other', [], 'messageType');
         expect(this.cb).not.toHaveBeenCalled();
       });
     });
@@ -133,7 +133,7 @@ describe('AfMessageService', function () {
       it('should call the callback with passed messages and messageType arguments', function () {
         inj.AfMessageService.validation(this.$scope, 'user', this.cb, true);
         this.$scope.$emit('validation', 'user.name', [], 'messageType');
-        expect(this.cb).toHaveBeenCalledWith([], 'messageType');
+        expect(this.cb).toHaveBeenCalledWith('user.name', [], 'messageType');
       });
     });
   });

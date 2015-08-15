@@ -54,7 +54,7 @@ angular.module('angularFormMessages')
         validation: function ($scope, messageId, callback, isMessageIdPrefix) {
           $scope.$on('validation', function (event, validationMessageId, messages, messageType) {
             if (validationMessageId === messageId || (isMessageIdPrefix && validationMessageId.indexOf(messageId) === 0)) {
-              callback(messages, messageType);
+              callback(validationMessageId, messages, messageType);
             }
           });
         },

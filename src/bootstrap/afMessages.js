@@ -35,7 +35,7 @@ angular.module('angularFormMessagesBootstrap')
           afSubmitCtrl = ctrls[2];
 
         var messageId = afMessagesCtrl.messageIdPrefix || afMessagesCtrl.messageId;
-        AfMessageService.validation($scope.$parent, messageId, function (messages, messageType) {
+        AfMessageService.validation($scope.$parent, messageId, function (validationMessageId, messages, messageType) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.messageId === afMessagesCtrl.messageId) {
             $scope.messageType = messageType || (afSubmitCtrl.showSuccess ? MESSAGE_TYPES[0] : undefined);

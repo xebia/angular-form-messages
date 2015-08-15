@@ -42,7 +42,7 @@ describe('afFeedback', function () {
             validation: function ($scope, messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
               $scope.$on('validation', function (event, validationMessageId, messages, messageType) {
-                callback(messages, messageType);
+                callback(validationMessageId, messages, messageType);
               });
             }
           }

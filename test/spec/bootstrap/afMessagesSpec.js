@@ -58,7 +58,7 @@ describe('afMessages', function () {
             validation: function ($scope, messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
               $scope.$on('validation', function (event, validationMessageId, messages, messageType) {
-                callback(messages, messageType);
+                callback(validationMessageId, angular.copy(messages), messageType);
               });
             }
           }
@@ -103,7 +103,7 @@ describe('afMessages', function () {
       });
     });
 
-    describe('when there is a messageIdStart passed', function () {
+    describe('when there is a messageIdPrefix passed', function () {
       beforeEach(function () {
         mox.get.AfMessageService.validation.calls.reset();
         compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-message-id-prefix="user"></div></form>');

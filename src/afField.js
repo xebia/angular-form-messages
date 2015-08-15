@@ -33,6 +33,7 @@ angular.module('angularFormMessages').directive('afField', function (
         afField = ctrls[1],
         submit = ctrls[2],
         formName = $interpolate(ctrls[3].$name)($scope),
+        modelName = $interpolate(ngModel.$name)($scope),
         triggerOn = attrs.afTriggerOn || submit.triggerOn || AfMessageService.triggerOn(),
         isPristineAfterSubmit;
 
@@ -51,7 +52,7 @@ angular.module('angularFormMessages').directive('afField', function (
         });
 
         var mostSevereMessage = AfMessageService.getMostSevereMessage(messages);
-        $scope.$emit('validation', ngModel.$name, messages, mostSevereMessage ? mostSevereMessage.type : undefined);
+        $scope.$emit('validation', modelName, messages, mostSevereMessage ? mostSevereMessage.type : undefined);
       }
 
       // Make this field clean again
@@ -64,7 +65,7 @@ angular.module('angularFormMessages').directive('afField', function (
       // Update validation on change / blur
       if (triggerOn === 'change') {
         // This also triggers custom directives which may not be able to listen to events
-        var ngModelPath = formName + '["' + ngModel.$name + '"]';
+        var ngModelPath = formName + '["' + modelName + '"]';
         $scope.$watch('[' + ngModelPath + '.$error, ' + ngModelPath + '.$dirty]', function (newVal, oldVal) {
           if ((newVal[0] !== oldVal[0]) || newVal[1]) {
             updateValidation();
@@ -100,7 +101,7 @@ angular.module('angularFormMessages').directive('afField', function (
 
       // Set validity of this field after submitting
       $scope.$on('setValidity', function setValidity(event, messageId, messages) {
-        if (messageId === formName + '.' + ngModel.$name) {
+        if (messageId === formName + '.' + modelName) {
           isPristineAfterSubmit = true;
           angular.forEach(messages, function (message) {
             afField.setMessageDetails(message.message, message.type);
