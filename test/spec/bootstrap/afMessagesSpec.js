@@ -21,7 +21,8 @@ describe('afMessages', function () {
 
   var
     MESSAGE_TYPES,
-    messages;
+    messages,
+    SHOW_MULTIPLE;
 
   beforeEach(function () {
     mox
@@ -51,10 +52,7 @@ describe('afMessages', function () {
       .setupResults(function () {
         return {
           AfMessageService: {
-            getMostSevereMessage: function (messages) {
-              return messages[1];
-            },
-            showMultiple: true,
+            getMessagesToShow: function (messages) { return messages; },
             validation: function ($scope, messageId, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
               $scope.$on('validation', function (event, validationMessageId, messages, messageType) {
@@ -128,32 +126,18 @@ describe('afMessages', function () {
       validation.call(this, MESSAGE_TYPES[0]);
     });
 
-    describe('when we allow to show multiple messages', function () {
-      it('should show the messages', function () {
-        expect(this.element.alerts()).toHaveLength(messages.length);
-      });
+    it('should show the messages', function () {
+      expect(this.element.alerts()).toHaveLength(messages.length);
     });
 
-    describe('when we only allow to show the message with the highest severity', function () {
+    describe('and there are no messages to show', function () {
       beforeEach(function () {
-        mox.get.AfMessageService.showMultiple.and.returnValue(false);
-        validation.call(this, MESSAGE_TYPES[0]);
+        this.$scope.$emit('validation', 'user.name', [], undefined);
+        this.$scope.$digest();
       });
 
-      it('should show the message with highest severity', function () {
-        expect(this.element.alerts()).toHaveLength(1);
-        expect(this.element.alert(0).label()).toHaveAttr('af-message-label', messages[1].message);
-      });
-
-      describe('and there are no messages to show', function () {
-        beforeEach(function () {
-          this.$scope.$emit('validation', 'user.name', [], undefined);
-          this.$scope.$digest();
-        });
-
-        it('should show no messages', function () {
-          expect(this.element.alerts()).toHaveLength(0);
-        });
+      it('should show no messages', function () {
+        expect(this.element.alerts()).toHaveLength(0);
       });
     });
 
@@ -176,6 +160,33 @@ describe('afMessages', function () {
       expect(this.element.alert(1).icon()).toHaveClass('glyphicon-info-sign');
       expect(this.element.alert(2).icon()).toHaveClass('glyphicon-warning-sign');
       expect(this.element.alert(3).icon()).toHaveClass('glyphicon-exclamation-sign');
+    });
+
+    describe('when there is a messageIdPrefix set and there is a second validation event with another messageId that also matches', function () {
+      beforeEach(function () {
+        addSelectors(compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-message-id-prefix="user"></div></form>'), {
+          alerts: '.alert',
+          alertLabel: '.alert:eq({0}) [af-message-label]'
+        });
+        this.$scope.$emit('validation', 'user.name', messages, MESSAGE_TYPES[0]);
+        this.$scope.$digest();
+        this.$scope.$emit('validation', 'user.email', messages, MESSAGE_TYPES[0]);
+        this.$scope.$digest();
+      });
+
+      it('should not overwrite the messages for a different messageId', function () {
+        expect(this.element.alerts()).toHaveLength(messages.length * 2);
+      });
+
+      it('should overwrite messages for the same messageId', function () {
+        this.$scope.$emit('validation', 'user.email', [messages[0]], MESSAGE_TYPES[0]);
+        this.$scope.$digest();
+        expect(this.element.alerts()).toHaveLength(messages.length + 1);
+      });
+
+      it('should filter the messages', function () {
+        expect(mox.get.AfMessageService.getMessagesToShow).toHaveBeenCalledWith(jasmine.any(Object));
+      });
     });
 
     describe('when there is a parent afFeedback directive with the same messageId', function () {

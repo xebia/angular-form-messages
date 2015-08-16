@@ -19,6 +19,7 @@ angular.module('angularFormMessagesBootstrap')
           });
 
           if (messages.length) {
+            // FIX ME: count the visible messages in the DOM because 'messages' only says something about the new messages in this event
             if (!(AfMessageService.showMultiple() && messages.length > 1)) {
               attrs.$addClass('has-' + messageType.toLowerCase());
             }

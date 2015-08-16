@@ -29,6 +29,20 @@ angular.module('angularFormMessagesBootstrap')
       require: ['?^afFeedback', 'afMessages', '^afSubmit'],
       templateUrl: 'templates/bootstrap/messages.html',
       link: function ($scope, elem, attrs, ctrls) {
+        function addMessageInfo(messages) {
+          angular.forEach(messages, function (message) {
+            message.alertType = alertTypes[message.type];
+            message.icon = icons[message.type];
+          });
+          return messages;
+        }
+
+        function groupAllMessagesById(messages, validationMessageId) {
+          var newMessages = {};
+          newMessages[validationMessageId] = messages;
+          return angular.extend($scope.messages || {}, newMessages);
+        }
+
         var
           afFeedbackCtrl = ctrls[0],
           afMessagesCtrl = ctrls[1],
@@ -42,15 +56,10 @@ angular.module('angularFormMessagesBootstrap')
             $scope.icon = feedbackIcons[$scope.messageType];
           }
 
-          // Messages
-          if (!AfMessageService.showMultiple() && messages.length) {
-            messages = [AfMessageService.getMostSevereMessage(messages)];
-          }
+          messages = addMessageInfo(messages);
+          messages = groupAllMessagesById(messages, validationMessageId);
+          messages = AfMessageService.getMessagesToShow(messages);
 
-          angular.forEach(messages, function (message) {
-            message.alertType = alertTypes[message.type];
-            message.icon = icons[message.type];
-          });
           $scope.messages = messages;
         }, !!afMessagesCtrl.messageIdPrefix);
       }

@@ -58,10 +58,10 @@ angular.module('angularFormMessages')
             return messages;
           }
 
-          angular.forEach(messages, function (messagesPerMessageId, messageId) {
+          angular.forEach(messages, function (messagesForMessageId, messageId) {
 
-            if (messagesPerMessageId.length) {
-              var mostSevereMessage = messageService.getMostSevereMessage(messagesPerMessageId);
+            if (messagesForMessageId.length) {
+              var mostSevereMessage = messageService.getMostSevereMessage(messagesForMessageId);
               var index = MESSAGE_TYPES.indexOf(mostSevereMessage.type);
               if (showMultiple === SHOW_MULTIPLE.ONE_PER_MESSAGE_ID) {
                 result[messageId] = [mostSevereMessage];
