@@ -110,7 +110,7 @@ describe('AfMessageService', function () {
           email: [messages.success]
         })).toEqual({
           name: [messages.warning]
-        })
+        });
       });
     });
 
@@ -126,7 +126,7 @@ describe('AfMessageService', function () {
         })).toEqual({
           name: [messages.warning],
           email: [messages.success]
-        })
+        });
       });
     });
 
@@ -140,7 +140,7 @@ describe('AfMessageService', function () {
           name: [messages.warning, messages.success],
           email: [messages.success]
         };
-        expect(inj.AfMessageService.getMessagesToShow(allMessages)).toBe(allMessages)
+        expect(inj.AfMessageService.getMessagesToShow(allMessages)).toBe(allMessages);
       });
     });
   });
@@ -157,8 +157,8 @@ describe('AfMessageService', function () {
       });
 
       it('should call the callback with passed messages and messageType arguments', function () {
-        this.$scope.$emit('validation', 'user.name', [], 'messageType');
-        expect(this.cb).toHaveBeenCalledWith('user.name', [], 'messageType');
+        this.$scope.$emit('validation', 'user.name', []);
+        expect(this.cb).toHaveBeenCalledWith('user.name', []);
       });
     });
 
@@ -168,7 +168,7 @@ describe('AfMessageService', function () {
       });
 
       it('should not call the callback with passed messages and messageType arguments', function () {
-        this.$scope.$emit('validation', 'user.other', [], 'messageType');
+        this.$scope.$emit('validation', 'user.other', []);
         expect(this.cb).not.toHaveBeenCalled();
       });
     });
@@ -176,14 +176,14 @@ describe('AfMessageService', function () {
     describe('when the passed messageId starts with the validation event messageId', function () {
       it('should not call the callback when we do not want partial matches', function () {
         inj.AfMessageService.validation(this.$scope, 'user', this.cb);
-        this.$scope.$emit('validation', 'user.name', [], 'messageType');
+        this.$scope.$emit('validation', 'user.name', []);
         expect(this.cb).not.toHaveBeenCalled();
       });
 
       it('should call the callback with passed messages and messageType arguments', function () {
         inj.AfMessageService.validation(this.$scope, 'user', this.cb, true);
         this.$scope.$emit('validation', 'user.name', [], 'messageType');
-        expect(this.cb).toHaveBeenCalledWith('user.name', [], 'messageType');
+        expect(this.cb).toHaveBeenCalledWith('user.name', []);
       });
     });
   });

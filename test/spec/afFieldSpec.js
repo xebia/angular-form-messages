@@ -44,15 +44,15 @@ describe('afField', function () {
   function expectMessage(type) {
     this.$scope.$emit.calls.reset();
     this.$scope.$digest();
-    expectEvent.call(this, [{ message: 'required', type: type }], MESSAGE_TYPES[0]);
+    expectEvent.call(this, [{ message: 'required', type: type }]);
   }
 
-  function expectEvent(messages, type) {
-    expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', messages, type);
+  function expectEvent(messages) {
+    expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', messages);
   }
 
   function expectNoValidEvent() {
-    expect(this.$scope.$emit).not.toHaveBeenCalledWith('validation',  'user.email', [], undefined);
+    expect(this.$scope.$emit).not.toHaveBeenCalledWith('validation',  'user.email', []);
   }
 
   var
@@ -80,8 +80,8 @@ describe('afField', function () {
       })
       .run();
 
-    expectValidEvent = _.partial(expectEvent, [], undefined);
-    expectRequiredErrorEvent = _.partial(expectEvent, [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+    expectValidEvent = _.partial(expectEvent, []);
+    expectRequiredErrorEvent = _.partial(expectEvent, [{ message: 'required', type: MESSAGE_TYPES[3] }]);
   });
 
   describe('when the field should be validated on change', function () {
@@ -250,7 +250,7 @@ describe('afField', function () {
       });
 
       it('should broadcast the validation events', function () {
-        expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }], MESSAGE_TYPES[0]);
+        expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
       });
 
       describe('and the user changes the field thereafter', function () {
@@ -274,12 +274,12 @@ describe('afField', function () {
 
         it('should also process validatity if there is an afField in a (sub)form with this name', function () {
           this.$scope.$broadcast('setValidity', 'subForm1.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
-          expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }], MESSAGE_TYPES[0]);
+          expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
 
           this.$scope.$emit.calls.reset();
 
           this.$scope.$broadcast('setValidity', 'subFormNotExisting.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
-          expect(this.$scope.$emit).not.toHaveBeenCalledWith('validation', 'user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }], MESSAGE_TYPES[0]);
+          expect(this.$scope.$emit).not.toHaveBeenCalledWith('validation', 'user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
         });
       });
     });
@@ -303,7 +303,7 @@ describe('afField', function () {
     it('should validate the field and set the default message with the type that has been set via afField methods', function () {
       afField.setErrorDetails('required');
       makeFieldEmpty.call(this);
-      expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }], MESSAGE_TYPES[0]);
+      expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }]);
 
       afField.setWarningDetails('required');
       this.$scope.triggerValue = 'something-else';
