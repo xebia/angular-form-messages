@@ -64,6 +64,17 @@ describe('afFieldState', function () {
       this.element.controller('afSubmit').showSuccess = value;
     }
 
+    describe('when the messageId is passed via the messageId attribute', function () {
+      beforeEach(function () {
+        addSelectors(compileHtml('<form name="userForm" af-submit><div af-field-state af-message-id="user.name"></div></form>'), {
+          fieldState: '[af-field-state]'
+        });
+        validate.call(this, 'user.name', [{ type: inj.MESSAGE_TYPES[3] }]);
+      });
+
+      it('should add the "has-error" class to the element', _.partial(checkMessageClass, 'error'));
+    });
+
     describe('when showSuccess is true on the afSubmit directive', function () {
       beforeEach(_.partial(showSuccess, true));
 

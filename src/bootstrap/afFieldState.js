@@ -19,7 +19,7 @@ angular.module('angularFormMessagesBootstrap')
           mapping[MESSAGE_TYPES[1]] = 'has-info';
           mapping[MESSAGE_TYPES[2]] = 'has-warning';
           mapping[MESSAGE_TYPES[3]] = 'has-error';
-          return mapping[messageType]
+          return mapping[messageType];
         }
 
         function alertClassToType(alertClass) {
@@ -49,8 +49,9 @@ angular.module('angularFormMessagesBootstrap')
           return groupedAlerts;
         }
 
-        var messageId = attrs.afFieldState || attrs.afMessageId;
-        var hasValidClass;
+        var
+          cachedMessages = [],
+          messageId = attrs.afFieldState || attrs.afMessageId;
 
         $scope.$on('validation', function (event, validationMessageId, messages) {
           // Make sure that the AfMessages validation callback runs first
@@ -63,26 +64,22 @@ angular.module('angularFormMessagesBootstrap')
               removeClass(type);
             });
 
+            // Save messages cache (determine below if we have to show them)
+            if (validationMessageId === messageId) {
+              cachedMessages = messages;
+            }
+
             // There is exactly one afMessage in the DOM
             if (alertClasses.length === 1) {
               addClass(alertClassToType(alertClasses[0]));
             }
 
-            // There is no afMessage but the field with the same messageId has one or more messages
+            // There is no afMessage in the DOM
             if (!alertClasses.length) {
-              if (validationMessageId === messageId) {
-                if (messages.length) {
-                  addClass(AfMessageService.getMostSevereMessage(messages).type);
-                }
-                // There are no afMessages or messages for the current messageId
-                // Determine if there should be a 'success' class for the field with the same message id
-                else if (afSubmitCtrl.showSuccess) {
-                  hasValidClass = true;
-                  addClass(MESSAGE_TYPES[0]);
-                }
-              }
-              // Show the 'success' class when there are no afMessages and the event is not for this fieldstate
-              else if (hasValidClass) {
+
+              if (cachedMessages.length) {
+                addClass(AfMessageService.getMostSevereMessage(cachedMessages).type);
+              } else if (afSubmitCtrl.showSuccess) {
                 addClass(MESSAGE_TYPES[0]);
               }
             }

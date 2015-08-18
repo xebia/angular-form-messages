@@ -21,8 +21,7 @@ describe('afMessages', function () {
 
   var
     MESSAGE_TYPES,
-    messages,
-    SHOW_MULTIPLE;
+    messages;
 
   beforeEach(function () {
     mox
