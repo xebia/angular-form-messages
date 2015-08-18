@@ -91,10 +91,16 @@ angular.module('angularFormMessages').directive('afField', function (
         }
       });
 
-      // Validate the field before submitting
+      // Broadcast validation info of the field before submitting
       $scope.$on('validate', function () {
         clearErrors();
-        ngModel.$validate();
+
+        // Workaround to trigger the validation pipeline of Angular 1.2
+        if (ngModel.$validate) {
+          ngModel.$validate();
+        } else {
+          ngModel.$setViewValue(ngModel.$viewValue);
+        }
         updateValidation();
       });
 

@@ -216,8 +216,21 @@ describe('afField', function () {
       expect(ngModel.$setValidity).toHaveBeenCalledWith('other', true);
     });
 
-    it('should validate the field', function () {
+    it('should validate the field in Angular 1.3 and higher', function () {
       expect(ngModel.$validate).toHaveBeenCalled();
+    });
+
+    describe('when we use Angular 1.2', function () {
+      beforeEach(function () {
+        // This method does not exist in 1.2
+        delete ngModel.$validate;
+        spyOn(ngModel, '$setViewValue');
+        this.$scope.$emit('validate');
+      });
+
+      it('should validate the field in Angular 1.2', function () {
+        expect(ngModel.$setViewValue).toHaveBeenCalledWith(ngModel.$viewValue);
+      });
     });
 
     it('should send validation "valid" to the ngSubmitController', function () {
