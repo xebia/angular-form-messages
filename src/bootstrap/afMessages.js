@@ -40,13 +40,14 @@ angular.module('angularFormMessagesBootstrap')
         function groupAllMessagesById(messages, validationMessageId) {
           var newMessages = {};
           newMessages[validationMessageId] = messages;
-          return angular.extend($scope.messages || {}, newMessages);
+          return angular.extend(allActiveMessages || {}, newMessages);
         }
 
         var
           afFeedbackCtrl = ctrls[0],
           afMessagesCtrl = ctrls[1],
-          afSubmitCtrl = ctrls[2];
+          afSubmitCtrl = ctrls[2],
+          allActiveMessages;
 
         var messageId = afMessagesCtrl.messageIdPrefix || afMessagesCtrl.messageId;
         AfMessageService.validation($scope.$parent, messageId, function (validationMessageId, messages, messageType) {
@@ -58,9 +59,8 @@ angular.module('angularFormMessagesBootstrap')
 
           messages = addMessageInfo(messages);
           messages = groupAllMessagesById(messages, validationMessageId);
-          messages = AfMessageService.getMessagesToShow(messages);
-
-          $scope.messages = messages;
+          allActiveMessages = messages;
+          $scope.messages = AfMessageService.getMessagesToShow(messages);
         }, !!afMessagesCtrl.messageIdPrefix);
       }
     };
