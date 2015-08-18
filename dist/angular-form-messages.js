@@ -1,12 +1,11 @@
 angular.module('angularFormMessages', []);
 
-angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSAGE_TYPES", "AfMessageService", function (
-  $rootScope,
+angular.module('angularFormMessages').directive('afField', ["$interpolate", "MESSAGE_TYPES", "AfMessageService", function (
+  $interpolate,
   MESSAGE_TYPES,
   AfMessageService
 ) {
   return {
-    priority: 100,
     require: ['ngModel', 'afField', '^afSubmit', '^form'],
     controller: function () {
       function setMessageDetails(type) {
@@ -35,7 +34,8 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
         ngModel = ctrls[0],
         afField = ctrls[1],
         submit = ctrls[2],
-        form = ctrls[3],
+        formName = $interpolate(ctrls[3].$name)($scope),
+        modelName = $interpolate(ngModel.$name)($scope),
         triggerOn = attrs.afTriggerOn || submit.triggerOn || AfMessageService.triggerOn(),
         isPristineAfterSubmit;
 
@@ -44,15 +44,16 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
         var messages = [];
 
         angular.forEach(ngModel.$error, function (isValid, key) {
-          // For now, the message is just the key
           // The message type is stored in afField.$messages when for example afField.setError has been called, additional to ngModel.$setValidity
-          messages.push({
-            message: key,
-            type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
-          });
+          if (isValid) {
+            messages.push({
+              message: key,
+              type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
+            });
+          }
         });
 
-        $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, AfMessageService.determineMessageType(messages));
+        $scope.$emit('validation', modelName, messages);
       }
 
       // Make this field clean again
@@ -65,7 +66,7 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
       // Update validation on change / blur
       if (triggerOn === 'change') {
         // This also triggers custom directives which may not be able to listen to events
-        var ngModelPath = form.$name + '["' + ngModel.$name + '"]';
+        var ngModelPath = formName + '["' + modelName + '"]';
         $scope.$watch('[' + ngModelPath + '.$error, ' + ngModelPath + '.$dirty]', function (newVal, oldVal) {
           if ((newVal[0] !== oldVal[0]) || newVal[1]) {
             updateValidation();
@@ -92,16 +93,22 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
         }
       });
 
-      // Validate the field before submitting
+      // Broadcast validation info of the field before submitting
       $scope.$on('validate', function () {
         clearErrors();
-        ngModel.$validate();
+
+        // Workaround to trigger the validation pipeline of Angular 1.2
+        if (ngModel.$validate) {
+          ngModel.$validate();
+        } else {
+          ngModel.$setViewValue(ngModel.$viewValue);
+        }
         updateValidation();
       });
 
       // Set validity of this field after submitting
       $scope.$on('setValidity', function setValidity(event, messageId, messages) {
-        if (messageId === form.$name + '.' + ngModel.$name) {
+        if (messageId === formName + '.' + modelName) {
           isPristineAfterSubmit = true;
           angular.forEach(messages, function (message) {
             afField.setMessageDetails(message.message, message.type);
@@ -115,42 +122,29 @@ angular.module('angularFormMessages').directive('afField', ["$rootScope", "MESSA
 }]);
 
 angular.module('angularFormMessages')
-  .directive('afMessage', ["AfMessageService", function (
-    AfMessageService
-  ) {
-    return {
-      scope: true,
-      require: ['^form', 'afMessage'],
-      controller: angular.noop,
-      link: function linkFn($scope, elem, attrs, ctrls) {
-        var formCtrl = ctrls[0];
-        var afMessageCtrl = ctrls[1];
-
-        afMessageCtrl.messageId = formCtrl.$name + '.' +  (attrs.afMessage || attrs.afMessageId);
-        AfMessageService.validation(afMessageCtrl.messageId, function (messages) {
-          $scope.messages = messages;
-        });
-      }
-    };
-  }]);
-
-angular.module('angularFormMessages')
-  .directive('afMessageLabel', ["$log", "$translate", "AfMessageService", function (
+  .directive('afMessageLabel', ["$interpolate", "$log", "$translate", "AfMessageService", function (
+    $interpolate,
     $log,
     $translate,
     AfMessageService
   ) {
     return {
       restrict: 'A',
-      require: '^afMessage',
-      link: function ($scope, elem, attrs, afMessageCtrl) {
+      require: ['^form', '^afMessages'],
+      link: function ($scope, elem, attrs, ctrls) {
         attrs.$observe('afMessageLabel', function (newVal) {
           function translate(translation) {
             elem.html(translation);
           }
 
+          if (!newVal) {
+            return;
+          }
+
           var
-            specificLabel = afMessageCtrl.messageId + '.' + newVal,
+            formCtrl = ctrls[0],
+            afMessagesCtrl = ctrls[1],
+            specificLabel = $interpolate(formCtrl.$name)($scope) + '.' + (afMessagesCtrl.messageId || afMessagesCtrl.messageIdPrefix) + '.' + newVal,
             genericLabel = AfMessageService.getGenericLabelPrefix() + newVal;
 
           $translate(specificLabel)
@@ -170,12 +164,15 @@ angular.module('angularFormMessages')
 
 angular.module('angularFormMessages')
   .constant('MESSAGE_TYPES', ['SUCCESS', 'INFO', 'WARNING', 'ERROR'])
-  .provider('AfMessageService', ["MESSAGE_TYPES", function (
-    MESSAGE_TYPES
+  .constant('SHOW_MULTIPLE', { ALL: true, ONE: false, ONE_PER_MESSAGE_ID: 'ONE_PER_MESSAGE_ID' })
+  .provider('AfMessageService', ["MESSAGE_TYPES", "SHOW_MULTIPLE", function (
+    MESSAGE_TYPES,
+    SHOW_MULTIPLE
   ) {
     var
       genericLabelPrefix,
       scrollToError = true,
+      showMultiple = SHOW_MULTIPLE.ALL,
       showSuccess = false,
       triggerOn = 'change';
 
@@ -187,6 +184,10 @@ angular.module('angularFormMessages')
       scrollToError = newValue;
     };
 
+    this.setShowMultiple = function (newValue) {
+      showMultiple = newValue;
+    };
+
     this.setShowSuccess = function (newValue) {
       showSuccess = newValue;
     };
@@ -195,29 +196,54 @@ angular.module('angularFormMessages')
       triggerOn = newValue;
     };
 
-    this.$get = ["$injector", function ($injector) {
+    this.$get = ["SHOW_MULTIPLE", function (SHOW_MULTIPLE) {
 
-      return {
+      var messageService = {
         /**
-         * Determine the message type with the highest severity from a list of messages
+         * Determine the message with the highest severity from a list of messages
          * @param {Object[]} messages
-         * @returns {string} message type with the highest severity
+         * @returns {Object} message with the highest severity
          */
-        determineMessageType: function (messages) {
-          var severityIndex = -1;
+        getMostSevereMessage: function (messages) {
+          var severityIndex = -1, mostSevereMessage;
           angular.forEach(messages, function (message) {
             var index = MESSAGE_TYPES.indexOf(message.type);
             if (index > severityIndex) {
               severityIndex = index;
+              mostSevereMessage = message;
             }
           });
-          return severityIndex === -1 ? undefined : MESSAGE_TYPES[severityIndex];
+          return mostSevereMessage;
+        },
+        getMessagesToShow: function (messages) {
+          var result = {}, severityIndex = -1;
+
+          if (showMultiple === SHOW_MULTIPLE.ALL) {
+            return messages;
+          }
+
+          angular.forEach(messages, function (messagesForMessageId, messageId) {
+
+            if (messagesForMessageId.length) {
+              var mostSevereMessage = messageService.getMostSevereMessage(messagesForMessageId);
+              var index = MESSAGE_TYPES.indexOf(mostSevereMessage.type);
+              if (showMultiple === SHOW_MULTIPLE.ONE_PER_MESSAGE_ID) {
+                result[messageId] = [mostSevereMessage];
+              } else if ((showMultiple === SHOW_MULTIPLE.ONE) && index > severityIndex) {
+                severityIndex = index;
+                result = {};
+                result[messageId] = [mostSevereMessage];
+              }
+            }
+          });
+
+          return result;
         },
 
-        validation: function (messageId, callback) {
-          $injector.get('$rootScope').$on('validation', function (event, validationMessageId, messages, messageType) {
-            if (validationMessageId === messageId) {
-              callback(messages, messageType);
+        validation: function ($scope, messageId, callback, isMessageIdPrefix) {
+          $scope.$on('validation', function (event, validationMessageId, messages) {
+            if (validationMessageId === messageId || (isMessageIdPrefix && validationMessageId.indexOf(messageId) === 0)) {
+              callback(validationMessageId, messages);
             }
           });
         },
@@ -230,6 +256,10 @@ angular.module('angularFormMessages')
           return scrollToError;
         },
 
+        showMultiple: function () {
+          return showMultiple;
+        },
+
         showSuccess: function () {
           return showSuccess;
         },
@@ -238,8 +268,23 @@ angular.module('angularFormMessages')
           return triggerOn;
         }
       };
+
+      return messageService;
     }];
   }]);
+
+angular.module('angularFormMessages')
+  .directive('afMessages', function () {
+    return {
+      scope: true,
+      require: 'afMessages',
+      controller: angular.noop,
+      link: function linkFn($scope, elem, attrs, afMessagesCtrl) {
+        afMessagesCtrl.messageIdPrefix = attrs.afMessageIdPrefix;
+        afMessagesCtrl.messageId = attrs.afMessages || attrs.afMessageId;
+      }
+    };
+  });
 
 angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "$timeout", "AfMessageService", function (
   $rootScope,
