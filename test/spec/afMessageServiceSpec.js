@@ -143,6 +143,34 @@ describe('AfMessageService', function () {
         expect(inj.AfMessageService.getMessagesToShow(allMessages)).toBe(allMessages);
       });
     });
+
+    describe('when there exists a messageId key without messages', function () {
+      it('should remove the empty keys except for when you want to show all messages', function () {
+        afMessageServiceProvider.setShowMultiple(inj.SHOW_MULTIPLE.ALL);
+        var allMessages = {
+          name: [],
+          email: [messages.success]
+        };
+        expect(inj.AfMessageService.getMessagesToShow(allMessages)).toBe(allMessages);
+
+        afMessageServiceProvider.setShowMultiple(inj.SHOW_MULTIPLE.ONE_PER_MESSAGE_ID);
+        expect(inj.AfMessageService.getMessagesToShow({
+          name: [],
+          email: [messages.success]
+        })).toEqual({
+          email: [messages.success]
+        });
+
+        afMessageServiceProvider.setShowMultiple(inj.SHOW_MULTIPLE.ONE);
+        expect(inj.AfMessageService.getMessagesToShow({
+          name: [],
+          email: [messages.success],
+          other: [messages.warning]
+        })).toEqual({
+          other: [messages.warning]
+        });
+      });
+    });
   });
 
   describe('validation()', function () {
