@@ -41,30 +41,25 @@ angular.module('angularFormMessagesBootstrap')
       require: '^afSubmit',
       controller: angular.noop,
       link: function ($scope, elem, attrs, afSubmitCtrl) {
-        function typeToFieldStateClass(messageType) {
-          var mapping = {};
-          mapping[MESSAGE_TYPES[0]] = 'has-success';
-          mapping[MESSAGE_TYPES[1]] = 'has-info';
-          mapping[MESSAGE_TYPES[2]] = 'has-warning';
-          mapping[MESSAGE_TYPES[3]] = 'has-error';
-          return mapping[messageType];
-        }
+        var typeToFieldStateClass = {};
+        typeToFieldStateClass[MESSAGE_TYPES[0]] = 'has-success';
+        typeToFieldStateClass[MESSAGE_TYPES[1]] = 'has-info';
+        typeToFieldStateClass[MESSAGE_TYPES[2]] = 'has-warning';
+        typeToFieldStateClass[MESSAGE_TYPES[3]] = 'has-error';
 
-        function alertClassToType(alertClass) {
-          return {
-            'alert-success': MESSAGE_TYPES[0],
-            'alert-info': MESSAGE_TYPES[1],
-            'alert-warning': MESSAGE_TYPES[2],
-            'alert-danger': MESSAGE_TYPES[3]
-          }[alertClass];
-        }
+        var alertClassToType = {
+          'alert-success': MESSAGE_TYPES[0],
+          'alert-info': MESSAGE_TYPES[1],
+          'alert-warning': MESSAGE_TYPES[2],
+          'alert-danger': MESSAGE_TYPES[3]
+        };
 
         function addClass(messageType) {
-          attrs.$addClass(typeToFieldStateClass(messageType));
+          attrs.$addClass(typeToFieldStateClass[messageType]);
         }
 
         function removeClass(messageType) {
-          attrs.$removeClass(typeToFieldStateClass(messageType));
+          attrs.$removeClass(typeToFieldStateClass[messageType]);
         }
 
         function groupByMessageType(alerts) {
@@ -99,7 +94,7 @@ angular.module('angularFormMessagesBootstrap')
 
             // There is exactly one afMessage in the DOM
             if (alertClasses.length === 1) {
-              addClass(alertClassToType(alertClasses[0]));
+              addClass(alertClassToType[alertClasses[0]]);
             }
 
             // There is no afMessage in the DOM

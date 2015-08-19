@@ -262,10 +262,6 @@ describe('afField', function () {
         expect(afField.setMessageDetails).toHaveBeenCalledWith('User name server side error', MESSAGE_TYPES[3]);
       });
 
-      it('should broadcast the validation events', function () {
-        expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
-      });
-
       describe('and the user changes the field thereafter', function () {
         beforeEach(function () {
           ngModel.$setValidity.calls.reset();
@@ -285,14 +281,14 @@ describe('afField', function () {
           compileWithSubform.call(this);
         });
 
-        it('should also process validatity if there is an afField in a (sub)form with this name', function () {
+        it('should also process validity if there is an afField in a (sub)form with this name', function () {
           this.$scope.$broadcast('setValidity', 'subForm1.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
-          expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
+          expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', false);
 
-          this.$scope.$emit.calls.reset();
+          ngModel.$setValidity.calls.reset();
 
           this.$scope.$broadcast('setValidity', 'subFormNotExisting.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
-          expect(this.$scope.$emit).not.toHaveBeenCalledWith('validation', 'user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
+          expect(ngModel.$setValidity).not.toHaveBeenCalledWith('User name server side error', false);
         });
       });
     });
