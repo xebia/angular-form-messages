@@ -214,7 +214,6 @@ describe('afSubmit', function () {
       beforeEach(function () {
         form.$valid = false;
         this.element.submit();
-        console.log(this.element[0].outerHTML);
       });
 
       it('should stop further processing', function () {
