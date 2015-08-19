@@ -1,7 +1,7 @@
 angular.module('angularFormMessages').directive('afSubmit', function (
   $rootScope,
   $timeout,
-  MessageService
+  AfMessageService
 ) {
 
   return {
@@ -13,9 +13,9 @@ angular.module('angularFormMessages').directive('afSubmit', function (
 
         // Settings
         var scrollToError = $scope.$eval(attrs.afScrollToError);
-        afSubmit.scrollToError = !!(scrollToError === undefined ? MessageService.scrollToError() : scrollToError);
+        afSubmit.scrollToError = !!(scrollToError === undefined ? AfMessageService.scrollToError() : scrollToError);
         var showSuccess = $scope.$eval(attrs.afShowSuccess);
-        afSubmit.showSuccess = !!(showSuccess === undefined ? MessageService.showSuccess() : showSuccess);
+        afSubmit.showSuccess = !!(showSuccess === undefined ? AfMessageService.showSuccess() : showSuccess);
         afSubmit.triggerOn = attrs.afTriggerOn;
       }, post: function ($scope, elem, attrs, ctrls) {
         var

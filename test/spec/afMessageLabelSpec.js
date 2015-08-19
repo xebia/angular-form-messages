@@ -1,44 +1,59 @@
 describe('the afMessageLabel directive', function () {
-  var $log;
+  var
+    $log,
+    afMessagesCtrl;
 
   beforeEach(function () {
     mox
-      .module('angularFormMessages')
+      .module('angularFormMessagesBootstrap')
       .mockServices(
-        'MessageService',
-        'translateFilter',
-        'TranslateService'
+        'AfMessageService',
+        '$translate'
       )
+      .mockDirectives({
+        name: 'afMessages',
+        controller: function () {
+          this.messageId = 'user.email';
+        }
+      })
       .setupResults(function () {
         return {
-          MessageService: {
+          AfMessageService: {
             getGenericLabelPrefix: 'prefix.'
           },
-          TranslateService: { hasLabel: true },
-          translateFilter: function (key) {
-            return {
+          $translate: function (key) {
+            var translations = {
+              'prefix.required': 'Required translation',
               'userForm.user.email.email': 'E-mail translation',
-              'prefix.required': 'Required translation'
-            }[key];
+              'subForm0.user.email.required': 'Required translation sub form',
+              'subForm1.user.email.email': 'E-mail translation sub form'
+            };
+            return key in translations ? promise(translations[key]) : reject(key);
           }
         };
       })
       .run();
 
     createScope();
-    compileHtml('<form name="userForm"><div af-message="user.email"><span af-message-label="{{key}}"></span></div></form>');
+    compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>');
+    afMessagesCtrl = this.element.find('[af-messages]').controller('afMessages');
     $log = mox.inject('$log');
     spyOn($log, 'warn');
   });
 
+  it('should do nothing when the key is empty', function () {
+    expect(this.element).toHaveText('Content');
+  });
+
   it('should replace the contents of the element with the field specific translation if this exists', function () {
+    delete afMessagesCtrl.messageId;
+    afMessagesCtrl.messageIdPrefix = 'user.email';
     this.$scope.key = 'email';
     this.$scope.$digest();
     expect(this.element).toHaveText('E-mail translation');
   });
 
   it('should replace the contents of the element with the generic translation if this exists', function () {
-    mox.get.TranslateService.hasLabel.and.returnValue(false);
     this.$scope.key = 'required';
     this.$scope.$digest();
     expect(this.element).toHaveText('Required translation');
@@ -49,8 +64,6 @@ describe('the afMessageLabel directive', function () {
     this.$scope.$digest();
     expect(this.element).toHaveText('specific not existing');
 
-    mox.get.TranslateService.hasLabel.and.returnValue(false);
-
     this.$scope.key = 'generic not existing';
     this.$scope.$digest();
     expect(this.element).toHaveText('generic not existing');
@@ -60,5 +73,35 @@ describe('the afMessageLabel directive', function () {
     this.$scope.key = 'not-existing';
     this.$scope.$digest();
     expect($log.warn).toHaveBeenCalledWith('Missing label: \'userForm.user.email.not-existing\' (specific) or \'prefix.not-existing\' (generic)');
+  });
+
+  describe('when the messageId is passed as prefix', function () {
+    beforeEach(function () {
+      compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>');
+    });
+
+    it('should replace the contents of the element with the translation', function () {
+      this.$scope.key = 'email';
+      this.$scope.$digest();
+      expect(this.element).toHaveText('E-mail translation');
+    });
+  });
+
+  describe('when the field is in a sub form with dynamic name', function () {
+    // This test also passes when we do not use $interpolate, but it is necessary for angular 1.2
+    beforeEach(function () {
+      addSelectors(compileHtml('<form name="userForm">' +
+          '<div ng-form name="subForm{{$index}}" ng-repeat="messageId in [\'required\', \'email\']">' +
+            '<div af-messages><span af-message-label="{{messageId}}">Content</span></div>' +
+          '</div>' +
+        '</form>'), {
+        messages: '[ng-form]:eq({0}) [af-messages]'
+      });
+    });
+
+    it('should validate these as well', function () {
+      expect(this.element.messages(0)).toHaveText('Required translation sub form');
+      expect(this.element.messages(1)).toHaveText('E-mail translation sub form');
+    });
   });
 });

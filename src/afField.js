@@ -1,10 +1,9 @@
 angular.module('angularFormMessages').directive('afField', function (
-  $rootScope,
+  $interpolate,
   MESSAGE_TYPES,
-  MessageService
+  AfMessageService
 ) {
   return {
-    priority: 100,
     require: ['ngModel', 'afField', '^afSubmit', '^form'],
     controller: function () {
       function setMessageDetails(type) {
@@ -33,8 +32,9 @@ angular.module('angularFormMessages').directive('afField', function (
         ngModel = ctrls[0],
         afField = ctrls[1],
         submit = ctrls[2],
-        form = ctrls[3],
-        triggerOn = attrs.afTriggerOn || submit.triggerOn || MessageService.triggerOn(),
+        formName = $interpolate(ctrls[3].$name)($scope),
+        modelName = $interpolate(ngModel.$name)($scope),
+        triggerOn = attrs.afTriggerOn || submit.triggerOn || AfMessageService.triggerOn(),
         isPristineAfterSubmit;
 
       // Collects validation info from ngModel and afField and broadcasts a validation event
@@ -42,15 +42,16 @@ angular.module('angularFormMessages').directive('afField', function (
         var messages = [];
 
         angular.forEach(ngModel.$error, function (isValid, key) {
-          // For now, the message is just the key
           // The message type is stored in afField.$messages when for example afField.setError has been called, additional to ngModel.$setValidity
-          messages.push({
-            message: key,
-            type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
-          });
+          if (isValid) {
+            messages.push({
+              message: key,
+              type: (afField.$messages[key] && afField.$messages[key].type) || MESSAGE_TYPES[3]
+            });
+          }
         });
 
-        $rootScope.$broadcast('validation', form.$name + '.' + ngModel.$name, messages, MessageService.determineMessageType(messages));
+        $scope.$emit('validation', modelName, messages);
       }
 
       // Make this field clean again
@@ -63,7 +64,7 @@ angular.module('angularFormMessages').directive('afField', function (
       // Update validation on change / blur
       if (triggerOn === 'change') {
         // This also triggers custom directives which may not be able to listen to events
-        var ngModelPath = form.$name + '["' + ngModel.$name + '"]';
+        var ngModelPath = formName + '["' + modelName + '"]';
         $scope.$watch('[' + ngModelPath + '.$error, ' + ngModelPath + '.$dirty]', function (newVal, oldVal) {
           if ((newVal[0] !== oldVal[0]) || newVal[1]) {
             updateValidation();
@@ -90,22 +91,27 @@ angular.module('angularFormMessages').directive('afField', function (
         }
       });
 
-      // Validate the field before submitting
+      // Broadcast validation info of the field before submitting
       $scope.$on('validate', function () {
         clearErrors();
-        ngModel.$validate();
+
+        // Workaround to trigger the validation pipeline of Angular 1.2
+        if (ngModel.$validate) {
+          ngModel.$validate();
+        } else {
+          ngModel.$setViewValue(ngModel.$viewValue);
+        }
         updateValidation();
       });
 
       // Set validity of this field after submitting
       $scope.$on('setValidity', function setValidity(event, messageId, messages) {
-        if (messageId === form.$name + '.' + ngModel.$name) {
+        if (messageId === formName + '.' + modelName) {
           isPristineAfterSubmit = true;
           angular.forEach(messages, function (message) {
             afField.setMessageDetails(message.message, message.type);
             ngModel.$setValidity(message.message, false);
           });
-          updateValidation();
         }
       });
     }
