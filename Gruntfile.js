@@ -11,9 +11,8 @@ module.exports = function (grunt) {
   };
 
   grunt.loadNpmTasks('grunt-mutation-testing');
-  grunt.option('verbose', true);
+  //grunt.option('verbose', true);
   grunt.initConfig({
-    option: { verbose: true },
     bwr: grunt.file.readJSON('bower.json'),
     paths: appConfig,
 
