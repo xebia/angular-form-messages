@@ -63,6 +63,23 @@ angular.module('angularFormMessages').directive('afSubmit', function (
           });
         }
 
+        $scope.$on('validate', function () {
+          angular.forEach(formCtrl.$error, function (isValid, validator) {
+            formCtrl.$setValidity(validator, true);
+          });
+        });
+
+        $scope.$on('setValidity', function setValidity(event, messageId, messages) {
+          if (messageId === formName) {
+            // Set errors in event payload
+            angular.forEach(messages, function (message) {
+              formCtrl.$setValidity(message.message, false);
+            });
+
+            $scope.$emit('validation', undefined, messages);
+          }
+        });
+
         elem.on('submit', doSubmit);
       }
     }

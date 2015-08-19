@@ -226,4 +226,46 @@ describe('afSubmit', function () {
       });
     });
   });
+
+  describe('when the validate event is received', function () {
+    beforeEach(function () {
+      form.$setValidity('someServerSideError', false);
+      form.$setValidity('anotherError', false);
+      this.$scope.$broadcast('validate');
+    });
+
+    it('should make the form valid', function () {
+      expect(form.$valid).toBe(true);
+    });
+  });
+
+  describe('when the setValidity event is received', function () {
+    beforeEach(function () {
+      spyOn(this.$scope, '$emit');
+      spyOn(form, '$setValidity');
+    });
+
+    describe('and it has the same messageId as the form name', function () {
+      beforeEach(function () {
+        this.$scope.$broadcast('setValidity', 'userForm', [{ message: 'required', type: MESSAGE_TYPES[3] }, { message: 'email', type: MESSAGE_TYPES[0] }]);
+      });
+
+      it('should set the validity of the form', function () {
+        expect(form.$setValidity).toHaveBeenCalledWith('required', false);
+        expect(form.$setValidity).toHaveBeenCalledWith('email', false);
+        expect(this.$scope.$emit).toHaveBeenCalled();
+      });
+    });
+
+    describe('and it has another messageId than the form name', function () {
+      beforeEach(function () {
+        this.$scope.$broadcast('setValidity', 'userForm.name', [{ message: 'required', type: MESSAGE_TYPES[3] }, { message: 'email', type: MESSAGE_TYPES[0] }]);
+      });
+
+      it('should do nothing because the event is addressed to a field', function () {
+        expect(form.$setValidity).not.toHaveBeenCalled();
+        expect(this.$scope.$emit).not.toHaveBeenCalled();
+      });
+    });
+  });
 });
