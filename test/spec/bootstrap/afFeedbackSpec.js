@@ -39,10 +39,10 @@ describe('afFeedback', function () {
       .setupResults(function () {
         return {
           AfMessageService: {
-            validation: function ($scope, messageId, callback) {
-              // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
-              $scope.$on('validation', function (event, validationMessageId, messages, messageType) {
-                callback(validationMessageId, messages, messageType);
+            validation: function ($scope, fieldName, callback) {
+              // This method is quite hard to mock, so we mimic the implementation, except for the fieldName condition
+              $scope.$on('validation', function (event, validationFieldName, messages, messageType) {
+                callback(validationFieldName, messages, messageType);
               });
             }
           }
@@ -67,10 +67,10 @@ describe('afFeedback', function () {
       expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.$scope, 'user.name', jasmine.any(Function));
     });
 
-    describe('when the messageId is passed via the messageId attribute', function () {
+    describe('when the fieldName is passed via the fieldName attribute', function () {
       beforeEach(function () {
         mox.get.AfMessageService.validation.calls.reset();
-        compileHtml('<form name="userForm" af-submit><div af-feedback af-message-id="user.name"></div></form>');
+        compileHtml('<form name="userForm" af-submit><div af-feedback af-field-name="user.name"></div></form>');
       });
 
       it('should register the validation event listener via the AfMessageService', function () {

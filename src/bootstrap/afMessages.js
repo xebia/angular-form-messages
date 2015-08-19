@@ -37,9 +37,9 @@ angular.module('angularFormMessagesBootstrap')
           return messages;
         }
 
-        function groupAllMessagesById(messages, validationMessageId) {
+        function groupAllMessagesByField(messages, validationFieldName) {
           var newMessages = {};
-          newMessages[validationMessageId] = messages;
+          newMessages[validationFieldName] = messages;
           return angular.extend(allActiveMessages || {}, newMessages);
         }
 
@@ -49,19 +49,19 @@ angular.module('angularFormMessagesBootstrap')
           afSubmitCtrl = ctrls[2],
           allActiveMessages;
 
-        var messageId = afMessagesCtrl.messageIdPrefix || afMessagesCtrl.messageId;
-        AfMessageService.validation($scope.$parent, messageId, function (validationMessageId, messages, messageType) {
+        var fieldName = afMessagesCtrl.fieldNamePrefix || afMessagesCtrl.fieldName;
+        AfMessageService.validation($scope.$parent, fieldName, function (validationFieldName, messages, messageType) {
           // Feedback
-          if (afFeedbackCtrl && afFeedbackCtrl.messageId === afMessagesCtrl.messageId) {
+          if (afFeedbackCtrl && afFeedbackCtrl.fieldName === fieldName) {
             $scope.messageType = messageType || (afSubmitCtrl.showSuccess ? MESSAGE_TYPES[0] : undefined);
             $scope.icon = feedbackIcons[$scope.messageType];
           }
 
           messages = addMessageInfo(messages);
-          messages = groupAllMessagesById(messages, validationMessageId);
+          messages = groupAllMessagesByField(messages, validationFieldName);
           allActiveMessages = messages;
           $scope.messages = AfMessageService.getMessagesToShow(messages);
-        }, !!afMessagesCtrl.messageIdPrefix);
+        }, !!afMessagesCtrl.fieldNamePrefix);
       }
     };
   });

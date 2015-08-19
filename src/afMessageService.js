@@ -60,17 +60,17 @@ angular.module('angularFormMessages')
             return messages;
           }
 
-          angular.forEach(messages, function (messagesForMessageId, messageId) {
+          angular.forEach(messages, function (messagesForField, fieldName) {
 
-            if (messagesForMessageId.length) {
-              var mostSevereMessage = messageService.getMostSevereMessage(messagesForMessageId);
+            if (messagesForField.length) {
+              var mostSevereMessage = messageService.getMostSevereMessage(messagesForField);
               var index = MESSAGE_TYPES.indexOf(mostSevereMessage.type);
               if (showMultiple === SHOW_MULTIPLE.ONE_PER_MESSAGE_ID) {
-                result[messageId] = [mostSevereMessage];
+                result[fieldName] = [mostSevereMessage];
               } else if ((showMultiple === SHOW_MULTIPLE.ONE) && index > severityIndex) {
                 severityIndex = index;
                 result = {};
-                result[messageId] = [mostSevereMessage];
+                result[fieldName] = [mostSevereMessage];
               }
             }
           });
@@ -78,10 +78,10 @@ angular.module('angularFormMessages')
           return result;
         },
 
-        validation: function ($scope, messageId, callback, isMessageIdPrefix) {
-          $scope.$on('validation', function (event, validationMessageId, messages) {
-            if (validationMessageId === messageId || (isMessageIdPrefix && validationMessageId.indexOf(messageId) === 0)) {
-              callback(validationMessageId, messages);
+        validation: function ($scope, fieldName, callback, isFieldNamePrefix) {
+          $scope.$on('validation', function (event, validationFieldName, messages) {
+            if (validationFieldName === fieldName || (isFieldNamePrefix && validationFieldName.indexOf(fieldName) === 0)) {
+              callback(validationFieldName, messages);
             }
           });
         },

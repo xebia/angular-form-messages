@@ -5,8 +5,8 @@ angular.module('angularFormMessages')
       require: 'afMessages',
       controller: angular.noop,
       link: function linkFn($scope, elem, attrs, afMessagesCtrl) {
-        afMessagesCtrl.messageIdPrefix = attrs.afMessageIdPrefix;
-        afMessagesCtrl.messageId = attrs.afMessages || attrs.afMessageId;
+        afMessagesCtrl.fieldNamePrefix = attrs.afFieldNamePrefix;
+        afMessagesCtrl.fieldName = attrs.afMessages || attrs.afFieldName;
       }
     };
   });

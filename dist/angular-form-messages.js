@@ -143,8 +143,8 @@ angular.module('angularFormMessages')
           var
             formCtrl = ctrls[0],
             afMessagesCtrl = ctrls[1],
-            messageId = afMessagesCtrl.messageId || afMessagesCtrl.messageIdPrefix,
-            specificLabel = $interpolate(formCtrl.$name)($scope) + (messageId ? '.' + messageId : '') + '.' + newVal,
+            fieldName = afMessagesCtrl.fieldName || afMessagesCtrl.fieldNamePrefix,
+            specificLabel = $interpolate(formCtrl.$name)($scope) + (fieldName ? '.' + fieldName : '') + '.' + newVal,
             genericLabel = AfMessageService.getGenericLabelPrefix() + newVal;
 
           $translate(specificLabel)
@@ -224,17 +224,17 @@ angular.module('angularFormMessages')
             return messages;
           }
 
-          angular.forEach(messages, function (messagesForMessageId, messageId) {
+          angular.forEach(messages, function (messagesForField, fieldName) {
 
-            if (messagesForMessageId.length) {
-              var mostSevereMessage = messageService.getMostSevereMessage(messagesForMessageId);
+            if (messagesForField.length) {
+              var mostSevereMessage = messageService.getMostSevereMessage(messagesForField);
               var index = MESSAGE_TYPES.indexOf(mostSevereMessage.type);
               if (showMultiple === SHOW_MULTIPLE.ONE_PER_MESSAGE_ID) {
-                result[messageId] = [mostSevereMessage];
+                result[fieldName] = [mostSevereMessage];
               } else if ((showMultiple === SHOW_MULTIPLE.ONE) && index > severityIndex) {
                 severityIndex = index;
                 result = {};
-                result[messageId] = [mostSevereMessage];
+                result[fieldName] = [mostSevereMessage];
               }
             }
           });
@@ -242,10 +242,10 @@ angular.module('angularFormMessages')
           return result;
         },
 
-        validation: function ($scope, messageId, callback, isMessageIdPrefix) {
-          $scope.$on('validation', function (event, validationMessageId, messages) {
-            if (validationMessageId === messageId || (isMessageIdPrefix && validationMessageId.indexOf(messageId) === 0)) {
-              callback(validationMessageId, messages);
+        validation: function ($scope, fieldName, callback, isFieldNamePrefix) {
+          $scope.$on('validation', function (event, validationFieldName, messages) {
+            if (validationFieldName === fieldName || (isFieldNamePrefix && validationFieldName.indexOf(fieldName) === 0)) {
+              callback(validationFieldName, messages);
             }
           });
         },
@@ -282,8 +282,8 @@ angular.module('angularFormMessages')
       require: 'afMessages',
       controller: angular.noop,
       link: function linkFn($scope, elem, attrs, afMessagesCtrl) {
-        afMessagesCtrl.messageIdPrefix = attrs.afMessageIdPrefix;
-        afMessagesCtrl.messageId = attrs.afMessages || attrs.afMessageId;
+        afMessagesCtrl.fieldNamePrefix = attrs.afFieldNamePrefix;
+        afMessagesCtrl.fieldName = attrs.afMessages || attrs.afFieldName;
       }
     };
   });
@@ -326,8 +326,8 @@ angular.module('angularFormMessages').directive('afSubmit', ["$interpolate", "$r
 
             function processErrors(result) {
               angular.forEach(result.validation, function (validations, validationFormName) {
-                angular.forEach(validations, function (messages, messageId) {
-                  $rootScope.$broadcast('setValidity', validationFormName + (messageId === '$messages' ? '' : '.' + messageId), messages);
+                angular.forEach(validations, function (messages, fieldName) {
+                  $rootScope.$broadcast('setValidity', validationFormName + (fieldName === '$messages' ? '' : '.' + fieldName), messages);
                 });
               });
 

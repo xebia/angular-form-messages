@@ -11,7 +11,7 @@ describe('the afMessageLabel directive', function () {
       .mockDirectives({
         name: 'afMessages',
         controller: function () {
-          this.messageId = 'user.email';
+          this.fieldName = 'user.email';
         }
       })
       .setupResults(function () {
@@ -71,14 +71,14 @@ describe('the afMessageLabel directive', function () {
     expect($log.warn).toHaveBeenCalledWith('Missing label: \'userForm.user.email.not-existing\' (specific) or \'prefix.not-existing\' (generic)');
   });
 
-  describe('when the messageId is passed as prefix', function () {
+  describe('when the fieldName is passed as prefix', function () {
     beforeEach(function () {
       addSelectors(compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>'), {
         messages: '[af-messages]'
       });
       var afMessagesCtrl = this.element.messages().controller('afMessages');
-      delete afMessagesCtrl.messageId;
-      afMessagesCtrl.messageIdPrefix = 'user.email';
+      delete afMessagesCtrl.fieldName;
+      afMessagesCtrl.fieldNamePrefix = 'user.email';
     });
 
     it('should replace the contents of the element with the translation', function () {
@@ -106,14 +106,14 @@ describe('the afMessageLabel directive', function () {
     });
   });
 
-  describe('when there is no messageId', function () {
+  describe('when there is no fieldName', function () {
     beforeEach(function () {
       addSelectors(compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>'), {
         messages: '[af-messages]',
         label: '[af-message-label]'
       });
 
-      delete this.element.messages().controller('afMessages').messageId;
+      delete this.element.messages().controller('afMessages').fieldName;
       this.$scope.key = 'name'; // to trigger watch
       this.$scope.$digest();
     });

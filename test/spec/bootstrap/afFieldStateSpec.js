@@ -22,8 +22,8 @@ describe('afFieldState', function () {
     validate.call(this);
   }
 
-  function validate(messageId, messages) {
-    this.$scope.$emit('validation', messageId || 'user.name', messages || []);
+  function validate(fieldName, messages) {
+    this.$scope.$emit('validation', fieldName || 'user.name', messages || []);
     this.$scope.$digest();
     inj.$timeout.flush();
   }
@@ -64,9 +64,9 @@ describe('afFieldState', function () {
       this.element.controller('afSubmit').showSuccess = value;
     }
 
-    describe('when the messageId is passed via the messageId attribute', function () {
+    describe('when the fieldName is passed via the fieldName attribute', function () {
       beforeEach(function () {
-        addSelectors(compileHtml('<form name="userForm" af-submit><div af-field-state af-message-id="user.name"></div></form>'), {
+        addSelectors(compileHtml('<form name="userForm" af-submit><div af-field-state af-field-name="user.name"></div></form>'), {
           fieldState: '[af-field-state]'
         });
         validate.call(this, 'user.name', [{ type: inj.MESSAGE_TYPES[3] }]);
@@ -86,14 +86,14 @@ describe('afFieldState', function () {
         it('should remove the "has-warning" class from the element', expectHasNoWarning);
         it('should remove the "has-info" class from the element', expectHasNoInfo);
 
-        describe('when there is another validation event for another messageId', function () {
+        describe('when there is another validation event for another fieldName', function () {
           beforeEach(function () {
             validate.call(this, 'user.other', [{ type: inj.MESSAGE_TYPES[3] }]);
           });
           it('should not remove the "has-success" class from the element', _.partial(checkMessageClass, 'success'));
         });
 
-        describe('when there is another validation event for the same messageId', function () {
+        describe('when there is another validation event for the same fieldName', function () {
           beforeEach(function () {
             validate.call(this, 'user.name', [{ type: inj.MESSAGE_TYPES[3] }]);
           });
@@ -113,7 +113,7 @@ describe('afFieldState', function () {
         it('should remove the "has-success" class from the element', expectHasNoSuccess);
 
         // This block of course also applies to the other message types
-        describe('when there is another validation event for the same messageId', function () {
+        describe('when there is another validation event for the same fieldName', function () {
           beforeEach(function () {
             validate.call(this, 'user.name', [{ type: inj.MESSAGE_TYPES[2] }]);
           });

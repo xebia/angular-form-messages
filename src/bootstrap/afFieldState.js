@@ -46,9 +46,9 @@ angular.module('angularFormMessagesBootstrap')
 
         var
           cachedMessages = [],
-          messageId = attrs.afFieldState || attrs.afMessageId;
+          fieldName = attrs.afFieldState || attrs.afFieldName;
 
-        $scope.$on('validation', function (event, validationMessageId, messages) {
+        $scope.$on('validation', function (event, validationFieldName, messages) {
           // Make sure that the AfMessages validation callback runs first
           $timeout(function () {
             var alerts = elem[0].querySelectorAll('.alert');
@@ -60,7 +60,7 @@ angular.module('angularFormMessagesBootstrap')
             });
 
             // Save messages cache (determine below if we have to show them)
-            if (validationMessageId === messageId) {
+            if (validationFieldName === fieldName) {
               cachedMessages = messages;
             }
 

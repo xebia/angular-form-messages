@@ -2,7 +2,7 @@ describe('afMessages', function () {
 
   function compile() {
     createScope({
-      messageId: 'user.name'
+      fieldName: 'user.name'
     });
     addSelectors(compileHtml('<form name="userForm" af-submit><div af-messages="user.name"></div></form>'), {
       feedbackIcon: '.form-control-feedback',
@@ -42,7 +42,7 @@ describe('afMessages', function () {
           compile: function () {
             return {
               pre: function ($scope, elem, attrs, afFeedbackCtrl) {
-                afFeedbackCtrl.messageId = attrs.afFeedback;
+                afFeedbackCtrl.fieldName = attrs.afFeedback;
               }
             };
           }
@@ -52,10 +52,10 @@ describe('afMessages', function () {
         return {
           AfMessageService: {
             getMessagesToShow: function (messages) { return messages; },
-            validation: function ($scope, messageId, callback) {
-              // This method is quite hard to mock, so we mimic the implementation, except for the messageId condition
-              $scope.$on('validation', function (event, validationMessageId, messages, messageType) {
-                callback(validationMessageId, angular.copy(messages), messageType);
+            validation: function ($scope, fieldName, callback) {
+              // This method is quite hard to mock, so we mimic the implementation, except for the fieldName condition
+              $scope.$on('validation', function (event, validationFieldName, messages, messageType) {
+                callback(validationFieldName, angular.copy(messages), messageType);
               });
             }
           }
@@ -84,29 +84,29 @@ describe('afMessages', function () {
       expect(this.element.feedbackScreenreader()).not.toExist();
     });
 
-    it('should register the validation event listener via the AfMessageService and not allows partial messageIds', function () {
+    it('should register the validation event listener via the AfMessageService and not allows partial fieldNames', function () {
       // this.$scope is the scope outside the directive, which is the same scope as $scope.$parent which is called from inside the directive
       expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.$scope, 'user.name', jasmine.any(Function), false);
     });
 
-    describe('when the messageId is passed via the messageId attribute', function () {
+    describe('when the fieldName is passed via the fieldName attribute', function () {
       beforeEach(function () {
         mox.get.AfMessageService.validation.calls.reset();
-        compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-message-id="user.name"></div></form>');
+        compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-field-name="user.name"></div></form>');
       });
 
-      it('should register the validation event listener via the AfMessageService and not allows partial messageIds', function () {
+      it('should register the validation event listener via the AfMessageService and not allows partial fieldNames', function () {
         expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.$scope, 'user.name', jasmine.any(Function), false);
       });
     });
 
-    describe('when there is a messageIdPrefix passed', function () {
+    describe('when there is a fieldNamePrefix passed', function () {
       beforeEach(function () {
         mox.get.AfMessageService.validation.calls.reset();
-        compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-message-id-prefix="user"></div></form>');
+        compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-field-name-prefix="user"></div></form>');
       });
 
-      it('should register the validation event listener via the AfMessageService and allows partial messageIds', function () {
+      it('should register the validation event listener via the AfMessageService and allows partial fieldNames', function () {
         expect(mox.get.AfMessageService.validation).toHaveBeenCalledWith(this.$scope, 'user', jasmine.any(Function), true);
       });
     });
@@ -161,9 +161,9 @@ describe('afMessages', function () {
       expect(this.element.alert(3).icon()).toHaveClass('glyphicon-exclamation-sign');
     });
 
-    describe('when there is a messageIdPrefix set and there is a second validation event with another messageId that also matches', function () {
+    describe('when there is a fieldNamePrefix set and there is a second validation event with another fieldName that also matches', function () {
       beforeEach(function () {
-        addSelectors(compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-message-id-prefix="user"></div></form>'), {
+        addSelectors(compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-field-name-prefix="user"></div></form>'), {
           alerts: '.alert',
           alertLabel: '.alert:eq({0}) [af-message-label]'
         });
@@ -173,11 +173,11 @@ describe('afMessages', function () {
         this.$scope.$digest();
       });
 
-      it('should not overwrite the messages for a different messageId', function () {
+      it('should not overwrite the messages for a different fieldName', function () {
         expect(this.element.alerts()).toHaveLength(messages.length * 2);
       });
 
-      it('should overwrite messages for the same messageId', function () {
+      it('should overwrite messages for the same fieldName', function () {
         this.$scope.$emit('validation', 'user.email', [messages[0]], MESSAGE_TYPES[0]);
         this.$scope.$digest();
         expect(this.element.alerts()).toHaveLength(messages.length + 1);
@@ -188,7 +188,7 @@ describe('afMessages', function () {
       });
     });
 
-    describe('when there is a parent afFeedback directive with the same messageId', function () {
+    describe('when there is a parent afFeedback directive with the same fieldName', function () {
 
       beforeEach(function () {
         this.element = addSelectors(compileHtml('<form name="userForm" af-submit><div af-feedback="user.name" af-show-success="true"><div af-messages="user.name"></div></div></form>'), {
@@ -247,7 +247,7 @@ describe('afMessages', function () {
       });
     });
 
-    describe('when there is no parent afFeedback directive with the same messageId', function () {
+    describe('when there is no parent afFeedback directive with the same fieldName', function () {
       beforeEach(function () {
         addSelectors(compileHtml.call(this, '<form name="userForm" af-submit><div af-feedback="user.other"><div af-messages="user.name"></div></div></form>'), {
           feedback: '[data-test="feedback"]'

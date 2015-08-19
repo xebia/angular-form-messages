@@ -114,12 +114,12 @@ describe('AfMessageService', function () {
       });
     });
 
-    describe('when we want to show one message per messageId', function () {
+    describe('when we want to show one message per fieldName', function () {
       beforeEach(function () {
         afMessageServiceProvider.setShowMultiple(inj.SHOW_MULTIPLE.ONE_PER_MESSAGE_ID);
       });
 
-      it('should return the filtered object with one message per messageId', function () {
+      it('should return the filtered object with one message per fieldName', function () {
         expect(inj.AfMessageService.getMessagesToShow({
           name: [messages.warning, messages.success],
           email: [messages.success]
@@ -144,7 +144,7 @@ describe('AfMessageService', function () {
       });
     });
 
-    describe('when there exists a messageId key without messages', function () {
+    describe('when there exists a fieldName key without messages', function () {
       it('should remove the empty keys except for when you want to show all messages', function () {
         afMessageServiceProvider.setShowMultiple(inj.SHOW_MULTIPLE.ALL);
         var allMessages = {
@@ -179,7 +179,7 @@ describe('AfMessageService', function () {
       this.cb = jasmine.createSpy('validation');
     });
 
-    describe('when the messageId is the same as the messageId passed to the validation registrer', function () {
+    describe('when the fieldName is the same as the fieldName passed to the validation registrer', function () {
       beforeEach(function () {
         inj.AfMessageService.validation(this.$scope, 'user.name', this.cb);
       });
@@ -190,7 +190,7 @@ describe('AfMessageService', function () {
       });
     });
 
-    describe('when the messageId is not the same as the messageId passed to the validation registrer', function () {
+    describe('when the fieldName is not the same as the fieldName passed to the validation registrer', function () {
       beforeEach(function () {
         inj.AfMessageService.validation(this.$scope, 'user.name', this.cb);
       });
@@ -201,7 +201,7 @@ describe('AfMessageService', function () {
       });
     });
 
-    describe('when the passed messageId starts with the validation event messageId', function () {
+    describe('when the passed fieldName starts with the validation event fieldName', function () {
       it('should not call the callback when we do not want partial matches', function () {
         inj.AfMessageService.validation(this.$scope, 'user', this.cb);
         this.$scope.$emit('validation', 'user.name', []);

@@ -13,9 +13,9 @@ angular.module('angularFormMessagesBootstrap')
           afFeedbackCtrl = ctrls[0],
           afSubmitCtrl = ctrls[1];
 
-        afFeedbackCtrl.messageId = attrs.afFeedback || attrs.afMessageId;
+        afFeedbackCtrl.fieldName = attrs.afFeedback || attrs.afFieldName;
 
-        AfMessageService.validation($scope, afFeedbackCtrl.messageId, function (validationMessageId, messages) {
+        AfMessageService.validation($scope, afFeedbackCtrl.fieldName, function (validationFieldName, messages) {
           if (messages.length || afSubmitCtrl.showSuccess) {
             attrs.$addClass('has-feedback');
           } else {
@@ -74,9 +74,9 @@ angular.module('angularFormMessagesBootstrap')
 
         var
           cachedMessages = [],
-          messageId = attrs.afFieldState || attrs.afMessageId;
+          fieldName = attrs.afFieldState || attrs.afFieldName;
 
-        $scope.$on('validation', function (event, validationMessageId, messages) {
+        $scope.$on('validation', function (event, validationFieldName, messages) {
           // Make sure that the AfMessages validation callback runs first
           $timeout(function () {
             var alerts = elem[0].querySelectorAll('.alert');
@@ -88,7 +88,7 @@ angular.module('angularFormMessagesBootstrap')
             });
 
             // Save messages cache (determine below if we have to show them)
-            if (validationMessageId === messageId) {
+            if (validationFieldName === fieldName) {
               cachedMessages = messages;
             }
 
@@ -152,9 +152,9 @@ angular.module('angularFormMessagesBootstrap')
           return messages;
         }
 
-        function groupAllMessagesById(messages, validationMessageId) {
+        function groupAllMessagesByField(messages, validationFieldName) {
           var newMessages = {};
-          newMessages[validationMessageId] = messages;
+          newMessages[validationFieldName] = messages;
           return angular.extend(allActiveMessages || {}, newMessages);
         }
 
@@ -164,19 +164,19 @@ angular.module('angularFormMessagesBootstrap')
           afSubmitCtrl = ctrls[2],
           allActiveMessages;
 
-        var messageId = afMessagesCtrl.messageIdPrefix || afMessagesCtrl.messageId;
-        AfMessageService.validation($scope.$parent, messageId, function (validationMessageId, messages, messageType) {
+        var fieldName = afMessagesCtrl.fieldNamePrefix || afMessagesCtrl.fieldName;
+        AfMessageService.validation($scope.$parent, fieldName, function (validationFieldName, messages, messageType) {
           // Feedback
-          if (afFeedbackCtrl && afFeedbackCtrl.messageId === afMessagesCtrl.messageId) {
+          if (afFeedbackCtrl && afFeedbackCtrl.fieldName === fieldName) {
             $scope.messageType = messageType || (afSubmitCtrl.showSuccess ? MESSAGE_TYPES[0] : undefined);
             $scope.icon = feedbackIcons[$scope.messageType];
           }
 
           messages = addMessageInfo(messages);
-          messages = groupAllMessagesById(messages, validationMessageId);
+          messages = groupAllMessagesByField(messages, validationFieldName);
           allActiveMessages = messages;
           $scope.messages = AfMessageService.getMessagesToShow(messages);
-        }, !!afMessagesCtrl.messageIdPrefix);
+        }, !!afMessagesCtrl.fieldNamePrefix);
       }
     };
   }]);
@@ -189,8 +189,8 @@ angular.module('angularFormMessages').run(['$templateCache', function($templateC
     "  <span class=\"glyphicon form-control-feedback\" ng-class=\"icon\" aria-hidden=\"true\"></span>\n" +
     "  <span class=\"sr-only\">({{messageType}})</span>\n" +
     "</span>\n" +
-    "<div ng-repeat=\"messagesForMessageId in messages track by $index\">\n" +
-    "  <div class=\"alert help-block\" ng-class=\"'alert-' + message.alertType\" ng-style=\"{ 'margin-bottom': $last ? undefined : '0px' }\" role=\"alert\" ng-repeat=\"message in messagesForMessageId track by $index\">\n" +
+    "<div ng-repeat=\"messagesForField in messages track by $index\">\n" +
+    "  <div class=\"alert help-block\" ng-class=\"'alert-' + message.alertType\" ng-style=\"{ 'margin-bottom': $last ? undefined : '0px' }\" role=\"alert\" ng-repeat=\"message in messagesForField track by $index\">\n" +
     "    <span class=\"glyphicon\" ng-class=\"message.icon\" aria-hidden=\"true\"></span>\n" +
     "    <span class=\"sr-only\">{{message.type}}:</span>\n" +
     "    <span af-message-label=\"{{message.message}}\"></span>\n" +

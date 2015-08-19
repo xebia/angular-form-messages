@@ -6,8 +6,8 @@ angular.module('angularFormMessages').run(['$templateCache', function($templateC
     "  <span class=\"glyphicon form-control-feedback\" ng-class=\"icon\" aria-hidden=\"true\"></span>\n" +
     "  <span class=\"sr-only\">({{messageType}})</span>\n" +
     "</span>\n" +
-    "<div ng-repeat=\"messagesForMessageId in messages track by $index\">\n" +
-    "  <div class=\"alert help-block\" ng-class=\"'alert-' + message.alertType\" ng-style=\"{ 'margin-bottom': $last ? undefined : '0px' }\" role=\"alert\" ng-repeat=\"message in messagesForMessageId track by $index\">\n" +
+    "<div ng-repeat=\"messagesForField in messages track by $index\">\n" +
+    "  <div class=\"alert help-block\" ng-class=\"'alert-' + message.alertType\" ng-style=\"{ 'margin-bottom': $last ? undefined : '0px' }\" role=\"alert\" ng-repeat=\"message in messagesForField track by $index\">\n" +
     "    <span class=\"glyphicon\" ng-class=\"message.icon\" aria-hidden=\"true\"></span>\n" +
     "    <span class=\"sr-only\">{{message.type}}:</span>\n" +
     "    <span af-message-label=\"{{message.message}}\"></span>\n" +

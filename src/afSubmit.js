@@ -36,8 +36,8 @@ angular.module('angularFormMessages').directive('afSubmit', function (
 
             function processErrors(result) {
               angular.forEach(result.validation, function (validations, validationFormName) {
-                angular.forEach(validations, function (messages, messageId) {
-                  $rootScope.$broadcast('setValidity', validationFormName + (messageId === '$messages' ? '' : '.' + messageId), messages);
+                angular.forEach(validations, function (messages, fieldName) {
+                  $rootScope.$broadcast('setValidity', validationFormName + (fieldName === '$messages' ? '' : '.' + fieldName), messages);
                 });
               });
 
