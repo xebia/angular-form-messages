@@ -55,7 +55,7 @@ angular.module('angularFormMessages').directive('afSubmit', function (
             if (isPromise(callbackResult)) {
               $scope.isSubmitting = true;
               callbackResult
-                .catch(processErrors)
+                ['catch'](processErrors)
                 ['finally'](function () {
                 $scope.isSubmitting = false;
               });
