@@ -21,15 +21,16 @@ angular.module('angularFormMessages')
           var
             formCtrl = ctrls[0],
             afMessagesCtrl = ctrls[1],
-            specificLabel = $interpolate(formCtrl.$name)($scope) + '.' + (afMessagesCtrl.messageId || afMessagesCtrl.messageIdPrefix) + '.' + newVal,
+            messageId = afMessagesCtrl.messageId || afMessagesCtrl.messageIdPrefix,
+            specificLabel = $interpolate(formCtrl.$name)($scope) + (messageId ? '.' + messageId : '') + '.' + newVal,
             genericLabel = AfMessageService.getGenericLabelPrefix() + newVal;
 
           $translate(specificLabel)
             .then(translate)
-            .catch(function () {
+            ['catch'](function () {
               $translate(genericLabel)
                 .then(translate)
-                .catch(function () {
+                ['catch'](function () {
                   $log.warn('Missing label: \'' + specificLabel + '\' (specific) or \'' + genericLabel + '\' (generic)');
                   translate(newVal);
                 });

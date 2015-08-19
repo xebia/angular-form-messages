@@ -1,7 +1,5 @@
 describe('the afMessageLabel directive', function () {
-  var
-    $log,
-    afMessagesCtrl;
+  var $log;
 
   beforeEach(function () {
     mox
@@ -24,6 +22,7 @@ describe('the afMessageLabel directive', function () {
           $translate: function (key) {
             var translations = {
               'prefix.required': 'Required translation',
+              'userForm.name': 'Name translation form',
               'userForm.user.email.email': 'E-mail translation',
               'subForm0.user.email.required': 'Required translation sub form',
               'subForm1.user.email.email': 'E-mail translation sub form'
@@ -36,7 +35,6 @@ describe('the afMessageLabel directive', function () {
 
     createScope();
     compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>');
-    afMessagesCtrl = this.element.find('[af-messages]').controller('afMessages');
     $log = mox.inject('$log');
     spyOn($log, 'warn');
   });
@@ -46,8 +44,6 @@ describe('the afMessageLabel directive', function () {
   });
 
   it('should replace the contents of the element with the field specific translation if this exists', function () {
-    delete afMessagesCtrl.messageId;
-    afMessagesCtrl.messageIdPrefix = 'user.email';
     this.$scope.key = 'email';
     this.$scope.$digest();
     expect(this.element).toHaveText('E-mail translation');
@@ -77,7 +73,12 @@ describe('the afMessageLabel directive', function () {
 
   describe('when the messageId is passed as prefix', function () {
     beforeEach(function () {
-      compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>');
+      addSelectors(compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>'), {
+        messages: '[af-messages]'
+      });
+      var afMessagesCtrl = this.element.messages().controller('afMessages');
+      delete afMessagesCtrl.messageId;
+      afMessagesCtrl.messageIdPrefix = 'user.email';
     });
 
     it('should replace the contents of the element with the translation', function () {
@@ -91,8 +92,8 @@ describe('the afMessageLabel directive', function () {
     // This test also passes when we do not use $interpolate, but it is necessary for angular 1.2
     beforeEach(function () {
       addSelectors(compileHtml('<form name="userForm">' +
-          '<div ng-form name="subForm{{$index}}" ng-repeat="messageId in [\'required\', \'email\']">' +
-            '<div af-messages><span af-message-label="{{messageId}}">Content</span></div>' +
+          '<div ng-form name="subForm{{$index}}" ng-repeat="validatorName in [\'required\', \'email\']">' +
+            '<div af-messages><span af-message-label="{{validatorName}}">Content</span></div>' +
           '</div>' +
         '</form>'), {
         messages: '[ng-form]:eq({0}) [af-messages]'
@@ -102,6 +103,23 @@ describe('the afMessageLabel directive', function () {
     it('should validate these as well', function () {
       expect(this.element.messages(0)).toHaveText('Required translation sub form');
       expect(this.element.messages(1)).toHaveText('E-mail translation sub form');
+    });
+  });
+
+  describe('when there is no messageId', function () {
+    beforeEach(function () {
+      addSelectors(compileHtml('<form name="userForm"><div af-messages><span af-message-label="{{key}}">Content</span></div></form>'), {
+        messages: '[af-messages]',
+        label: '[af-message-label]'
+      });
+
+      delete this.element.messages().controller('afMessages').messageId;
+      this.$scope.key = 'name'; // to trigger watch
+      this.$scope.$digest();
+    });
+
+    it('should get the label for form', function () {
+      expect(this.element).toHaveText('Name translation form');
     });
   });
 });
