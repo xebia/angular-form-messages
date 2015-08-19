@@ -1,4 +1,5 @@
 angular.module('angularFormMessages').directive('afSubmit', function (
+  $interpolate,
   $rootScope,
   $timeout,
   AfMessageService
@@ -19,8 +20,9 @@ angular.module('angularFormMessages').directive('afSubmit', function (
         afSubmit.triggerOn = attrs.afTriggerOn;
       }, post: function ($scope, elem, attrs, ctrls) {
         var
-          afSubmit = ctrls[1],
-          form = ctrls[0];
+          afSubmitCtrl = ctrls[1],
+          formCtrl = ctrls[0],
+          formName = $interpolate(formCtrl.$name)($scope);
 
         function isPromise(obj) {
           return angular.isObject(obj) && typeof (obj.then) === 'function';
@@ -33,21 +35,21 @@ angular.module('angularFormMessages').directive('afSubmit', function (
           $scope.$apply(function () {
 
             function processErrors(result) {
-              angular.forEach(result.validation, function (validations, formName) {
+              angular.forEach(result.validation, function (validations, validationFormName) {
                 angular.forEach(validations, function (messages, messageId) {
-                  $rootScope.$broadcast('setValidity', formName + '.' + messageId, messages);
+                  $rootScope.$broadcast('setValidity', validationFormName + (messageId === '$messages' ? '' : '.' + messageId), messages);
                 });
               });
 
               $timeout(function autoFocusFirstMessage() {
                 var firstMessageField = elem[0].querySelector('.ng-invalid[af-field]');
-                if (afSubmit.scrollToError && firstMessageField) {
+                if (afSubmitCtrl.scrollToError && firstMessageField) {
                   firstMessageField.focus();
                 }
               });
             }
 
-            if (!form.$valid) {
+            if (!formCtrl.$valid) {
               return;
             }
 

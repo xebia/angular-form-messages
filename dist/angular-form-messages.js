@@ -143,15 +143,16 @@ angular.module('angularFormMessages')
           var
             formCtrl = ctrls[0],
             afMessagesCtrl = ctrls[1],
-            specificLabel = $interpolate(formCtrl.$name)($scope) + '.' + (afMessagesCtrl.messageId || afMessagesCtrl.messageIdPrefix) + '.' + newVal,
+            messageId = afMessagesCtrl.messageId || afMessagesCtrl.messageIdPrefix,
+            specificLabel = $interpolate(formCtrl.$name)($scope) + (messageId ? '.' + messageId : '') + '.' + newVal,
             genericLabel = AfMessageService.getGenericLabelPrefix() + newVal;
 
           $translate(specificLabel)
             .then(translate)
-            .catch(function () {
+            ['catch'](function () {
               $translate(genericLabel)
                 .then(translate)
-                .catch(function () {
+                ['catch'](function () {
                   $log.warn('Missing label: \'' + specificLabel + '\' (specific) or \'' + genericLabel + '\' (generic)');
                   translate(newVal);
                 });
@@ -287,7 +288,8 @@ angular.module('angularFormMessages')
     };
   });
 
-angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "$timeout", "AfMessageService", function (
+angular.module('angularFormMessages').directive('afSubmit', ["$interpolate", "$rootScope", "$timeout", "AfMessageService", function (
+  $interpolate,
   $rootScope,
   $timeout,
   AfMessageService
@@ -308,8 +310,9 @@ angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "$tim
         afSubmit.triggerOn = attrs.afTriggerOn;
       }, post: function ($scope, elem, attrs, ctrls) {
         var
-          afSubmit = ctrls[1],
-          form = ctrls[0];
+          afSubmitCtrl = ctrls[1],
+          formCtrl = ctrls[0],
+          formName = $interpolate(formCtrl.$name)($scope);
 
         function isPromise(obj) {
           return angular.isObject(obj) && typeof (obj.then) === 'function';
@@ -322,21 +325,21 @@ angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "$tim
           $scope.$apply(function () {
 
             function processErrors(result) {
-              angular.forEach(result.validation, function (validations, formName) {
+              angular.forEach(result.validation, function (validations, validationFormName) {
                 angular.forEach(validations, function (messages, messageId) {
-                  $rootScope.$broadcast('setValidity', formName + '.' + messageId, messages);
+                  $rootScope.$broadcast('setValidity', validationFormName + (messageId === '$messages' ? '' : '.' + messageId), messages);
                 });
               });
 
               $timeout(function autoFocusFirstMessage() {
                 var firstMessageField = elem[0].querySelector('.ng-invalid[af-field]');
-                if (afSubmit.scrollToError && firstMessageField) {
+                if (afSubmitCtrl.scrollToError && firstMessageField) {
                   firstMessageField.focus();
                 }
               });
             }
 
-            if (!form.$valid) {
+            if (!formCtrl.$valid) {
               return;
             }
 
@@ -344,13 +347,30 @@ angular.module('angularFormMessages').directive('afSubmit', ["$rootScope", "$tim
             if (isPromise(callbackResult)) {
               $scope.isSubmitting = true;
               callbackResult
-                .catch(processErrors)
+                ['catch'](processErrors)
                 ['finally'](function () {
                 $scope.isSubmitting = false;
               });
             }
           });
         }
+
+        $scope.$on('validate', function () {
+          angular.forEach(formCtrl.$error, function (isValid, validator) {
+            formCtrl.$setValidity(validator, true);
+          });
+        });
+
+        $scope.$on('setValidity', function setValidity(event, messageId, messages) {
+          if (messageId === formName) {
+            // Set errors in event payload
+            angular.forEach(messages, function (message) {
+              formCtrl.$setValidity(message.message, false);
+            });
+
+            $scope.$emit('validation', undefined, messages);
+          }
+        });
 
         elem.on('submit', doSubmit);
       }
