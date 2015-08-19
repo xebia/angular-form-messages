@@ -52,7 +52,9 @@ angular.module('angularFormMessages')
           return mostSevereMessage;
         },
         getMessagesToShow: function (messages) {
-          var result = {}, severityIndex = -1;
+          var
+            severityIndex = -1,
+            result = {};
 
           if (showMultiple === SHOW_MULTIPLE.ALL) {
             return messages;
