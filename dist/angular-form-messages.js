@@ -61,6 +61,8 @@ angular.module('angularFormMessages').directive('afField', ["$interpolate", "MES
         angular.forEach(ngModel.$error, function (isValid, validator) {
           ngModel.$setValidity(validator, true);
         });
+
+        $scope.$emit('setValidity', formName, []);
       }
 
       // Update validation on change / blur

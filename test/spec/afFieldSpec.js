@@ -211,9 +211,10 @@ describe('afField', function () {
       this.$scope.$emit('validate');
     });
 
-    it('should clear all current validations', function () {
+    it('should clear all current validations for the field and for the parent form', function () {
       expect(ngModel.$setValidity).toHaveBeenCalledWith('required', true);
       expect(ngModel.$setValidity).toHaveBeenCalledWith('other', true);
+      expect(this.$scope.$emit).toHaveBeenCalledWith('setValidity', 'userForm', []);
     });
 
     it('should validate the field in Angular 1.3 and higher', function () {
