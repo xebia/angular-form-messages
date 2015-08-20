@@ -41,6 +41,8 @@ angular.module('angularFormMessages').directive('afSubmit', function (
                 });
               });
 
+              formCtrl.$setPristine();
+
               $timeout(function autoFocusFirstMessage() {
                 var firstMessageField = elem[0].querySelector('.ng-invalid[af-field]');
                 if (afSubmitCtrl.scrollToError && firstMessageField) {
@@ -65,12 +67,22 @@ angular.module('angularFormMessages').directive('afSubmit', function (
           });
         }
 
-        $scope.$on('validate', function () {
+        function clearMessages() {
           angular.forEach(formCtrl.$error, function (isValid, validator) {
             formCtrl.$setValidity(validator, true);
           });
-        });
 
+          $scope.$emit('validation', '', []);
+        }
+
+        $scope.$watch(formCtrl.$name + '.$dirty', function (newVal, oldVal) {
+          if (newVal === true && newVal !== oldVal) {
+            clearMessages();
+          }
+        });
+        $scope.$on('validate', clearMessages);
+
+        // Set messages on the form
         $scope.$on('setValidity', function setValidity(event, messageId, messages) {
           if (messageId === formName) {
             // Set errors in event payload
@@ -78,7 +90,7 @@ angular.module('angularFormMessages').directive('afSubmit', function (
               formCtrl.$setValidity(message.message, false);
             });
 
-            $scope.$emit('validation', undefined, messages);
+            $scope.$emit('validation', '', messages);
           }
         });
 

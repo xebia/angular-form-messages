@@ -155,6 +155,7 @@ describe('afSubmit', function () {
           var nameField;
 
           beforeEach(function () {
+            form.$setDirty();
             this.element.submit();
 
             nameField = this.element.find('[name="user.name"]');
@@ -170,6 +171,10 @@ describe('afSubmit', function () {
 
           it('should set $scope.isSubmitting to false', function () {
             expect(this.$scope.isSubmitting).toBe(false);
+          });
+
+          it('should make the form pristine', function () {
+            expect(form.$pristine).toBe(true);
           });
 
           describe('when afSubmit.scrollToError is true', function () {
@@ -197,11 +202,12 @@ describe('afSubmit', function () {
       describe('when the submit callback does not return a promise', function () {
         beforeEach(function () {
           this.$scope.submit.and.returnValue(callbackResult);
+          form.$setDirty();
           this.element.submit();
         });
 
         it('does no further processing', function () {
-          expect($rootScope.$broadcast).not.toHaveBeenCalledWith('validation');
+          expect(form.$dirty).toBe(true);
         });
 
         it('should not set $scope.isSubmitting', function () {
@@ -238,6 +244,19 @@ describe('afSubmit', function () {
       form.$setValidity('someServerSideError', false);
       form.$setValidity('anotherError', false);
       this.$scope.$broadcast('validate');
+    });
+
+    it('should make the form valid', function () {
+      expect(form.$valid).toBe(true);
+    });
+  });
+
+  describe('when the form becomes dirty', function () {
+    beforeEach(function () {
+      form.$setValidity('someServerSideError', false);
+      form.$setValidity('anotherError', false);
+      form.$setDirty();
+      this.$scope.$digest();
     });
 
     it('should make the form valid', function () {
