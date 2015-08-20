@@ -57,12 +57,10 @@ angular.module('angularFormMessages').directive('afField', ["$interpolate", "MES
       }
 
       // Make this field clean again
-      function clearErrors() {
+      function clearMessages() {
         angular.forEach(ngModel.$error, function (isValid, validator) {
           ngModel.$setValidity(validator, true);
         });
-
-        $scope.$emit('setValidity', formName, []);
       }
 
       // Update validation on change / blur
@@ -91,13 +89,13 @@ angular.module('angularFormMessages').directive('afField', ["$interpolate", "MES
       ngModel.$viewChangeListeners.push(function cleanValidationAfterSubmitChange() {
         if (isPristineAfterSubmit) {
           isPristineAfterSubmit = false;
-          clearErrors();
+          clearMessages();
         }
       });
 
       // Broadcast validation info of the field before submitting
       $scope.$on('validate', function () {
-        clearErrors();
+        clearMessages();
 
         // Workaround to trigger the validation pipeline of Angular 1.2
         if (ngModel.$validate) {
@@ -285,7 +283,7 @@ angular.module('angularFormMessages')
       controller: angular.noop,
       link: function linkFn($scope, elem, attrs, afMessagesCtrl) {
         afMessagesCtrl.fieldNamePrefix = attrs.afFieldNamePrefix;
-        afMessagesCtrl.fieldName = attrs.afMessages || attrs.afFieldName;
+        afMessagesCtrl.fieldName = attrs.afMessages || attrs.afFieldName || '';
       }
     };
   });
@@ -333,6 +331,8 @@ angular.module('angularFormMessages').directive('afSubmit', ["$interpolate", "$r
                 });
               });
 
+              formCtrl.$setPristine();
+
               $timeout(function autoFocusFirstMessage() {
                 var firstMessageField = elem[0].querySelector('.ng-invalid[af-field]');
                 if (afSubmitCtrl.scrollToError && firstMessageField) {
@@ -357,12 +357,22 @@ angular.module('angularFormMessages').directive('afSubmit', ["$interpolate", "$r
           });
         }
 
-        $scope.$on('validate', function () {
+        function clearMessages() {
           angular.forEach(formCtrl.$error, function (isValid, validator) {
             formCtrl.$setValidity(validator, true);
           });
-        });
 
+          $scope.$emit('validation', '', []);
+        }
+
+        $scope.$watch(formCtrl.$name + '.$dirty', function (newVal, oldVal) {
+          if (newVal === true && newVal !== oldVal) {
+            clearMessages();
+          }
+        });
+        $scope.$on('validate', clearMessages);
+
+        // Set messages on the form
         $scope.$on('setValidity', function setValidity(event, messageId, messages) {
           if (messageId === formName) {
             // Set errors in event payload
@@ -370,7 +380,7 @@ angular.module('angularFormMessages').directive('afSubmit', ["$interpolate", "$r
               formCtrl.$setValidity(message.message, false);
             });
 
-            $scope.$emit('validation', undefined, messages);
+            $scope.$emit('validation', '', messages);
           }
         });
 

@@ -31,5 +31,15 @@ describe('afMessages', function () {
         expect(getController(this.element).fieldName).toBe('user.name');
       });
     });
+
+    describe('when there is no fieldName', function () {
+      beforeEach(function () {
+        compileHtml('<div af-messages></div>');
+      });
+
+      it('should default to empty string', function () {
+        expect(getController(this.element).fieldName).toBe('');
+      });
+    });
   });
 });
