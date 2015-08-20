@@ -55,12 +55,10 @@ angular.module('angularFormMessages').directive('afField', function (
       }
 
       // Make this field clean again
-      function clearErrors() {
+      function clearMessages() {
         angular.forEach(ngModel.$error, function (isValid, validator) {
           ngModel.$setValidity(validator, true);
         });
-
-        $scope.$emit('setValidity', formName, []);
       }
 
       // Update validation on change / blur
@@ -89,13 +87,13 @@ angular.module('angularFormMessages').directive('afField', function (
       ngModel.$viewChangeListeners.push(function cleanValidationAfterSubmitChange() {
         if (isPristineAfterSubmit) {
           isPristineAfterSubmit = false;
-          clearErrors();
+          clearMessages();
         }
       });
 
       // Broadcast validation info of the field before submitting
       $scope.$on('validate', function () {
-        clearErrors();
+        clearMessages();
 
         // Workaround to trigger the validation pipeline of Angular 1.2
         if (ngModel.$validate) {
