@@ -50,10 +50,11 @@ angular.module('angularFormMessagesBootstrap')
           allActiveMessages;
 
         var fieldName = afMessagesCtrl.fieldNamePrefix || afMessagesCtrl.fieldName;
-        AfMessageService.validation($scope.$parent, fieldName, function (validationFieldName, messages, messageType) {
+        AfMessageService.validation($scope.$parent, fieldName, function (validationFieldName, messages) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.fieldName === fieldName) {
-            $scope.messageType = messageType || (afSubmitCtrl.showSuccess ? MESSAGE_TYPES[0] : undefined);
+            var message = AfMessageService.getMostSevereMessage(messages);
+            $scope.messageType = (message && message.type) || (afSubmitCtrl.showSuccess ? MESSAGE_TYPES[0] : undefined);
             $scope.icon = feedbackIcons[$scope.messageType];
           }
 

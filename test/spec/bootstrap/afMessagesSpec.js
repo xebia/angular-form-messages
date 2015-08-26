@@ -54,8 +54,8 @@ describe('afMessages', function () {
             getMessagesToShow: function (messages) { return messages; },
             validation: function ($scope, fieldName, callback) {
               // This method is quite hard to mock, so we mimic the implementation, except for the fieldName condition
-              $scope.$on('validation', function (event, validationFieldName, messages, messageType) {
-                callback(validationFieldName, angular.copy(messages), messageType);
+              $scope.$on('validation', function (event, validationFieldName, messages) {
+                callback(validationFieldName, angular.copy(messages));
               });
             }
           }
@@ -115,7 +115,8 @@ describe('afMessages', function () {
   describe('when a validation event is fired', function () {
 
     function validation(messageType) {
-      this.$scope.$emit('validation', 'user.name', messages, messageType);
+      mox.get.AfMessageService.getMostSevereMessage.and.returnValue({ type: messageType });
+      this.$scope.$emit('validation', 'user.name', messages);
       this.$scope.$digest();
     }
 
