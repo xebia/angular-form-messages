@@ -217,6 +217,10 @@ module.exports = function (grunt) {
         commitMessage: 'Bump version to v%VERSION%',
         push: false
       }
+    },
+
+    ngdocs: {
+      all: 'src/**/*.js'
     }
 
   });
