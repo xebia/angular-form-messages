@@ -23,19 +23,34 @@ module.exports = function (grunt) {
         tasks: ['wiredep']
       },
       js: {
-        files: ['<%= paths.src %>/{,*/}*.js'],
+        files: ['<%= paths.src %>/**/*.js'],
         tasks: ['newer:jshint:all']
       },
       jsTest: {
-        files: ['test/spec/{,*/}*.js'],
+        files: ['<%= paths.test %>/spec/**/*.js'],
         tasks: ['newer:jshint:test', 'karma']
       },
       gruntfile: {
         files: ['Gruntfile.js']
       },
+      docs: {
+        files: ['Gruntfile.js', '<%= paths.src %>/**/*.js'],
+        tasks: ['clean:docs', 'ngdocs']
+      },
       build: {
-        files: ['<%= paths.src %>/{,*/}*.js'],
+        files: ['<%= paths.src %>/**/*.js'],
         tasks: ['default']
+      }
+    },
+
+    connect: {
+      options: {
+        hostname: 'localhost',
+        port: 8000,
+        keepalive: true
+      },
+      docs: {
+        base: '/docs'
       }
     },
 
@@ -129,7 +144,8 @@ module.exports = function (grunt) {
           }
         ]
       },
-      coverage: 'test/coverage'
+      coverage: 'test/coverage',
+      docs: 'docs'
     },
 
     wiredep: {
@@ -220,6 +236,18 @@ module.exports = function (grunt) {
     },
 
     ngdocs: {
+      options: {
+        scripts: [
+          '../bower_components/angular/angular.js',
+          '../bower_components/angular-animate/angular-animate.js',
+          '../bower_components/angular-messages/angular-messages.js',
+          '../bower_components/angular-form-messages-example/app/scripts/app.js',
+          '../bower_components/angular-form-messages-example/app/scripts/translate.js',
+          '../dist/angular-form-messages.js',
+          '../dist/angular-form-messages-bootstrap.js'
+        ],
+        html5Mode: false
+      },
       all: 'src/**/*.js'
     }
 
