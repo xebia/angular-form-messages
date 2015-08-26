@@ -1,0 +1,38 @@
+<h1><code ng:non-bindable="">afField</code>
+<div><span class="hint">directive in module <code ng:non-bindable="">angularFormMessages</code>
+</span>
+</div>
+</h1>
+<div><h2 id="description">Description</h2>
+<div class="description"><div class="angularformmessages-directive-page angularformmessages-directive-affield-page"><p>Register a form element with angularFormMessages, so that validation information is broadcasted to other directives</p>
+</div></div>
+<h2 id="dependencies">Dependencies</h2>
+<ul class="dependencies"><li><code ng:non-bindable=""><a href="#/api/angularFormMessages.service:AfMessageService">AfMessageService</a></code>
+</li>
+<li><code ng:non-bindable=""><a href="#/api/MESSAGE_TYPES">MESSAGE_TYPES</a></code>
+<div class="angularformmessages-directive-page angularformmessages-directive-affield-page"><p>(constant)</p>
+</div></li>
+</ul>
+<h2 id="usage">Usage</h2>
+<div class="usage">as attribute<pre class="prettyprint linenums">&lt;ANY af-field&gt;
+   ...
+&lt;/ANY&gt;</pre>
+</div>
+<h2 id="example">Example</h2>
+<div class="example"><div class="angularformmessages-directive-page angularformmessages-directive-affield-page"><h4 id="example_source">Source</h4>
+<div source-edit="angularFormMessagesExample" source-edit-deps="angular.js" source-edit-html="index.html" source-edit-css="" source-edit-js="" source-edit-json="" source-edit-unit="" source-edit-scenario=""></div>
+<div class="tabbable"><div class="tab-pane" title="index.html">
+<pre class="prettyprint linenums" ng-set-text="index.html" ng-html-wrap-loaded="angularFormMessagesExample angular.js"></pre>
+<script type="text/ng-template" id="index.html">
+<div>
+<form name="userForm" af-submit>
+  <input ng-model="user.name" name="user.name" af-field required />
+</form>
+Errors: {{userForm['user.name'].$error}}
+</div>
+</script>
+</div>
+</div><h4 id="example_demo">Demo</h4>
+<div class="well doc-example-live animate-container" ng-embed-app="angularFormMessagesExample" ng-set-html="index.html" ng-eval-javascript=""></div>
+</div></div>
+</div>
