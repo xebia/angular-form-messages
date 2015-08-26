@@ -1,4 +1,10 @@
 angular.module('angularFormMessagesBootstrap')
+/**
+ * @ngdoc directive
+ * @name angularFormMessagesBootstrap.directive:afFeedback
+ * @description
+ * Adds the 'has-feedback' class to the element when a feedback icon is shown in the {@link angularFormMessagesBootstrap.directive:afMessages} component.
+ */
   .directive('afFeedback', function (
     MESSAGE_TYPES,
     AfMessageService

@@ -1,6 +1,19 @@
 angular.module('angularFormMessages')
   .constant('MESSAGE_TYPES', ['SUCCESS', 'INFO', 'WARNING', 'ERROR'])
   .constant('SHOW_MULTIPLE', { ALL: true, ONE: false, ONE_PER_MESSAGE_ID: 'ONE_PER_MESSAGE_ID' })
+/**
+ * @ngdoc service
+ * @name angularFormMessages.service:AfMessageService
+ * @description
+ * The provider is used to configure app wide settings:
+ * * Label prefix for {@link angularFormMessages.directive.afMessageLabel afMessageLabel}.
+ * * Auto focusing the first invalid form element.
+ * * Showing multiple errors on a form or form element.
+ * * Showing success feedback icon and/or colors on valid form elements.
+ * * Validation triggers (change, blur or submit).
+ *
+ * Furthermore this service contains some utility functions.
+ */
   .provider('AfMessageService', function (
     MESSAGE_TYPES,
     SHOW_MULTIPLE

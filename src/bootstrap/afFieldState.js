@@ -1,5 +1,8 @@
 angular.module('angularFormMessagesBootstrap')
 /**
+ * @ngdoc directive
+ * @name angularFormMessagesBootstrap.directive:afFieldState
+ * @description
  * This directive shows the 'has-error', 'has-warning', 'has-info' or 'has-success' when there is one message on the field.
  * Where there are multiple messages and multiple messages are shown, no class is added.
  * When there is no message (the field is valid) and showSuccess is true, show the 'has-success' class.

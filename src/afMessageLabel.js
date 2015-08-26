@@ -1,3 +1,9 @@
+/**
+ * @ngdoc directive
+ * @name angularFormMessages.directive:afMessageLabel
+ * @description
+ * Translates a validator name to a message.
+ */
 angular.module('angularFormMessages')
   .directive('afMessageLabel', function (
     $interpolate,

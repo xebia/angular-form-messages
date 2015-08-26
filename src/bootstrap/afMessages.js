@@ -1,4 +1,10 @@
 angular.module('angularFormMessagesBootstrap')
+/**
+ * @ngdoc directive
+ * @name angularFormMessagesBootstrap.directive:afMessages
+ * @description
+ * Component that shows a message in a Bootstrap alert.
+ */
   .directive('afMessages', function (
     AfMessageService,
     MESSAGE_TYPES
