@@ -50,7 +50,9 @@ module.exports = function (grunt) {
         keepalive: true
       },
       docs: {
-        base: '/docs'
+        options: {
+          base: '<%= paths.dist %>/docs'
+        }
       }
     },
 
