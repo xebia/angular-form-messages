@@ -1,6 +1,24 @@
+/**
+ * @ngdoc overview
+ * @name angularFormMessagesBootstrap
+ * @description
+ * Extension on the Angular Form Messages module to add Twitter Bootstrap behaviour to the forms.
+ *
+ * ## Directives
+ * * {@link angularFormMessagesBootstrap.directive:afFeedback afFeedback} - Adds the 'has-feedback' class for correct feedback icon position.
+ * * {@link angularFormMessagesBootstrap.directive:afFieldState afFieldState} - Adds the 'has-error', 'has-warning', 'has-info' or 'has-success' class when there are messages in child elements or associated afFields.
+ * If the {@link angularFormMessagesBootstrap.directive:afFeedback afFeedback} directive is also set on the element, the 'has-feedback' class is also added when appropriate.
+ * * {@link angularFormMessagesBootstrap.directive:afMessages afMessages} - Showing an alert box with message(s). Also shows a feedback icon (checkmark, warning sign or cross) if the {@link angularFormMessagesBootstrap.directive:afFeedback afFeedback} directive is used on a parent element.
+ */
 angular.module('angularFormMessagesBootstrap', ['angularFormMessages']);
 
 angular.module('angularFormMessagesBootstrap')
+/**
+ * @ngdoc directive
+ * @name angularFormMessagesBootstrap.directive:afFeedback
+ * @description
+ * Adds the 'has-feedback' class to the element when a feedback icon is shown in the {@link angularFormMessagesBootstrap.directive:afMessages} component.
+ */
   .directive('afFeedback', ["MESSAGE_TYPES", "AfMessageService", function (
     MESSAGE_TYPES,
     AfMessageService
@@ -28,6 +46,9 @@ angular.module('angularFormMessagesBootstrap')
 
 angular.module('angularFormMessagesBootstrap')
 /**
+ * @ngdoc directive
+ * @name angularFormMessagesBootstrap.directive:afFieldState
+ * @description
  * This directive shows the 'has-error', 'has-warning', 'has-info' or 'has-success' when there is one message on the field.
  * Where there are multiple messages and multiple messages are shown, no class is added.
  * When there is no message (the field is valid) and showSuccess is true, show the 'has-success' class.
@@ -114,6 +135,12 @@ angular.module('angularFormMessagesBootstrap')
   }]);
 
 angular.module('angularFormMessagesBootstrap')
+/**
+ * @ngdoc directive
+ * @name angularFormMessagesBootstrap.directive:afMessages
+ * @description
+ * Component that shows a message in a Bootstrap alert.
+ */
   .directive('afMessages', ["AfMessageService", "MESSAGE_TYPES", function (
     AfMessageService,
     MESSAGE_TYPES
