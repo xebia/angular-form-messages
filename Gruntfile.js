@@ -10,7 +10,6 @@ module.exports = function (grunt) {
     dist: 'dist'
   };
 
-  grunt.loadNpmTasks('grunt-mutation-testing');
   //grunt.option('verbose', true);
   grunt.initConfig({
     bwr: grunt.file.readJSON('bower.json'),
@@ -141,13 +140,14 @@ module.exports = function (grunt) {
           {
             dot: true,
             src: [
-              '<%= paths.dist %>/**/*'
+              '<%= paths.dist %>/**/*',
+              '!<%= paths.dist %>/docs'
             ]
           }
         ]
       },
       coverage: 'test/coverage',
-      docs: '<%= paths.dist %>/docs'
+      docs: '<%= paths.dist %>/docs/**/*'
     },
 
     copy: {
@@ -156,7 +156,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: '<%= paths.dist %>',
           src: ['angular-form-messages?(-bootstrap).js'],
-          dest: '<%= paths.dist %>/docs/js/'
+          dest: '<%= paths.dist %>/docs/'
         }]
       }
     },
@@ -253,8 +253,8 @@ module.exports = function (grunt) {
         dest: '<%= paths.dist %>/docs',
         scripts: [
           'angular.js',
-          '../js/angular-form-messages.js',
-          '../js/angular-form-messages-bootstrap.js'
+          'dist/angular-form-messages.js',
+          'dist/angular-form-messages-bootstrap.js'
         ],
         html5Mode: false
       },
@@ -296,6 +296,7 @@ module.exports = function (grunt) {
     'lintspaces',
     'jsonlint',
     'test',
-    'build'
+    'build',
+    'docs'
   ]);
 };
