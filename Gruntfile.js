@@ -35,7 +35,7 @@ module.exports = function (grunt) {
       },
       docs: {
         files: ['Gruntfile.js', '<%= paths.src %>/**/*.js'],
-        tasks: ['clean:docs', 'ngdocs']
+        tasks: ['docs']
       },
       build: {
         files: ['<%= paths.src %>/**/*.js'],
@@ -147,7 +147,18 @@ module.exports = function (grunt) {
         ]
       },
       coverage: 'test/coverage',
-      docs: 'docs'
+      docs: '<%= paths.dist %>/docs'
+    },
+
+    copy: {
+      docs: {
+        files: [{
+          expand: true,
+          cwd: '<%= paths.dist %>',
+          src: ['angular-form-messages?(-bootstrap).js'],
+          dest: '<%= paths.dist %>/docs/js/'
+        }]
+      }
     },
 
     wiredep: {
@@ -239,26 +250,35 @@ module.exports = function (grunt) {
 
     ngdocs: {
       options: {
+        dest: '<%= paths.dist %>/docs',
         scripts: [
-          '../bower_components/angular/angular.js',
-          '../bower_components/angular-animate/angular-animate.js',
-          '../bower_components/angular-messages/angular-messages.js',
-          '../bower_components/angular-form-messages-example/app/scripts/app.js',
-          '../bower_components/angular-form-messages-example/app/scripts/translate.js',
-          '../dist/angular-form-messages.js',
-          '../dist/angular-form-messages-bootstrap.js'
+          'angular.js',
+          '../js/angular-form-messages.js',
+          '../js/angular-form-messages-bootstrap.js'
         ],
         html5Mode: false
       },
       all: 'src/**/*.js'
-    }
+    },
 
+    'gh-pages': {
+      options: {
+        base: 'dist/docs'
+      },
+      src: ['**']
+    }
   });
 
   grunt.registerTask('test', [
     'wiredep',
     'karma',
     'coverage'
+  ]);
+
+  grunt.registerTask('docs', [
+    'clean:docs',
+    'ngdocs',
+    'copy:docs'
   ]);
 
   grunt.registerTask('build', [
