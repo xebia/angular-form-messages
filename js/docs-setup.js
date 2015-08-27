@@ -10,7 +10,7 @@ NG_DOCS={
       "type": "overview",
       "moduleName": "angularFormMessages",
       "shortDescription": "The Angular Form Messages module. Contains all basic functionality to make Angular Form Messages possible.",
-      "keywords": "affield afmessagelabel afmessages afmessageservice afsubmit afsubmitbutton angular angularformmessages api app basic button configuration directive directives disables element flag form functionality functions handles message messages module overview provider registering scope services sets shared showing submit submitting translated utility wide"
+      "keywords": "affield afmessagelabel afmessages afmessageservice afsubmit afsubmitbutton angular angularformmessages api app basic button configuration directive directives disables element flag form functionality functions handles message messages module overview provider registering scope service services sets shared showing submit submitting translated utility wide"
     },
     {
       "section": "api",
@@ -19,7 +19,7 @@ NG_DOCS={
       "type": "directive",
       "moduleName": "angularFormMessages",
       "shortDescription": "Register a form element with angularFormMessages, so that validation information is broadcasted to other directives",
-      "keywords": "$error af-field af-submit angularformmessages angularformmessagesexample api broadcasted directive directives element errors form html message_types module ng-model register required service user userform validation"
+      "keywords": "$error af-field af-submit angularformmessages api broadcasted directive directives element errors form html message_types module ng-model register required service user userform validation"
     },
     {
       "section": "api",
@@ -28,7 +28,7 @@ NG_DOCS={
       "type": "directive",
       "moduleName": "angularFormMessages",
       "shortDescription": "Translates a validator name to a message.",
-      "keywords": "angularformmessages api directive message translates validator"
+      "keywords": "$q $translate af-field af-messages af-submit angular angularformmessages angularformmessagesbootstrap api directive factory field function html js key message module ng-model reject required return translate translates translations user userform validator var"
     },
     {
       "section": "api",
@@ -110,11 +110,7 @@ NG_DOCS={
   "editExample": true,
   "startPage": "/api",
   "scripts": [
-    "angular.js",
-    "angular-animate.js",
-    "angular-messages.js",
-    "app.js",
-    "translate.js",
+    "angular.min.js",
     "angular-form-messages.js",
     "angular-form-messages-bootstrap.js"
   ]
