@@ -3,6 +3,27 @@
  * @name angularFormMessages.directive:afMessageLabel
  * @description
  * Translates a validator name to a message.
+ *
+ * @example
+ * <example module="angularFormMessagesBootstrap">
+ *   <file name="index.html">
+ *     <form name="userForm" af-submit>
+ *       <input af-field name="user.name" ng-model="user.name" required />
+ *       <div af-messages="user.name"></div>
+ *     </form>
+ *   </file>
+ *   <file name="translate.js">
+ *  angular.module('angularFormMessages').factory('$translate', function ($q) {
+ *    var translations = {
+ *      required: 'This field is required'
+ *    };
+ *
+ *     return function (key) {
+ *      return key in translations ? $q.when(translations[key]) : $q.reject(key);
+ *    };
+ *  });
+ *   </file>
+ * </example>
  */
 angular.module('angularFormMessages')
   .directive('afMessageLabel', function (

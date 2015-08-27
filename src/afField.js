@@ -7,7 +7,7 @@
  * @requires angularFormMessages.service:AfMessageService
  * @requires MESSAGE_TYPES (constant)
  * @example
- <example module="angularFormMessagesExample">
+ <example module="angularFormMessages">
  <file name="index.html">
  <div>
  <form name="userForm" af-submit>
