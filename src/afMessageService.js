@@ -6,7 +6,7 @@ angular.module('angularFormMessages')
  * @name angularFormMessages.service:AfMessageService
  * @description
  * The provider is used to configure app wide settings:
- * * Label prefix for {@link angularFormMessages.directive.afMessageLabel afMessageLabel}.
+ * * Label prefix for {@link angularFormMessages.directive:afMessageLabel afMessageLabel}.
  * * Auto focusing the first invalid form element.
  * * Showing multiple errors on a form or form element.
  * * Showing success feedback icon and/or colors on valid form elements.

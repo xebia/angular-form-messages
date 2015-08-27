@@ -3,7 +3,7 @@ angular.module('angularFormMessages')
  * @ngdoc directive
  * @name angularFormMessages.directive:afSubmitButton
  * @description
- * The submit button is disabled while $scope.isSubmitting is true. This scope flag is set by the {@link angularFormMessages.directive.afSubmit afSubmit} directive.
+ * The submit button is disabled while $scope.isSubmitting is true. This scope flag is set by the {@link angularFormMessages.directive:afSubmit afSubmit} directive.
  */
   .directive('afSubmitButton', function () {
     return {

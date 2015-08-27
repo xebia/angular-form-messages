@@ -12,7 +12,7 @@
  * * {@link angularFormMessages.directive:afSubmitButton afSubmitButton} - Disables the form submit button and sets a flag on the scope while submitting.
  *
  * ## Services
- * * {@link angularFormMessages.directive:afMessageService afMessageService} - Contains all shared utility functions that are used by the directives. The provider does app wide configuration.
+ * * {@link angularFormMessages.service:AfMessageService afMessageService} - Contains all shared utility functions that are used by the directives. The provider does app wide configuration.
  *
  */
 angular.module('angularFormMessages', []);
