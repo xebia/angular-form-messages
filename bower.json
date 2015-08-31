@@ -9,12 +9,11 @@
   "description": "Angular Form Messages lets you show custom serverside and clientside validation messages in your forms, not only on fields but also on groups of fields.",
   "dependencies": {},
   "devDependencies": {
-    "angular-mocks": "1",
-    "mox": "0.4",
-    "jasmine-jquery": "~2.1.0",
+    "angular-animate": "1.4",
+    "angular-mocks": "1.4",
+    "jasmine-jquery": "2.1",
     "lodash": "~3.8.0",
-    "angular-animate": "1.4.3",
-    "angular-form-messages-example": "git://github.com/xebia/angular-form-messages-example.git#~0.11.0"
+    "mox": "0.4"
   },
   "ignore": [
     "test",
