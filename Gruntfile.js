@@ -162,6 +162,9 @@ module.exports = function (grunt) {
     },
 
     concat: {
+      options: {
+        sourceMap: true
+      },
       dist: {
         src: [
           '<%= paths.src %>/afModule.js',
