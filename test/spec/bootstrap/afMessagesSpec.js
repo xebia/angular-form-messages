@@ -147,6 +147,20 @@ describe('afMessages', function () {
       expect(this.element.helpBlocks(1).label()).toHaveAttr('af-message-label', messages[1].message);
     });
 
+    it('should show the correct aria attributes', function () {
+      expect(this.element.helpBlocks(0)).not.toHaveAttr('role');
+      expect(this.element.helpBlocks(0)).not.toHaveAttr('aria-live');
+
+      expect(this.element.helpBlocks(1)).not.toHaveAttr('role');
+      expect(this.element.helpBlocks(1)).not.toHaveAttr('aria-live');
+
+      expect(this.element.helpBlocks(2)).toHaveAttr('role', 'alert');
+      expect(this.element.helpBlocks(2)).toHaveAttr('aria-live', 'polite');
+
+      expect(this.element.helpBlocks(3)).toHaveAttr('role', 'alert');
+      expect(this.element.helpBlocks(3)).toHaveAttr('aria-live', 'assertive');
+    });
+
     describe('when we want to show the message as alert', function () {
       beforeEach(function () {
         addSelectors(compileHtml('<form name="userForm" af-submit><div af-messages="user.name" af-alert></div></form>'), {

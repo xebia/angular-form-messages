@@ -10,7 +10,8 @@ angular.module('angularFormMessages').run(['$templateCache', function($templateC
     "  <div\n" +
     "      ng-class=\"isAlert ? 'alert alert-' + message.alertType : 'help-block'\"\n" +
     "      ng-style=\"{ 'margin-bottom': $last ? undefined : '0px' }\"\n" +
-    "      role=\"alert\"\n" +
+    "      ng-attr-role=\"{{message.ariaRole}}\"\n" +
+    "      ng-attr-aria-live=\"{{message.ariaLive}}\"\n" +
     "      ng-repeat=\"message in messagesForField track by $index\">\n" +
     "    <span class=\"glyphicon\" ng-class=\"message.icon\" aria-hidden=\"true\"></span>\n" +
     "    <span class=\"sr-only\">{{message.type}}:</span>\n" +

@@ -148,6 +148,13 @@ angular.module('angularFormMessagesBootstrap')
           angular.forEach(messages, function (message) {
             message.alertType = alertTypes[message.type];
             message.icon = icons[message.type];
+            if (message.alertType === 'danger') {
+              message.ariaRole = 'alert';
+              message.ariaLive = 'assertive';
+            } else if (message.alertType === 'warning') {
+              message.ariaRole = 'alert';
+              message.ariaLive = 'polite';
+            }
           });
           return messages;
         }
@@ -195,7 +202,8 @@ angular.module('angularFormMessages').run(['$templateCache', function($templateC
     "  <div\n" +
     "      ng-class=\"isAlert ? 'alert alert-' + message.alertType : 'help-block'\"\n" +
     "      ng-style=\"{ 'margin-bottom': $last ? undefined : '0px' }\"\n" +
-    "      role=\"alert\"\n" +
+    "      ng-attr-role=\"{{message.ariaRole}}\"\n" +
+    "      ng-attr-aria-live=\"{{message.ariaLive}}\"\n" +
     "      ng-repeat=\"message in messagesForField track by $index\">\n" +
     "    <span class=\"glyphicon\" ng-class=\"message.icon\" aria-hidden=\"true\"></span>\n" +
     "    <span class=\"sr-only\">{{message.type}}:</span>\n" +

@@ -6,7 +6,8 @@
   <div
       ng-class="isAlert ? 'alert alert-' + message.alertType : 'help-block'"
       ng-style="{ 'margin-bottom': $last ? undefined : '0px' }"
-      role="alert"
+      ng-attr-role="{{message.ariaRole}}"
+      ng-attr-aria-live="{{message.ariaLive}}"
       ng-repeat="message in messagesForField track by $index">
     <span class="glyphicon" ng-class="message.icon" aria-hidden="true"></span>
     <span class="sr-only">{{message.type}}:</span>
