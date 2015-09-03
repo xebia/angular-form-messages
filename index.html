@@ -11,7 +11,7 @@
                  Declarative templates with data-binding, MVC, dependency injection and great
                  testability story all implemented with pure client-side JavaScript!">
   <meta name="fragment" content="!">
-  <title ng-bind-template="angular-form-messages: {{partialTitle}}">Docs</title>
+  <title ng-bind-template="Angular Form Messages: {{partialTitle}}">Docs</title>
   <script type="text/javascript">
     // dynamically add base tag as well as css and javascript files.
     // we can't add css/js the usual way, because some browsers (FF) eagerly prefetch resources
@@ -89,7 +89,7 @@
         <div class="container">
           
           
-            <a  class="brand">angular-form-messages</a>
+            <a  class="brand">Angular Form Messages</a>
           
           <ul class="nav">
             <li ng-repeat="(url, name) in sections" ng-class="{active: isActivePath(url)}">
@@ -130,8 +130,16 @@
       <div class="span3">
         <form class="form-search" ng-submit="submitForm()">
           
-          <input type="text" ng-model="search" placeholder="search the docs"
-                 tabindex="1" accesskey="s" class="search-query">
+          <div class="dropdown search"
+               ng-class="{open: focused && bestMatch.rank > 0 && bestMatch.page != currentPage}">
+            <input type="text" ng-model="search" placeholder="search the docs"
+                   tabindex="1" accesskey="s" class="search-query" focused="focused">
+            <ul class="dropdown-menu">
+              <li>
+                <a href="{{bestMatch.page.url}}">{{bestMatch.page.shortName}}</a>
+              </li>
+            </ul>
+          </div>
           
           <div class="spacer"></div>
 

@@ -1,0 +1,58 @@
+<h1><code ng:non-bindable=""></code>
+<div><span class="hint"></span>
+</div>
+</h1>
+<div><div class="index-page"><h2 id="documentation-for-angular-form-messages">Documentation for Angular Form Messages</h2>
+<p>There are two modules. The base module (<a href="#/api/angularFormMessages">angularFormMessages</a>) and a Bootstrap extension (<a href="#/api/angularFormMessagesBootstrap">angularFormMessagesBootstrap</a>).
+Feel free to add both js files to your app in a script tag.</p>
+<p>Angular Form Messages can be used with Angular 1.2 and up.</p>
+<h3 id="documentation-for-angular-form-messages_why">Why?</h3>
+<p>When you make a form in Angular, you usually add validation messages using <code>ng-show=&quot;formName.fieldName.$dirty &amp;&amp; formName.fieldName.$invalid&quot;</code>.</p>
+<p>Since Angular 1.3, showing messages has been a lot easier, but this &quot;dirty and invalid&quot; boilerplate is still required to have control over showing and hiding messages.</p>
+<p>The addition of <code>ngModelOptions</code> give you freedom to set model triggers (ie. on blur), but this still requires some boilerplate code every form element.
+Nevertheless this functionality is not available in Angular 1.2.</p>
+<p>Angular Form Messages helps you with managing form messages by doing some simple configuration.</p>
+<h3 id="documentation-for-angular-form-messages_how-it-works">How it works</h3>
+<p>When a field becomes invalid, a validation event is emitted. Event listeners that are subscribed to the field that broadcasts this event are called.</p>
+<p>The result is that the <a href="#/api/angularFormMessagesBootstrap.directive:afFieldState">afFieldState</a> directive adds a <code>&#39;has-error&#39;</code> class,
+the <a href="#/api/angularFormmessagesBootstrap.directive:afMessages">afMessages</a> directives shows a message, etc.</p>
+<h3 id="documentation-for-angular-form-messages_usage">Usage</h3>
+<p>Just make a form like you are used to, with <code>ng-model</code>s on the form elements. The form tag and the form elements have <code>name</code> attributes.</p>
+<p>Now you have to add the AFM sauce:</p>
+<ol>
+<li>Add <code>af-field</code> to the form elements.</li>
+<li>Add <code>af-submit=&quot;submitMethod()&quot;</code> to the form tag and remove <code>ng-submit</code>.</li>
+<li>Add <code>af-messages=&quot;fieldName&quot;</code> directives to the places where you want to show messages for certain fields.</li>
+<li>Add <code>af-messages</code> directives to the form to show general form messages.</li>
+</ol>
+<p>When you also want to show server side messages, the <code>submitMethod</code> needs to return a rejecting promise containing:</p>
+<pre><code>{
+  validation: {
+    $messages: [{
+      message: &#39;This is general message&#39;, type: &#39;ERROR&#39;
+    }],
+    formName: {
+      $messages: [{
+        message: &#39;This is general form message&#39;, type: &#39;ERROR&#39;
+      }],
+      fieldName1: [
+        { message: &#39;This is the first message for fieldName1&#39;, type: &#39;ERROR&#39; },
+        { message: &#39;This is the second message for fieldName1&#39;, type: &#39;WARNING&#39; }
+      ],
+      fieldName2: [
+        { message: &#39;This is the first message for fieldName2&#39;, type: &#39;INFO&#39; },
+        { message: &#39;This is the second message for fieldName2&#39;, type: &#39;SUCCESS&#39; }
+      ],
+    }
+  }
+}
+</code></pre><p>You can easily add your own custom directives by subscribing to the <code>validation</code> event.</p>
+<h3 id="documentation-for-angular-form-messages_modules">Modules</h3>
+<h4 id="documentation-for-angular-form-messages_modules"><a href="#/api/angularFormMessages">angularFormMessages</a></h4>
+<p>This module contains the base directives to make Angular Form Messages work. Showing messages when filling in the form,
+but also when processing messages after submitting.</p>
+<p>The directives are using the <a href="#/api/angularFormMessages.service:AfMessageService">AfMessageService</a> util methods.
+You can inject this service when you are making your own directives.</p>
+<h4 id="documentation-for-angular-form-messages_modules"><a href="#/api/angularFormMessagesBootstrap">angularFormMessagesBootstrap</a></h4>
+<p>Additional directives and extensions of the base directives that show feedback icons on the form elements and add <code>&#39;has-error&#39;</code> classes to the form wraps.</p>
+</div></div>

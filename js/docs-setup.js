@@ -1,8 +1,17 @@
 NG_DOCS={
   "sections": {
-    "api": "API Documentation"
+    "api": "Documentation"
   },
   "pages": [
+    {
+      "section": "api",
+      "id": "index",
+      "shortName": "index",
+      "type": "overview",
+      "moduleName": "index",
+      "shortDescription": "Documentation for Angular Form Messages",
+      "keywords": "$dirty $invalid $messages add addition additional adds af-field af-messages af-submit affieldstate afm afmessages afmessageservice angular angularformmessages angularformmessagesbootstrap api app attributes base blur boilerplate bootstrap broadcasts called class classes code configuration control custom directive directives dirty documentation easier easily element elements emitted error event extension extensions feedback feel field fieldname fieldname1 fieldname2 fields files filling form formname free freedom functionality general has-error helps hiding icons info inject invalid js listeners lot making managing message messages methods model module modules ng-model ng-show ng-submit ngmodeloptions overview places processing promise rejecting remove required requires result return sauce script second server service set showing side simple submitmethod submitting subscribed subscribing success tag triggers type usage util validation warning work works wraps"
+    },
     {
       "section": "api",
       "id": "angularFormMessages",
