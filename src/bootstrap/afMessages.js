@@ -50,6 +50,7 @@ angular.module('angularFormMessagesBootstrap')
           allActiveMessages;
 
         var fieldName = afMessagesCtrl.fieldNamePrefix || afMessagesCtrl.fieldName;
+        $scope.isAlert = attrs.afAlert !== undefined;
         AfMessageService.validation($scope.$parent, fieldName, function (validationFieldName, messages) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.fieldName === fieldName) {

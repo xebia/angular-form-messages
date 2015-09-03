@@ -3,7 +3,11 @@
   <span class="sr-only">({{messageType}})</span>
 </span>
 <div ng-repeat="messagesForField in messages track by $index">
-  <div class="alert help-block" ng-class="'alert-' + message.alertType" ng-style="{ 'margin-bottom': $last ? undefined : '0px' }" role="alert" ng-repeat="message in messagesForField track by $index">
+  <div
+      ng-class="isAlert ? 'alert alert-' + message.alertType : 'help-block'"
+      ng-style="{ 'margin-bottom': $last ? undefined : '0px' }"
+      role="alert"
+      ng-repeat="message in messagesForField track by $index">
     <span class="glyphicon" ng-class="message.icon" aria-hidden="true"></span>
     <span class="sr-only">{{message.type}}:</span>
     <span af-message-label="{{message.message}}"></span>
