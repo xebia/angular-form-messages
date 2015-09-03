@@ -12,10 +12,17 @@ Check out the [documentation](http://xebia.github.io/angular-form-messages) page
 
 Here is an example project: [Angular Form Messages Example](http://github.com/xebia/angular-form-messages-example)
 
+## Installation
+
+Add the Angular Form Messages dependency to your project.
+
+`bower install --save-dev angular-form-messages`
+
+Include dist/angular-form-messages.js (min.js) and optionally dist/angular-form-messages-bootstrap.js in a script tag.
+
+The bootstrap scripts contain some additional helper directives for adding Bootstrap HTML and CSS classes
+(see [documentation](http://xebia.github.io/angular-form-messages/#/api/angularFormMessagesBootstrap)).
+
 ## Build & development
 
-Run `grunt` for building.
-
-## Testing
-
-Running `grunt test` will run the unit tests with karma.
+Running `grunt` tests and builds the project.
