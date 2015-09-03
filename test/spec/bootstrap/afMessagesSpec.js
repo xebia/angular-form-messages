@@ -7,9 +7,8 @@ describe('afMessages', function () {
     addSelectors(compileHtml('<form name="userForm" af-submit><div af-messages="user.name"></div></form>'), {
       feedbackIcon: '.form-control-feedback',
       feedbackScreenreader: '.form-control-feedback + .sr-only',
-      alerts: '.alert',
-      alert: {
-        selector: '.alert:eq({0})',
+      helpBlocks: {
+        repeater: '.help-block',
         sub: {
           icon: '.glyphicon',
           prefix: '.sr-only',
@@ -76,7 +75,7 @@ describe('afMessages', function () {
 
   describe('on initialization', function () {
     it('should show no messages', function () {
-      expect(this.element.alerts()).not.toExist();
+      expect(this.element.helpBlocks()).not.toExist();
     });
 
     it('should show no feedback', function () {
@@ -127,7 +126,7 @@ describe('afMessages', function () {
     });
 
     it('should show the messages', function () {
-      expect(this.element.alerts()).toHaveLength(messages.length);
+      expect(this.element.helpBlocks()).toHaveLength(messages.length);
     });
 
     describe('and there are no messages to show', function () {
@@ -137,36 +136,65 @@ describe('afMessages', function () {
       });
 
       it('should show no messages', function () {
-        expect(this.element.alerts()).toHaveLength(0);
+        expect(this.element.helpBlocks()).toHaveLength(0);
       });
     });
 
     it('should the message text and type', function () {
-      expect(this.element.alert(0).prefix()).toHaveText(messages[0].type + ':');
-      expect(this.element.alert(1).prefix()).toHaveText(messages[1].type + ':');
-      expect(this.element.alert(0).label()).toHaveAttr('af-message-label', messages[0].message);
-      expect(this.element.alert(1).label()).toHaveAttr('af-message-label', messages[1].message);
+      expect(this.element.helpBlocks(0).prefix()).toHaveText(messages[0].type + ':');
+      expect(this.element.helpBlocks(1).prefix()).toHaveText(messages[1].type + ':');
+      expect(this.element.helpBlocks(0).label()).toHaveAttr('af-message-label', messages[0].message);
+      expect(this.element.helpBlocks(1).label()).toHaveAttr('af-message-label', messages[1].message);
     });
 
-    it('should show an alert class for messages with type error, warning, info and success', function () {
-      expect(this.element.alert(0)).toHaveClass('alert-success');
-      expect(this.element.alert(1)).toHaveClass('alert-info');
-      expect(this.element.alert(2)).toHaveClass('alert-warning');
-      expect(this.element.alert(3)).toHaveClass('alert-danger');
+    it('should show the correct aria attributes', function () {
+      expect(this.element.helpBlocks(0)).not.toHaveAttr('role');
+      expect(this.element.helpBlocks(0)).not.toHaveAttr('aria-live');
+
+      expect(this.element.helpBlocks(1)).not.toHaveAttr('role');
+      expect(this.element.helpBlocks(1)).not.toHaveAttr('aria-live');
+
+      expect(this.element.helpBlocks(2)).toHaveAttr('role', 'alert');
+      expect(this.element.helpBlocks(2)).toHaveAttr('aria-live', 'polite');
+
+      expect(this.element.helpBlocks(3)).toHaveAttr('role', 'alert');
+      expect(this.element.helpBlocks(3)).toHaveAttr('aria-live', 'assertive');
+    });
+
+    describe('when we want to show the message as alert', function () {
+      beforeEach(function () {
+        addSelectors(compileHtml('<form name="userForm" af-submit><div af-messages="user.name" af-alert></div></form>'), {
+          alerts: {
+            repeater: '.alert'
+          }
+        });
+        validation.call(this, MESSAGE_TYPES[0]);
+      });
+
+      it('should show an alert class for messages with type error, warning, info and success', function () {
+        expect(this.element.alerts(0)).toHaveClass('alert-success');
+        expect(this.element.alerts(1)).toHaveClass('alert-info');
+        expect(this.element.alerts(2)).toHaveClass('alert-warning');
+        expect(this.element.alerts(3)).toHaveClass('alert-danger');
+      });
     });
 
     it('should show a message type icon', function () {
-      expect(this.element.alert(0).icon()).toHaveClass('glyphicon-ok');
-      expect(this.element.alert(1).icon()).toHaveClass('glyphicon-info-sign');
-      expect(this.element.alert(2).icon()).toHaveClass('glyphicon-warning-sign');
-      expect(this.element.alert(3).icon()).toHaveClass('glyphicon-exclamation-sign');
+      expect(this.element.helpBlocks(0).icon()).toHaveClass('glyphicon-ok');
+      expect(this.element.helpBlocks(1).icon()).toHaveClass('glyphicon-info-sign');
+      expect(this.element.helpBlocks(2).icon()).toHaveClass('glyphicon-warning-sign');
+      expect(this.element.helpBlocks(3).icon()).toHaveClass('glyphicon-exclamation-sign');
     });
 
     describe('when there is a fieldNamePrefix set and there is a second validation event with another fieldName that also matches', function () {
       beforeEach(function () {
         addSelectors(compileHtml.call(this, '<form name="userForm" af-submit><div af-messages af-field-name-prefix="user"></div></form>'), {
-          alerts: '.alert',
-          alertLabel: '.alert:eq({0}) [af-message-label]'
+          helpBlocks: {
+            repeater: '.help-block',
+            sub: {
+              messageLabel: '[af-message-label]'
+            }
+          }
         });
         this.$scope.$emit('validation', 'user.name', messages, MESSAGE_TYPES[0]);
         this.$scope.$digest();
@@ -175,13 +203,13 @@ describe('afMessages', function () {
       });
 
       it('should not overwrite the messages for a different fieldName', function () {
-        expect(this.element.alerts()).toHaveLength(messages.length * 2);
+        expect(this.element.helpBlocks()).toHaveLength(messages.length * 2);
       });
 
       it('should overwrite messages for the same fieldName', function () {
         this.$scope.$emit('validation', 'user.email', [messages[0]], MESSAGE_TYPES[0]);
         this.$scope.$digest();
-        expect(this.element.alerts()).toHaveLength(messages.length + 1);
+        expect(this.element.helpBlocks()).toHaveLength(messages.length + 1);
       });
 
       it('should filter the messages', function () {

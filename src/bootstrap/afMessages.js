@@ -33,6 +33,13 @@ angular.module('angularFormMessagesBootstrap')
           angular.forEach(messages, function (message) {
             message.alertType = alertTypes[message.type];
             message.icon = icons[message.type];
+            if (message.alertType === 'danger') {
+              message.ariaRole = 'alert';
+              message.ariaLive = 'assertive';
+            } else if (message.alertType === 'warning') {
+              message.ariaRole = 'alert';
+              message.ariaLive = 'polite';
+            }
           });
           return messages;
         }
@@ -50,6 +57,7 @@ angular.module('angularFormMessagesBootstrap')
           allActiveMessages;
 
         var fieldName = afMessagesCtrl.fieldNamePrefix || afMessagesCtrl.fieldName;
+        $scope.isAlert = attrs.afAlert !== undefined;
         AfMessageService.validation($scope.$parent, fieldName, function (validationFieldName, messages) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.fieldName === fieldName) {

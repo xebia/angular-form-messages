@@ -148,6 +148,13 @@ angular.module('angularFormMessagesBootstrap')
           angular.forEach(messages, function (message) {
             message.alertType = alertTypes[message.type];
             message.icon = icons[message.type];
+            if (message.alertType === 'danger') {
+              message.ariaRole = 'alert';
+              message.ariaLive = 'assertive';
+            } else if (message.alertType === 'warning') {
+              message.ariaRole = 'alert';
+              message.ariaLive = 'polite';
+            }
           });
           return messages;
         }
@@ -165,6 +172,7 @@ angular.module('angularFormMessagesBootstrap')
           allActiveMessages;
 
         var fieldName = afMessagesCtrl.fieldNamePrefix || afMessagesCtrl.fieldName;
+        $scope.isAlert = attrs.afAlert !== undefined;
         AfMessageService.validation($scope.$parent, fieldName, function (validationFieldName, messages) {
           // Feedback
           if (afFeedbackCtrl && afFeedbackCtrl.fieldName === fieldName) {
@@ -191,7 +199,12 @@ angular.module('angularFormMessages').run(['$templateCache', function($templateC
     "  <span class=\"sr-only\">({{messageType}})</span>\n" +
     "</span>\n" +
     "<div ng-repeat=\"messagesForField in messages track by $index\">\n" +
-    "  <div class=\"alert help-block\" ng-class=\"'alert-' + message.alertType\" ng-style=\"{ 'margin-bottom': $last ? undefined : '0px' }\" role=\"alert\" ng-repeat=\"message in messagesForField track by $index\">\n" +
+    "  <div\n" +
+    "      ng-class=\"isAlert ? 'alert alert-' + message.alertType : 'help-block'\"\n" +
+    "      ng-style=\"{ 'margin-bottom': $last ? undefined : '0px' }\"\n" +
+    "      ng-attr-role=\"{{message.ariaRole}}\"\n" +
+    "      ng-attr-aria-live=\"{{message.ariaLive}}\"\n" +
+    "      ng-repeat=\"message in messagesForField track by $index\">\n" +
     "    <span class=\"glyphicon\" ng-class=\"message.icon\" aria-hidden=\"true\"></span>\n" +
     "    <span class=\"sr-only\">{{message.type}}:</span>\n" +
     "    <span af-message-label=\"{{message.message}}\"></span>\n" +
