@@ -45,7 +45,7 @@ module.exports = function (grunt) {
     connect: {
       options: {
         hostname: 'localhost',
-        port: 8000,
+        port: 9001,
         keepalive: true
       },
       docs: {
@@ -256,9 +256,14 @@ module.exports = function (grunt) {
           'dist/angular-form-messages.js',
           'dist/angular-form-messages-bootstrap.js'
         ],
-        html5Mode: false
+        html5Mode: false,
+        bestMatch: true,
+        title: 'Angular Form Messages'
       },
-      all: 'src/**/*.js'
+      all: {
+        title: 'Documentation',
+        src: 'src/**/*.js'
+      }
     },
 
     'gh-pages': {
