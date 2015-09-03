@@ -8,7 +8,7 @@ Angular Form Messages lets you show custom validation messages on your forms. Th
 but most of them do not allow you to set custom validation callbacks on your forms or they do not support validation messages that come from your backend.
 Angular Form Messages also gives you the ability to show validation messages for groups of fields.
 
-Full documentation is coming soon.
+Check out the [documentation](http://xebia.github.io/angular-form-messages) pages (under development).
 
 Here is an example project: [Angular Form Messages Example](http://github.com/xebia/angular-form-messages-example)
 
