@@ -65,8 +65,8 @@ angular.module('angularFormMessages').directive('afField', function (
       if (triggerOn === 'change') {
         // This also triggers custom directives which may not be able to listen to events
         var ngModelPath = formName + '["' + modelName + '"]';
-        $scope.$watch('[' + ngModelPath + '.$error, ' + ngModelPath + '.$dirty]', function (newVal, oldVal) {
-          if ((newVal[0] !== oldVal[0]) || newVal[1]) {
+        $scope.$watch(ngModelPath + '.$error', function () {
+          if ($scope[formName][modelName].$dirty) {
             updateValidation();
           }
         }, true);

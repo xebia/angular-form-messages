@@ -41,6 +41,18 @@ describe('afField', function () {
     spyOn(this.$scope, '$emit').and.callThrough();
   }
 
+  function compileRadio() {
+    createScope({ user: {} });
+    spyOn(this.$scope, '$emit').and.callThrough();
+    var element = addSelectors(compileHtml(
+      '<form name="userForm" af-submit>' +
+      '<input type="radio" id="{{gender}}" af-field name="user.gender" ng-model="user.gender" required ng-repeat="gender in [\'male\', \'female\']" />' +
+      '</form>'), {
+      field: '[af-field]'
+    });
+    ngModel = element.field().controller('ngModel');
+  }
+
   function expectMessage(type) {
     this.$scope.$emit.calls.reset();
     this.$scope.$digest();
@@ -51,6 +63,9 @@ describe('afField', function () {
     expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', messages);
   }
 
+  /**
+   * afSubmit is cleaning the messages on input, so we have to check for arguments
+   */
   function expectNoValidEvent() {
     expect(this.$scope.$emit).not.toHaveBeenCalledWith('validation',  'user.email', []);
   }
@@ -90,9 +105,9 @@ describe('afField', function () {
     });
 
     describe('and the user changes the field', function () {
-      it('should validate the field as "valid" if it was initially valid', function () {
+      it('should not revalidate if it was initially valid', function () {
         this.element.field().val('other@address').trigger('input');
-        expectValidEvent.call(this);
+        expectNoValidEvent.call(this);
       });
 
       it('should validate the field and set the default (error) message if it was initially valid', function () {
@@ -164,17 +179,6 @@ describe('afField', function () {
 
     it('should only broadcast messages in the validation event for valid validators', function () {
       expectRequiredErrorEvent.call(this);
-    });
-  });
-
-  describe('when no triggerOn value is defined on the afSubmit directive and field', function () {
-    beforeEach(function () {
-      compile.call(this);
-    });
-
-    it('should use the value of AfMessageService.triggerOn() as default', function () {
-      this.element.field().val('other@address').trigger('input');
-      expectValidEvent.call(this);
     });
   });
 
@@ -260,6 +264,17 @@ describe('afField', function () {
       it('should set the validity and message type for the field', function () {
         expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', false);
         expect(afField.setMessageDetails).toHaveBeenCalledWith('User name server side error', MESSAGE_TYPES[3]);
+      });
+
+      describe('and there are multiple afFields with the same ngModel and each of them with another scope', function () {
+        beforeEach(function () {
+          compileRadio.call(this);
+        });
+
+        it('should not mark the fields invalid on initialization', function () {
+          expect(ngModel.$error).toEqual({ required: true });
+          expect(this.$scope.$emit).not.toHaveBeenCalled();
+        });
       });
 
       describe('and the user changes the field thereafter', function () {
