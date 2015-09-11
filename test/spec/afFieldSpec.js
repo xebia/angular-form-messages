@@ -46,11 +46,11 @@ describe('afField', function () {
     spyOn(this.$scope, '$emit').and.callThrough();
     var element = addSelectors(compileHtml(
       '<form name="userForm" af-submit>' +
-      '<input type="radio" id="{{gender}}" af-field name="user.gender" ng-model="user.gender" required ng-repeat="gender in [\'male\', \'female\']" />' +
+      '<input type="radio" id="{{gender}}" af-field name="user.gender" ng-model="user.gender" ng-value="gender" required ng-repeat="gender in [\'male\', \'female\']" />' +
       '</form>'), {
-      field: '[af-field]'
+      field: { repeater: '[af-field]' }
     });
-    ngModel = element.field().controller('ngModel');
+    ngModel = element.field(0).controller('ngModel');
   }
 
   function expectMessage(type) {
@@ -105,9 +105,9 @@ describe('afField', function () {
     });
 
     describe('and the user changes the field', function () {
-      it('should not revalidate if it was initially valid', function () {
+      it('should validate the field as "valid" if it was initially valid', function () {
         this.element.field().val('other@address').trigger('input');
-        expectNoValidEvent.call(this);
+        expectValidEvent.call(this);
       });
 
       it('should validate the field and set the default (error) message if it was initially valid', function () {
@@ -274,6 +274,15 @@ describe('afField', function () {
         it('should not mark the fields invalid on initialization', function () {
           expect(ngModel.$error).toEqual({ required: true });
           expect(this.$scope.$emit).not.toHaveBeenCalled();
+        });
+
+        describe('when clicking not the last radio', function () {
+          beforeEach(function () {
+            this.element.field(0).click().trigger('click');
+          });
+          it('should set the validity because the clicked radio becomes dirty', function () {
+            expect(this.$scope.$emit).toHaveBeenCalled();
+          });
         });
       });
 
