@@ -1,6 +1,6 @@
 describe('afFieldState', function () {
 
-  function setup(messageTypes) {
+  function setup(messageTypes, fieldName) {
     // Add messages
     this.$scope.messages = _.map(messageTypes, function (type) {
       return type === inj.MESSAGE_TYPES[3] ? 'danger' : type.toLowerCase();
@@ -19,7 +19,7 @@ describe('afFieldState', function () {
     }
 
     // Send the validation event to trigger the directive
-    validate.call(this);
+    validate.call(this, fieldName);
   }
 
   function validate(fieldName, messages) {
@@ -47,6 +47,14 @@ describe('afFieldState', function () {
   beforeEach(function () {
     mox
       .module('angularFormMessagesBootstrap')
+      .mockServices('AfMessageService')
+      .setupResults(function () {
+        return {
+          AfMessageService: {
+            getMostSevereMessage: function (messages) { return messages[0]; }
+          }
+        };
+      })
       .run();
 
     inj = mox.inject('$rootScope', '$timeout', 'MESSAGE_TYPES');
@@ -164,6 +172,13 @@ describe('afFieldState', function () {
         it('should remove the "has-error" class from the element', expectHasNoError);
         it('should remove the "has-warning" class from the element', expectHasNoWarning);
         it('should remove the "has-info" class from the element', expectHasNoInfo);
+      });
+
+      describe('when there is no message for another fieldName', function () {
+        beforeEach(function () {
+          setup.call(this, [], 'user.other');
+        });
+        it('should not add the "has-success" class to the element', expectHasNoSuccess);
       });
 
       describe('when there are multiple messages', function () {

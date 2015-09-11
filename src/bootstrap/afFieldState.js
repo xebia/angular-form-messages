@@ -45,7 +45,7 @@ angular.module('angularFormMessagesBootstrap')
         }
 
         var
-          cachedMessages = [],
+          cachedMessages,
           fieldName = attrs.afFieldState || attrs.afFieldName;
 
         $scope.$on('validation', function (event, validationFieldName, messages) {
@@ -69,9 +69,8 @@ angular.module('angularFormMessagesBootstrap')
               addClass(alertClassToType[alertClasses[0]]);
             }
 
-            // There is no afMessage in the DOM
-            if (!alertClasses.length) {
-
+            // There is no afMessage in the DOM and this field received a validation event before
+            if (!alertClasses.length && cachedMessages) {
               if (cachedMessages.length) {
                 addClass(AfMessageService.getMostSevereMessage(cachedMessages).type);
               } else if (afSubmitCtrl.showSuccess) {
