@@ -41,6 +41,18 @@ describe('afField', function () {
     spyOn(this.$scope, '$emit').and.callThrough();
   }
 
+  function compileRadio() {
+    createScope({ user: {} });
+    spyOn(this.$scope, '$emit').and.callThrough();
+    var element = addSelectors(compileHtml(
+      '<form name="userForm" af-submit>' +
+      '<input type="radio" id="{{gender}}" af-field name="user.gender" ng-model="user.gender" ng-value="gender" required ng-repeat="gender in [\'male\', \'female\']" />' +
+      '</form>'), {
+      field: { repeater: '[af-field]' }
+    });
+    ngModel = element.field(0).controller('ngModel');
+  }
+
   function expectMessage(type) {
     this.$scope.$emit.calls.reset();
     this.$scope.$digest();
@@ -51,6 +63,9 @@ describe('afField', function () {
     expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', messages);
   }
 
+  /**
+   * afSubmit is cleaning the messages on input, so we have to check for arguments
+   */
   function expectNoValidEvent() {
     expect(this.$scope.$emit).not.toHaveBeenCalledWith('validation',  'user.email', []);
   }
@@ -167,17 +182,6 @@ describe('afField', function () {
     });
   });
 
-  describe('when no triggerOn value is defined on the afSubmit directive and field', function () {
-    beforeEach(function () {
-      compile.call(this);
-    });
-
-    it('should use the value of AfMessageService.triggerOn() as default', function () {
-      this.element.field().val('other@address').trigger('input');
-      expectValidEvent.call(this);
-    });
-  });
-
   describe('when the field has a triggerOn attribute', function () {
     beforeEach(function () {
       compile.call(this, 'change', 'blur');
@@ -260,6 +264,26 @@ describe('afField', function () {
       it('should set the validity and message type for the field', function () {
         expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', false);
         expect(afField.setMessageDetails).toHaveBeenCalledWith('User name server side error', MESSAGE_TYPES[3]);
+      });
+
+      describe('and there are multiple afFields with the same ngModel and each of them with another scope', function () {
+        beforeEach(function () {
+          compileRadio.call(this);
+        });
+
+        it('should not mark the fields invalid on initialization', function () {
+          expect(ngModel.$error).toEqual({ required: true });
+          expect(this.$scope.$emit).not.toHaveBeenCalled();
+        });
+
+        describe('when clicking not the last radio', function () {
+          beforeEach(function () {
+            this.element.field(0).click().trigger('click');
+          });
+          it('should set the validity because the clicked radio becomes dirty', function () {
+            expect(this.$scope.$emit).toHaveBeenCalled();
+          });
+        });
       });
 
       describe('and the user changes the field thereafter', function () {

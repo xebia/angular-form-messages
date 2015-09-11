@@ -64,9 +64,12 @@ angular.module('angularFormMessages').directive('afField', function (
       // Update validation on change / blur
       if (triggerOn === 'change') {
         // This also triggers custom directives which may not be able to listen to events
-        var ngModelPath = formName + '["' + modelName + '"]';
-        $scope.$watch('[' + ngModelPath + '.$error, ' + ngModelPath + '.$dirty]', function (newVal, oldVal) {
-          if ((newVal[0] !== oldVal[0]) || newVal[1]) {
+        $scope.$watch(function () {
+          // We cannot check $scope.formName.fieldName because that always refers to the lastest ngModelCtrl for the bound model
+          // @see https://github.com/angular/angular.js/issues/7647
+          return [ngModel.$error, ngModel.$dirty];
+        }, function (newVal) {
+          if (newVal[1]) {
             updateValidation();
           }
         }, true);
