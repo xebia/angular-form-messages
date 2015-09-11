@@ -40,9 +40,6 @@
  * ```
  * {
  *   validation: {
- *     $messages: [{
- *       message: 'This is general message', type: 'ERROR'
- *     }],
  *     formName: {
  *       $messages: [{
  *         message: 'This is general form message', type: 'ERROR'
