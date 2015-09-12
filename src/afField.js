@@ -61,6 +61,17 @@ angular.module('angularFormMessages').directive('afField', function (
         });
       }
 
+      function revalidate() {
+        clearMessages();
+        // Workaround to trigger the validation pipeline of Angular 1.2
+        if (ngModel.$validate) {
+          ngModel.$validate();
+        } else {
+          ngModel.$setViewValue(ngModel.$viewValue);
+        }
+        updateValidation();
+      }
+
       // Update validation on change / blur
       if (triggerOn === 'change') {
         // This also triggers custom directives which may not be able to listen to events
@@ -90,22 +101,12 @@ angular.module('angularFormMessages').directive('afField', function (
       ngModel.$viewChangeListeners.push(function cleanValidationAfterSubmitChange() {
         if (isPristineAfterSubmit) {
           isPristineAfterSubmit = false;
-          clearMessages();
+          revalidate();
         }
       });
 
       // Broadcast validation info of the field before submitting
-      $scope.$on('validate', function () {
-        clearMessages();
-
-        // Workaround to trigger the validation pipeline of Angular 1.2
-        if (ngModel.$validate) {
-          ngModel.$validate();
-        } else {
-          ngModel.$setViewValue(ngModel.$viewValue);
-        }
-        updateValidation();
-      });
+      $scope.$on('validate', revalidate);
 
       // Set validity of this field after submitting
       $scope.$on('setValidity', function setValidity(event, messageId, messages) {

@@ -18,7 +18,7 @@ describe('afField', function () {
     ngModel = element.field().controller('ngModel');
     afField = element.field().controller('afField');
     spyOn(this.$scope, '$emit').and.callThrough();
-    spyOn(ngModel, '$validate');
+    spyOn(ngModel, '$validate').and.callThrough();
   }
 
   function compileWithSubform() {
@@ -320,13 +320,14 @@ describe('afField', function () {
       describe('and the user changes the field thereafter', function () {
         beforeEach(function () {
           ngModel.$setValidity.calls.reset();
-          this.element.field().val('other@address').trigger('input');
+          this.element.field().val('noemail').trigger('input');
         });
 
-        it('should clear validation errors and do not a revalidation', function () {
-          expect(ngModel.$setValidity).not.toHaveBeenCalledWith('User name server side error', false);
+        it('should clear validation errors and do a revalidation', function () {
           expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', true);
           expect(ngModel.$setValidity).toHaveBeenCalledWith('Warning message', true);
+          expect(ngModel.$setValidity).toHaveBeenCalledWith('email', true);
+          expect(ngModel.$error).toEqual({ email: true });
         });
       });
 
