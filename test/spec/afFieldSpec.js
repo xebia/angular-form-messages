@@ -41,6 +41,18 @@ describe('afField', function () {
     spyOn(this.$scope, '$emit').and.callThrough();
   }
 
+  function compileError(value) {
+    createScope({ user: { email: value } });
+    addSelectors(compileHtml(
+      '<form name="userForm" af-submit>' +
+      '<input type="email" af-field name="user.email" ng-model="user.email" af-trigger="triggerValue" ng-required="triggerValue" />' +
+      '</form>'), {
+      field: '[af-field]'
+    });
+
+    spyOn(this.$scope, '$emit').and.callThrough();
+  }
+
   function compileRadio() {
     createScope({ user: {} });
     spyOn(this.$scope, '$emit').and.callThrough();
@@ -103,19 +115,11 @@ describe('afField', function () {
 
     describe('when the field is invalid', function () {
       beforeEach(function () {
-        createScope({ user: {} });
-        addSelectors(compileHtml(
-          '<form name="userForm" af-submit>' +
-          '<input type="email" af-field name="user.email" ng-model="user.email" required />' +
-          '</form>'), {
-          field: '[af-field]'
-        });
-
-        spyOn(this.$scope, '$emit').and.callThrough();
+        compileError.call(this, 'noEmail');
       });
 
       it('should emit no validation information', function () {
-        expect(this.element.field().controller('ngModel').$error).toEqual({ required: true });
+        expect(this.element.field().controller('ngModel').$error).toEqual({ email: true });
         expect(this.$scope.$emit).not.toHaveBeenCalled();
       });
     });
@@ -238,13 +242,13 @@ describe('afField', function () {
 
   describe('when the trigger value changes', function () {
     beforeEach(function () {
-      compile.call(this);
-      this.$scope.triggerValue = 'changed';
-      this.$scope.$digest();
+      compileError.call(this);
     });
 
     it('should validate the field', function () {
-      expectValidEvent.call(this);
+      this.$scope.triggerValue = 'changed';
+      this.$scope.$digest();
+      expectRequiredErrorEvent.call(this);
     });
   });
 

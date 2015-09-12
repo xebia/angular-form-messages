@@ -27,6 +27,7 @@ angular.module('angularFormMessages').directive('afField', function (
       this.setInfoDetails = setMessageDetails(MESSAGE_TYPES[1]);
       this.setSuccessDetails = setMessageDetails(MESSAGE_TYPES[0]);
     },
+    priority: 100, // Must run after ngRequired
     link: function linkFn($scope, elem, attrs, ctrls) {
       var
         ngModel = ctrls[0],
