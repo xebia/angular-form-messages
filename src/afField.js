@@ -69,7 +69,7 @@ angular.module('angularFormMessages').directive('afField', function (
           // @see https://github.com/angular/angular.js/issues/7647
           return [ngModel.$error, ngModel.$dirty];
         }, function (newVal) {
-          if (newVal[1]) {
+          if (newVal[1] || isPristineAfterSubmit) {
             updateValidation();
           }
         }, true);

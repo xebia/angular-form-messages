@@ -99,6 +99,49 @@ describe('afField', function () {
     expectRequiredErrorEvent = _.partial(expectEvent, [{ message: 'required', type: MESSAGE_TYPES[3] }]);
   });
 
+  describe('on initialization', function () {
+
+    describe('when the field is invalid', function () {
+      beforeEach(function () {
+        createScope({ user: {} });
+        addSelectors(compileHtml(
+          '<form name="userForm" af-submit>' +
+          '<input type="email" af-field name="user.email" ng-model="user.email" required />' +
+          '</form>'), {
+          field: '[af-field]'
+        });
+
+        spyOn(this.$scope, '$emit').and.callThrough();
+      });
+
+      it('should emit no validation information', function () {
+        expect(this.element.field().controller('ngModel').$error).toEqual({ required: true });
+        expect(this.$scope.$emit).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when there are multiple afFields with the same ngModel and each of them with another scope', function () {
+      beforeEach(function () {
+        compileRadio.call(this);
+      });
+
+      it('should emit no validation information ', function () {
+        expect(ngModel.$error).toEqual({ required: true });
+        expect(this.$scope.$emit).not.toHaveBeenCalled();
+      });
+
+      describe('when clicking not the last radio', function () {
+        beforeEach(function () {
+          this.element.field(0).click().trigger('click');
+        });
+
+        it('should set the validity because the clicked radio becomes dirty', function () {
+          expect(this.$scope.$emit).toHaveBeenCalled();
+        });
+      });
+    });
+  });
+
   describe('when the field should be validated on change', function () {
     beforeEach(function () {
       compile.call(this, 'change');
@@ -255,10 +298,12 @@ describe('afField', function () {
     });
 
     describe('when it is addressed to this field', function () {
+
       beforeEach(function () {
+        this.messages = [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning message', type: MESSAGE_TYPES[2] }];
         spyOn(afField, 'setMessageDetails').and.callThrough();
-        // set isPristineAfterSubmit to true
-        this.$scope.$broadcast('setValidity', 'userForm.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
+        // set isPristineAfterSubmit to true so that messages are cleared on next view change
+        this.$scope.$broadcast('setValidity', 'userForm.user.email', this.messages);
       });
 
       it('should set the validity and message type for the field', function () {
@@ -266,24 +311,10 @@ describe('afField', function () {
         expect(afField.setMessageDetails).toHaveBeenCalledWith('User name server side error', MESSAGE_TYPES[3]);
       });
 
-      describe('and there are multiple afFields with the same ngModel and each of them with another scope', function () {
-        beforeEach(function () {
-          compileRadio.call(this);
-        });
-
-        it('should not mark the fields invalid on initialization', function () {
-          expect(ngModel.$error).toEqual({ required: true });
-          expect(this.$scope.$emit).not.toHaveBeenCalled();
-        });
-
-        describe('when clicking not the last radio', function () {
-          beforeEach(function () {
-            this.element.field(0).click().trigger('click');
-          });
-          it('should set the validity because the clicked radio becomes dirty', function () {
-            expect(this.$scope.$emit).toHaveBeenCalled();
-          });
-        });
+      it('should emit the validation information despite the field is not dirty', function () {
+        this.$scope.$digest();
+        expect(ngModel.$dirty).toBe(false);
+        expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', this.messages);
       });
 
       describe('and the user changes the field thereafter', function () {
@@ -295,7 +326,7 @@ describe('afField', function () {
         it('should clear validation errors and do not a revalidation', function () {
           expect(ngModel.$setValidity).not.toHaveBeenCalledWith('User name server side error', false);
           expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', true);
-          expect(ngModel.$setValidity).toHaveBeenCalledWith('Warning', true);
+          expect(ngModel.$setValidity).toHaveBeenCalledWith('Warning message', true);
         });
       });
 
