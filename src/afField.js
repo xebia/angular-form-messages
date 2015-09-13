@@ -73,19 +73,18 @@ angular.module('angularFormMessages').directive('afField', function (
         updateValidation();
       }
 
-      // Update validation on change / blur
-      if (triggerOn === 'change') {
-        // This also triggers custom directives which may not be able to listen to events
-        $scope.$watch(function () {
-          // We cannot check $scope.formName.fieldName because that always refers to the lastest ngModelCtrl for the bound model
-          // @see https://github.com/angular/angular.js/issues/7647
-          return [ngModel.$error, ngModel.$dirty];
-        }, function (newVal) {
-          if (newVal[1] || isPristineAfterSubmit) {
-            updateValidation();
-          }
-        }, true);
-      } else if (triggerOn === 'blur') {
+      $scope.$watch(function () {
+        // We cannot check $scope.formName.fieldName because that always refers to the lastest ngModelCtrl for the bound model
+        // @see https://github.com/angular/angular.js/issues/7647
+        return [ngModel.$error, ngModel.$dirty];
+      }, function (newVal) {
+        // Update validation when this comes from the submit callback or when the trigger is 'change' and the field becomes dirty
+        if (isPristineAfterSubmit || (triggerOn === 'change' && newVal[1])) {
+          updateValidation();
+        }
+      }, true);
+
+      if (triggerOn === 'blur') {
         elem.on('blur', function () {
           $scope.$apply(updateValidation);
         });

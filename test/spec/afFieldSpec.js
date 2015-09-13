@@ -303,6 +303,13 @@ describe('afField', function () {
 
     describe('when it is addressed to this field', function () {
 
+      function expectValidation() {
+        this.$scope.$broadcast('setValidity', 'userForm.user.email', this.messages);
+        this.$scope.$digest();
+        expect(ngModel.$dirty).toBe(false);
+        expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', this.messages);
+      }
+
       beforeEach(function () {
         this.messages = [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning message', type: MESSAGE_TYPES[2] }];
         spyOn(afField, 'setMessageDetails').and.callThrough();
@@ -316,9 +323,15 @@ describe('afField', function () {
       });
 
       it('should emit the validation information despite the field is not dirty', function () {
-        this.$scope.$digest();
-        expect(ngModel.$dirty).toBe(false);
-        expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', this.messages);
+        expectValidation.call(this);
+      });
+
+      it('should emit the validation information as well when the field is not triggered on change', function () {
+        compile.call(this, 'blur');
+        expectValidation.call(this);
+
+        compile.call(this, 'submit');
+        expectValidation.call(this);
       });
 
       describe('and the user changes the field thereafter', function () {
