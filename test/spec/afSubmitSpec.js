@@ -127,7 +127,7 @@ describe('afSubmit', function () {
 
     it('should request validation from all form elements', function () {
       this.element.submit();
-      expect($rootScope.$broadcast).toHaveBeenCalledWith('validate');
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('validate', 'userForm');
     });
 
     describe('when the form is client side valid', function () {
@@ -246,12 +246,28 @@ describe('afSubmit', function () {
     beforeEach(function () {
       form.$setValidity('someServerSideError', false);
       form.$setValidity('anotherError', false);
-      this.$scope.$broadcast('validate');
     });
 
-    it('should make the form valid', function () {
-      expect(form.$valid).toBe(true);
+    describe('and it is addressed to this form', function () {
+      beforeEach(function () {
+        this.$scope.$broadcast('validate', 'userForm');
+      });
+
+      it('should make the form valid', function () {
+        expect(form.$valid).toBe(true);
+      });
     });
+
+    describe('and it is not addressed to this form', function () {
+      beforeEach(function () {
+        this.$scope.$broadcast('validate', 'otherForm');
+      });
+
+      it('should do nothing', function () {
+        expect(form.$valid).toBe(false);
+      });
+    });
+
   });
 
   describe('when the form becomes dirty', function () {

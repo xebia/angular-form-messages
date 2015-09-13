@@ -259,39 +259,55 @@ describe('afField', function () {
       compile.call(this);
       spyOn(ngModel, '$setValidity').and.callThrough();
       ngModel.$error = { required: true, other: true };
-      this.$scope.$emit('validate');
     });
 
-    it('should clear all current validations for the field and for the parent form', function () {
-      expect(ngModel.$setValidity).toHaveBeenCalledWith('required', true);
-      expect(ngModel.$setValidity).toHaveBeenCalledWith('other', true);
-    });
-
-    it('should validate the field in Angular 1.3 and higher', function () {
-      expect(ngModel.$validate).toHaveBeenCalled();
-    });
-
-    describe('when we use Angular 1.2', function () {
+    describe('when it is addressed to this form', function () {
       beforeEach(function () {
-        // This method does not exist in 1.2
-        delete ngModel.$validate;
-        spyOn(ngModel, '$setViewValue');
-        this.$scope.$emit('validate');
+        this.$scope.$emit('validate', 'userForm');
       });
 
-      it('should validate the field in Angular 1.2', function () {
-        expect(ngModel.$setViewValue).toHaveBeenCalledWith(ngModel.$viewValue);
+      it('should clear all current validations for the field and for the parent form', function () {
+        expect(ngModel.$setValidity).toHaveBeenCalledWith('required', true);
+        expect(ngModel.$setValidity).toHaveBeenCalledWith('other', true);
+      });
+
+      it('should validate the field in Angular 1.3 and higher', function () {
+        expect(ngModel.$validate).toHaveBeenCalled();
+      });
+
+      describe('when we use Angular 1.2', function () {
+        beforeEach(function () {
+          // This method does not exist in 1.2
+          delete ngModel.$validate;
+          spyOn(ngModel, '$setViewValue');
+          this.$scope.$emit('validate', 'userForm');
+        });
+
+        it('should validate the field in Angular 1.2', function () {
+          expect(ngModel.$setViewValue).toHaveBeenCalledWith(ngModel.$viewValue);
+        });
+      });
+
+      it('should send validation "valid" to the ngSubmitController', function () {
+        expectValidEvent.call(this);
+      });
+
+      it('should send validation "invalid" to the ngSubmitController', function () {
+        // Make field invalid to trigger a second validation event via the model watch
+        makeFieldEmpty.call(this);
+        expectRequiredErrorEvent.call(this);
       });
     });
 
-    it('should send validation "valid" to the ngSubmitController', function () {
-      expectValidEvent.call(this);
-    });
+    describe('when it is not addressed to this form', function () {
+      beforeEach(function () {
+        this.$scope.$emit('validate', 'otherForm');
+      });
 
-    it('should send validation "invalid" to the ngSubmitController', function () {
-      // Make field invalid to trigger a second validation event via the model watch
-      makeFieldEmpty.call(this);
-      expectRequiredErrorEvent.call(this);
+      it('should do nothing', function () {
+        expect(ngModel.$setValidity).not.toHaveBeenCalled();
+        expect(ngModel.$validate).not.toHaveBeenCalled();
+      });
     });
   });
 

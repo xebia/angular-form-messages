@@ -31,7 +31,7 @@ angular.module('angularFormMessages').directive('afSubmit', function (
         function doSubmit(event) {
           event.preventDefault();
 
-          $scope.$broadcast('validate');
+          $scope.$broadcast('validate', formName);
           $scope.$apply(function () {
 
             function processErrors(result) {
@@ -80,7 +80,11 @@ angular.module('angularFormMessages').directive('afSubmit', function (
             clearMessages();
           }
         });
-        $scope.$on('validate', clearMessages);
+        $scope.$on('validate', function (event, validateFormName) {
+          if (formName === validateFormName) {
+            clearMessages();
+          }
+        });
 
         // Set messages on the form
         $scope.$on('setValidity', function setValidity(event, messageId, messages) {

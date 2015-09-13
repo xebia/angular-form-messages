@@ -106,7 +106,11 @@ angular.module('angularFormMessages').directive('afField', function (
       });
 
       // Broadcast validation info of the field before submitting
-      $scope.$on('validate', revalidate);
+      $scope.$on('validate', function (event, validateFormName) {
+        if (formName === validateFormName) {
+          revalidate();
+        }
+      });
 
       // Set validity of this field after submitting
       $scope.$on('setValidity', function setValidity(event, messageId, messages) {
