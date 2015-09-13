@@ -25,12 +25,15 @@ describe('afSubmit', function () {
     submit;
 
   function compile(trigger, scrollToError, showSuccess) {
-    compileHtml('<form af-submit="submit()" name="userForm" ' +
+    addSelectors(compileHtml('<form af-submit="submit()" name="userForm" ' +
                 (trigger ? 'af-trigger-on="' + trigger + '"' : '') +
                 (scrollToError === undefined ? '' : 'af-scroll-to-error="' + scrollToError + '"') +
                 (showSuccess === undefined ? '' : 'af-show-success="' + showSuccess + '"') + '>' +
-                  '<input af-field name="first" ng-model="first"><input af-field name="user.name" ng-model="user.name">' +
-                '</form>', this.$scope);
+                  '<input af-field name="first" ng-model="first" required>' +
+                  '<input af-field name="user.name" ng-model="user.name" required>' +
+                '</form>', this.$scope), {
+      field: { repeater: '[af-field]' }
+    });
     submit = this.element.controller('afSubmit');
     form = this.element.controller('form');
   }
@@ -39,7 +42,6 @@ describe('afSubmit', function () {
     mox
       .module('angularFormMessages')
       .mockServices('AfMessageService')
-      .mockDirectives('afField')
       .setupResults(function () {
         return {
           AfMessageService: {
@@ -53,7 +55,9 @@ describe('afSubmit', function () {
     $timeout = mox.inject('$timeout');
 
     createScope({
-      submit: jasmine.createSpy('submit callback')
+      submit: jasmine.createSpy('submit callback'),
+      first: 'first',
+      user: { name: 'name' }
     });
     compile.call(this);
 
@@ -155,11 +159,7 @@ describe('afSubmit', function () {
           var nameField;
 
           beforeEach(function () {
-            form.$setDirty();
             this.element.submit();
-
-            nameField = this.element.find('[name="user.name"]');
-            nameField.controller('ngModel').$setValidity('required', false);
             this.$scope.$digest();
           });
 
@@ -167,6 +167,9 @@ describe('afSubmit', function () {
             expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm.address', []);
             expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm.user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }]);
             expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm', [{ message: 'Form error', type: MESSAGE_TYPES[2] }]);
+            expect(this.element.field(0).controller('ngModel').$error).toEqual({});
+            expect(this.element.field(1).controller('ngModel').$error).toEqual({ 'User name server side error': true});
+            expect(this.element.controller('form').$error).toEqual(jasmine.objectContaining({ 'Form error': [undefined] }));
           });
 
           it('should set $scope.isSubmitting to false', function () {
@@ -181,8 +184,8 @@ describe('afSubmit', function () {
             it('should autofocus the first field that contains a message', function () {
 
               $timeout.flush(1000);
-              expect(nameField).toBeFocused();
-              expect(this.element.find('[name="first"]')).not.toBeFocused();
+              expect(this.element.field(1)).toBeFocused();
+              expect(this.element.field(0)).not.toBeFocused();
             });
           });
 
@@ -193,7 +196,7 @@ describe('afSubmit', function () {
 
             it('should not autofocus', function () {
               $timeout.flush(1000);
-              expect(nameField).not.toBeFocused();
+              expect(this.element.field(1)).not.toBeFocused();
             });
           });
         });
@@ -218,7 +221,7 @@ describe('afSubmit', function () {
 
     describe('when the form is client side invalid', function () {
       beforeEach(function () {
-        form.$valid = false;
+        this.element.field(0).val('').trigger('input');
         this.element.submit();
       });
 
