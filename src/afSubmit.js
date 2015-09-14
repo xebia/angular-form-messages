@@ -80,10 +80,9 @@ angular.module('angularFormMessages').directive('afSubmit', function (
             clearMessages();
           }
         });
-        $scope.$on('validate', function (event, validateFormName) {
-          if (formName === validateFormName) {
-            clearMessages();
-          }
+
+        $scope.$on('validate', function () {
+          clearMessages();
         });
 
         // Set messages on the form
@@ -93,7 +92,6 @@ angular.module('angularFormMessages').directive('afSubmit', function (
             angular.forEach(messages, function (message) {
               formCtrl.$setValidity(message.message, false);
             });
-
             $scope.$emit('validation', '', messages);
           }
         });

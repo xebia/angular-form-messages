@@ -29,6 +29,7 @@ angular.module('angularFormMessages').directive('afField', ["$interpolate", "MES
       this.setInfoDetails = setMessageDetails(MESSAGE_TYPES[1]);
       this.setSuccessDetails = setMessageDetails(MESSAGE_TYPES[0]);
     },
+    priority: 100, // Must run after ngRequired
     link: function linkFn($scope, elem, attrs, ctrls) {
       var
         ngModel = ctrls[0],
@@ -63,19 +64,29 @@ angular.module('angularFormMessages').directive('afField', ["$interpolate", "MES
         });
       }
 
-      // Update validation on change / blur
-      if (triggerOn === 'change') {
-        // This also triggers custom directives which may not be able to listen to events
-        $scope.$watch(function () {
-          // We cannot check $scope.formName.fieldName because that always refers to the lastest ngModelCtrl for the bound model
-          // @see https://github.com/angular/angular.js/issues/7647
-          return [ngModel.$error, ngModel.$dirty];
-        }, function (newVal) {
-          if (newVal[1] || isPristineAfterSubmit) {
-            updateValidation();
-          }
-        }, true);
-      } else if (triggerOn === 'blur') {
+      function revalidate() {
+        clearMessages();
+        // Workaround to trigger the validation pipeline of Angular 1.2
+        if (ngModel.$validate) {
+          ngModel.$validate();
+        } else {
+          ngModel.$setViewValue(ngModel.$viewValue);
+        }
+        updateValidation();
+      }
+
+      $scope.$watch(function () {
+        // We cannot check $scope.formName.fieldName because that always refers to the lastest ngModelCtrl for the bound model
+        // @see https://github.com/angular/angular.js/issues/7647
+        return [ngModel.$error, ngModel.$dirty];
+      }, function (newVal) {
+        // Update validation when this comes from the submit callback or when the trigger is 'change' and the field becomes dirty
+        if (isPristineAfterSubmit || (triggerOn === 'change' && newVal[1])) {
+          updateValidation();
+        }
+      }, true);
+
+      if (triggerOn === 'blur') {
         elem.on('blur', function () {
           $scope.$apply(updateValidation);
         });
@@ -92,21 +103,13 @@ angular.module('angularFormMessages').directive('afField', ["$interpolate", "MES
       ngModel.$viewChangeListeners.push(function cleanValidationAfterSubmitChange() {
         if (isPristineAfterSubmit) {
           isPristineAfterSubmit = false;
-          clearMessages();
+          revalidate();
         }
       });
 
       // Broadcast validation info of the field before submitting
       $scope.$on('validate', function () {
-        clearMessages();
-
-        // Workaround to trigger the validation pipeline of Angular 1.2
-        if (ngModel.$validate) {
-          ngModel.$validate();
-        } else {
-          ngModel.$setViewValue(ngModel.$viewValue);
-        }
-        updateValidation();
+        revalidate();
       });
 
       // Set validity of this field after submitting
@@ -324,7 +327,7 @@ angular.module('angularFormMessages').directive('afSubmit', ["$interpolate", "$r
         function doSubmit(event) {
           event.preventDefault();
 
-          $scope.$broadcast('validate');
+          $scope.$broadcast('validate', formName);
           $scope.$apply(function () {
 
             function processErrors(result) {
@@ -373,7 +376,10 @@ angular.module('angularFormMessages').directive('afSubmit', ["$interpolate", "$r
             clearMessages();
           }
         });
-        $scope.$on('validate', clearMessages);
+
+        $scope.$on('validate', function () {
+          clearMessages();
+        });
 
         // Set messages on the form
         $scope.$on('setValidity', function setValidity(event, messageId, messages) {
@@ -382,7 +388,6 @@ angular.module('angularFormMessages').directive('afSubmit', ["$interpolate", "$r
             angular.forEach(messages, function (message) {
               formCtrl.$setValidity(message.message, false);
             });
-
             $scope.$emit('validation', '', messages);
           }
         });

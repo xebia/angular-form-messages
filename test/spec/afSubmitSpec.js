@@ -156,8 +156,6 @@ describe('afSubmit', function () {
 
         describe('which rejects', function () {
 
-          var nameField;
-
           beforeEach(function () {
             this.element.submit();
             this.$scope.$digest();
@@ -168,7 +166,7 @@ describe('afSubmit', function () {
             expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm.user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }]);
             expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm', [{ message: 'Form error', type: MESSAGE_TYPES[2] }]);
             expect(this.element.field(0).controller('ngModel').$error).toEqual({});
-            expect(this.element.field(1).controller('ngModel').$error).toEqual({ 'User name server side error': true});
+            expect(this.element.field(1).controller('ngModel').$error).toEqual({ 'User name server side error': true });
             expect(this.element.controller('form').$error).toEqual(jasmine.objectContaining({ 'Form error': [undefined] }));
           });
 
@@ -260,6 +258,7 @@ describe('afSubmit', function () {
 
     describe('and it is not addressed to this form', function () {
       beforeEach(function () {
+        pending();
         this.$scope.$broadcast('validate', 'otherForm');
       });
 

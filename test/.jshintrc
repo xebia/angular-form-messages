@@ -14,6 +14,7 @@
     "getMockData": false,
     "inject": false,
     "mox": false,
+    "pending": false,
     "promise": false,
     "reject": false,
     "unresolvedPromise": false

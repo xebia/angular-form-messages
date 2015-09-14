@@ -301,6 +301,7 @@ describe('afField', function () {
 
     describe('when it is not addressed to this form', function () {
       beforeEach(function () {
+        pending();
         this.$scope.$emit('validate', 'otherForm');
       });
 
