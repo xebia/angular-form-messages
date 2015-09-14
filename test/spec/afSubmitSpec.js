@@ -219,8 +219,13 @@ describe('afSubmit', function () {
 
     describe('when the form is client side invalid', function () {
       beforeEach(function () {
-        this.element.field(0).val('').trigger('input');
+        this.element.field(1).val('').trigger('input');
         this.element.submit();
+      });
+
+      it('should autofocus the first field that contains a message', function () {
+        expect(this.element.field(1)).toBeFocused();
+        expect(this.element.field(0)).not.toBeFocused();
       });
 
       it('should stop further processing', function () {

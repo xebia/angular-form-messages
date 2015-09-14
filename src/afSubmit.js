@@ -33,6 +33,12 @@ angular.module('angularFormMessages').directive('afSubmit', function (
 
           $scope.$broadcast('validate', formName);
           $scope.$apply(function () {
+            function autoFocusFirstMessage() {
+              var firstMessageField = elem[0].querySelector('.ng-invalid[af-field]');
+              if (afSubmitCtrl.scrollToError && firstMessageField) {
+                firstMessageField.focus();
+              }
+            }
 
             function processErrors(result) {
               angular.forEach(result.validation, function (validations, validationFormName) {
@@ -43,15 +49,11 @@ angular.module('angularFormMessages').directive('afSubmit', function (
 
               formCtrl.$setPristine();
 
-              $timeout(function autoFocusFirstMessage() {
-                var firstMessageField = elem[0].querySelector('.ng-invalid[af-field]');
-                if (afSubmitCtrl.scrollToError && firstMessageField) {
-                  firstMessageField.focus();
-                }
-              });
+              $timeout(autoFocusFirstMessage);
             }
 
             if (!formCtrl.$valid) {
+              autoFocusFirstMessage();
               return;
             }
 
