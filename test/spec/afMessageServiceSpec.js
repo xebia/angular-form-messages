@@ -38,6 +38,15 @@ describe('AfMessageService', function () {
     });
   });
 
+  describe('fieldLabelPrefix', function () {
+    it('should return the configured fieldLabelPrefix value with a dot', function () {
+      expect(inj.AfMessageService.getFieldLabelPrefix()).toBeFalsy();
+
+      afMessageServiceProvider.setFieldLabelPrefix('prefix');
+      expect(inj.AfMessageService.getFieldLabelPrefix()).toBe('prefix.');
+    });
+  });
+
   describe('scrollToError', function () {
     it('should return the configured scrollToError value', function () {
       expect(inj.AfMessageService.scrollToError()).toBe(true);

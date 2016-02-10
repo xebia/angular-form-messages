@@ -6,11 +6,16 @@ angular.module('angularFormMessages')
     SHOW_MULTIPLE
   ) {
     var
+      fieldLabelPrefix,
       genericLabelPrefix,
       scrollToError = true,
       showMultiple = SHOW_MULTIPLE.ALL,
       showSuccess = false,
       triggerOn = 'change';
+
+    this.setFieldLabelPrefix = function (newValue) {
+      fieldLabelPrefix = newValue;
+    };
 
     this.setGenericLabelPrefix = function (newValue) {
       genericLabelPrefix = newValue;
@@ -88,6 +93,10 @@ angular.module('angularFormMessages')
 
         getGenericLabelPrefix: function () {
           return genericLabelPrefix ? genericLabelPrefix + '.' : '';
+        },
+
+        getFieldLabelPrefix: function () {
+          return fieldLabelPrefix ? fieldLabelPrefix + '.' : '';
         },
 
         scrollToError: function () {
