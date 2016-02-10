@@ -6,19 +6,19 @@ angular.module('angularFormMessages')
     SHOW_MULTIPLE
   ) {
     var
-      fieldLabelPrefix,
-      genericLabelPrefix,
+      fieldValidatorLabelPrefix,
+      validatorLabelPrefix,
       scrollToError = true,
       showMultiple = SHOW_MULTIPLE.ALL,
       showSuccess = false,
       triggerOn = 'change';
 
-    this.setFieldLabelPrefix = function (newValue) {
-      fieldLabelPrefix = newValue;
+    this.setFieldValidatorLabelPrefix = function (newValue) {
+      fieldValidatorLabelPrefix = newValue;
     };
 
-    this.setGenericLabelPrefix = function (newValue) {
-      genericLabelPrefix = newValue;
+    this.setValidatorLabelPrefix = function (newValue) {
+      validatorLabelPrefix = newValue;
     };
 
     this.setScrollToError = function (newValue) {
@@ -91,12 +91,12 @@ angular.module('angularFormMessages')
           });
         },
 
-        getGenericLabelPrefix: function () {
-          return genericLabelPrefix ? genericLabelPrefix + '.' : '';
+        getValidatorLabelPrefix: function () {
+          return validatorLabelPrefix ? validatorLabelPrefix + '.' : '';
         },
 
-        getFieldLabelPrefix: function () {
-          return fieldLabelPrefix ? fieldLabelPrefix + '.' : '';
+        getFieldValidatorLabelPrefix: function () {
+          return fieldValidatorLabelPrefix ? fieldValidatorLabelPrefix + '.' : '';
         },
 
         scrollToError: function () {

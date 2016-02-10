@@ -29,21 +29,21 @@ describe('AfMessageService', function () {
     };
   });
 
-  describe('genericLabelPrefix', function () {
-    it('should return the configured genericLabelPrefix value with a dot', function () {
-      expect(inj.AfMessageService.getGenericLabelPrefix()).toBeFalsy();
+  describe('validatorLabelPrefix', function () {
+    it('should return the configured validatorLabelPrefix value with a dot', function () {
+      expect(inj.AfMessageService.getValidatorLabelPrefix()).toBeFalsy();
 
-      afMessageServiceProvider.setGenericLabelPrefix('prefix');
-      expect(inj.AfMessageService.getGenericLabelPrefix()).toBe('prefix.');
+      afMessageServiceProvider.setValidatorLabelPrefix('prefix');
+      expect(inj.AfMessageService.getValidatorLabelPrefix()).toBe('prefix.');
     });
   });
 
-  describe('fieldLabelPrefix', function () {
-    it('should return the configured fieldLabelPrefix value with a dot', function () {
-      expect(inj.AfMessageService.getFieldLabelPrefix()).toBeFalsy();
+  describe('fieldValidatorLabelPrefix', function () {
+    it('should return the configured fieldValidatorLabelPrefix value with a dot', function () {
+      expect(inj.AfMessageService.getFieldValidatorLabelPrefix()).toBeFalsy();
 
-      afMessageServiceProvider.setFieldLabelPrefix('prefix');
-      expect(inj.AfMessageService.getFieldLabelPrefix()).toBe('prefix.');
+      afMessageServiceProvider.setFieldValidatorLabelPrefix('prefix');
+      expect(inj.AfMessageService.getFieldValidatorLabelPrefix()).toBe('prefix.');
     });
   });
 
