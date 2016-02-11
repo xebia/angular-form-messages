@@ -10,7 +10,7 @@
   "dependencies": {
   },
   "devDependencies": {
-    "angular-mocks": "1",
+    "angular-mocks": "1.4",
     "mox": "0.4",
     "jasmine-jquery": "~2.1.0",
     "lodash": "~3.8.0"
