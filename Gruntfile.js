@@ -10,14 +10,6 @@ module.exports = function (grunt) {
 
   //grunt.option('verbose', true);
   grunt.initConfig({
-    bump: {
-      options: {
-        files: ['package.json', 'bower.json'],
-        commitFiles: ['package.json', 'bower.json'],
-        commitMessage: 'Bump version to v%VERSION%',
-        push: false
-      }
-    },
     bwr: grunt.file.readJSON('bower.json'),
     clean: {
       dist: {
