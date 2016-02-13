@@ -3,9 +3,8 @@ module.exports = function (grunt) {
   require('load-grunt-tasks')(grunt);
   require('time-grunt')(grunt);
 
-  var appConfig = {
+  var paths = {
     src: 'src',
-    tmp: '.tmp',
     test: 'test',
     dist: 'dist'
   };
@@ -13,16 +12,14 @@ module.exports = function (grunt) {
   //grunt.option('verbose', true);
   grunt.initConfig({
     bwr: grunt.file.readJSON('bower.json'),
-    paths: appConfig,
 
-    // Watches files for changes and runs tasks based on the changed files
     watch: {
       bower: {
         files: ['bower.json'],
         tasks: ['wiredep']
       },
       js: {
-        files: ['<%= paths.src %>/{,*/}*.js'],
+        files: [paths.src + '/{,*/}*.js'],
         tasks: ['newer:jshint:all']
       },
       jsTest: {
@@ -33,12 +30,11 @@ module.exports = function (grunt) {
         files: ['Gruntfile.js']
       },
       build: {
-        files: ['<%= paths.src %>/{,*/}*.js'],
+        files: [paths.src + '/{,*/}*.js'],
         tasks: ['default']
       }
     },
 
-    // Make sure code styles are up to par and there are no obvious mistakes
     jshint: {
       options: {
         jshintrc: '.jshintrc',
@@ -47,7 +43,7 @@ module.exports = function (grunt) {
       all: {
         src: [
           'Gruntfile.js',
-          '<%= paths.src %>/**/!(templateCache)*.js'
+          paths.src + '/**/!(templateCache)*.js'
         ]
       },
       test: {
@@ -64,7 +60,7 @@ module.exports = function (grunt) {
       },
       all: {
         files: {
-          src: ['<%= paths.src %>/**/!(templateCache)*.js']
+          src: [paths.src + '/**/!(templateCache)*.js']
         }
       },
       test: {
@@ -81,7 +77,7 @@ module.exports = function (grunt) {
       all: {
         src: [
           'Gruntfile.js',
-          '<%= paths.src %>/{,**/}*.js'
+          paths.src + '/{,**/}*.js'
         ]
       },
       test: {
@@ -92,7 +88,7 @@ module.exports = function (grunt) {
     },
 
     jsonlint: {
-      src: '<%= paths.test %>/mock/**/*.json'
+      src: paths.test + '/mock/**/*.json'
     },
 
     coverage: {
@@ -123,7 +119,7 @@ module.exports = function (grunt) {
           {
             dot: true,
             src: [
-              '<%= paths.dist %>/**/*'
+              paths.dist + '/**/*'
             ]
           }
         ]
@@ -156,7 +152,7 @@ module.exports = function (grunt) {
       },
       bootstrap: {
         src: 'templates/bootstrap/*.html',
-        dest: '<%= paths.src %>/bootstrap/templateCache.js'
+        dest: paths.src + '/bootstrap/templateCache.js'
       }
     },
 
@@ -166,17 +162,17 @@ module.exports = function (grunt) {
       },
       dist: {
         src: [
-          '<%= paths.src %>/afModule.js',
-          '<%= paths.src %>/*.js'
+          paths.src + '/afModule.js',
+          paths.src + '/*.js'
         ],
-        dest: '<%= paths.dist %>/<%= bwr.name %>.js'
+        dest: paths.dist + '/<%= bwr.name %>.js'
       },
       bootstrap: {
         src: [
-          '<%= paths.src %>/bootstrap/afModule.js',
-          '<%= paths.src %>/bootstrap/*.js'
+          paths.src + '/bootstrap/afModule.js',
+          paths.src + '/bootstrap/*.js'
         ],
-        dest: '<%= paths.dist %>/<%= bwr.name %>-bootstrap.js'
+        dest: paths.dist + '/<%= bwr.name %>-bootstrap.js'
       }
     },
 
