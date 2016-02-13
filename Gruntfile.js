@@ -102,9 +102,6 @@ module.exports = function (grunt) {
         src: ['*.js', paths.test + '/{,!(spec)}/*.js']
       }
     },
-    jsonlint: {
-      src: paths.test + '/mock/**/*.json'
-    },
     karma: {
       unit: {
         configFile: paths.test + '/karma.conf.js',
@@ -157,7 +154,6 @@ module.exports = function (grunt) {
   grunt.registerTask('default', [
     'jshint',
     'jscs',
-    'jsonlint',
     'test',
     'build'
   ]);
