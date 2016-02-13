@@ -17,7 +17,7 @@ module.exports = function (config) {
       'src/**/*.js',
       'templates/**/*.html',
       'test/mock/*.js',
-      'test/mock/html/**/*.html',
+      //'test/mock/html/**/*.html',
       'test/spec/**/*.js'
     ],
     exclude: [
