@@ -11,11 +11,7 @@ module.exports = function (config) {
     exclude: karmaFiles.exclude,
     preprocessors: {
       'src/**/*.js': ['coverage'],
-      'test/mock/html/**/*.html': 'ng-html2js',
       'templates/**/*.html': 'ng-html2js'
-    },
-    ngHtml2JsPreprocessor: {
-      stripPrefix: 'test/mock/html/'
     },
     reporters: ['progress', 'coverage'],
     port: 8080,

@@ -9,6 +9,12 @@ module.exports = function () {
       'templates/**/*.html': function (file) {
         return require('wallaby-ng-html2js-preprocessor').transform(file);
       }
+    },
+    env: {
+      runner: require('phantomjs2-ext').path,
+      params: {
+        runner: '--web-security=false'
+      }
     }
   };
 };
