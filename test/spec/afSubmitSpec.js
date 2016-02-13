@@ -20,22 +20,23 @@ describe('afSubmit', function () {
         }
       }
     },
+    element,
     form,
     MESSAGE_TYPES,
     submit;
 
   function compile(trigger, scrollToError, showSuccess) {
-    addSelectors(compileHtml('<form af-submit="submit()" name="userForm" ' +
+    element = addSelectors(compileHtml('<form af-submit="submit()" name="userForm" ' +
                 (trigger ? 'af-trigger-on="' + trigger + '"' : '') +
                 (scrollToError === undefined ? '' : 'af-scroll-to-error="' + scrollToError + '"') +
                 (showSuccess === undefined ? '' : 'af-show-success="' + showSuccess + '"') + '>' +
                   '<input af-field name="first" ng-model="first" required>' +
                   '<input af-field name="user.name" ng-model="user.name" required>' +
-                '</form>', this.$scope), {
+                '</form>'), {
       field: { repeater: '[af-field]' }
     });
-    submit = this.element.controller('afSubmit');
-    form = this.element.controller('form');
+    submit = element.controller('afSubmit');
+    form = element.controller('form');
   }
 
   beforeEach(function () {
@@ -59,7 +60,7 @@ describe('afSubmit', function () {
       first: 'first',
       user: { name: 'name' }
     });
-    compile.call(this);
+    compile();
 
     MESSAGE_TYPES = mox.inject('MESSAGE_TYPES');
     this.$scope.submit.and.returnValue(reject(callbackResult));
@@ -69,11 +70,11 @@ describe('afSubmit', function () {
 
     describe('the trigger setting', function () {
       it('should be saved in the controller without a default value', function () {
-        expect(this.element.controller('afSubmit').triggerOn).toBeUndefined();
+        expect(element.controller('afSubmit').triggerOn).toBeUndefined();
       });
 
       it('should be saved in the controller with value from the af-trigger-on attribute', function () {
-        compile.call(this, 'blur');
+        compile('blur');
         expect(submit.triggerOn).toBe('blur');
       });
     });
@@ -83,15 +84,15 @@ describe('afSubmit', function () {
         expect(submit.scrollToError).toBe(true);
 
         mox.get.AfMessageService.scrollToError.and.returnValue(false);
-        compile.call(this);
+        compile();
         expect(submit.scrollToError).toBe(false);
       });
 
       it('should be saved in the controller with boolean value from the af-scroll-to-error attribute', function () {
-        compile.call(this, undefined, '\'truthy value as string\'');
+        compile(undefined, '\'truthy value as string\'');
         expect(submit.scrollToError).toBe(true);
 
-        compile.call(this, undefined, false);
+        compile(undefined, false);
         expect(submit.scrollToError).toBe(false);
       });
     });
@@ -101,15 +102,15 @@ describe('afSubmit', function () {
         expect(submit.showSuccess).toBe(false);
 
         mox.get.AfMessageService.showSuccess.and.returnValue('truthy value');
-        compile.call(this);
+        compile();
         expect(submit.showSuccess).toBe(true);
       });
 
       it('should be saved in the controller with boolean value from the af-show-success attribute', function () {
-        compile.call(this, undefined, undefined, '\'truthy value as string\'');
+        compile(undefined, undefined, '\'truthy value as string\'');
         expect(submit.showSuccess).toBe(true);
 
-        compile.call(this, undefined, undefined, false);
+        compile(undefined, undefined, false);
         expect(submit.showSuccess).toBe(false);
       });
     });
@@ -126,14 +127,14 @@ describe('afSubmit', function () {
     });
 
     it('should request validation from all form elements', function () {
-      this.element.submit();
+      element.submit();
       expect($rootScope.$broadcast).toHaveBeenCalledWith('validate', 'userForm');
     });
 
     describe('when the form is client side valid', function () {
 
       it('should call the submit callback', function () {
-        this.element.submit();
+        element.submit();
         expect(this.$scope.submit).toHaveBeenCalled();
       });
 
@@ -142,14 +143,14 @@ describe('afSubmit', function () {
         describe('which does not resolve', function () {
           it('should set $scope.isSubmitting to true', function () {
             this.$scope.submit.and.returnValue(unresolvedPromise());
-            this.element.submit();
+            element.submit();
             expect(this.$scope.isSubmitting).toBe(true);
           });
         });
 
         describe('which resolves', function () {
           it('should set $scope.isSubmitting to false', function () {
-            this.element.submit();
+            element.submit();
             expect(this.$scope.isSubmitting).toBe(false);
           });
         });
@@ -157,7 +158,7 @@ describe('afSubmit', function () {
         describe('which rejects', function () {
 
           beforeEach(function () {
-            this.element.submit();
+            element.submit();
             this.$scope.$digest();
           });
 
@@ -165,9 +166,9 @@ describe('afSubmit', function () {
             expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm.address', []);
             expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm.user.name', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }]);
             expect($rootScope.$broadcast).toHaveBeenCalledWith('setValidity', 'userForm', [{ message: 'Form error', type: MESSAGE_TYPES[2] }]);
-            expect(this.element.field(0).controller('ngModel').$error).toEqual({});
-            expect(this.element.field(1).controller('ngModel').$error).toEqual({ 'User name server side error': true });
-            expect(this.element.controller('form').$error).toEqual(jasmine.objectContaining({ 'Form error': [undefined] }));
+            expect(element.field(0).controller('ngModel').$error).toEqual({});
+            expect(element.field(1).controller('ngModel').$error).toEqual({ 'User name server side error': true });
+            expect(element.controller('form').$error).toEqual(jasmine.objectContaining({ 'Form error': [undefined] }));
           });
 
           it('should set $scope.isSubmitting to false', function () {
@@ -182,8 +183,8 @@ describe('afSubmit', function () {
             it('should autofocus the first field that contains a message', function () {
 
               $timeout.flush(1000);
-              expect(this.element.field(1)).toBeFocused();
-              expect(this.element.field(0)).not.toBeFocused();
+              expect(element.field(1)).toBeFocused();
+              expect(element.field(0)).not.toBeFocused();
             });
           });
 
@@ -194,7 +195,7 @@ describe('afSubmit', function () {
 
             it('should not autofocus', function () {
               $timeout.flush(1000);
-              expect(this.element.field(1)).not.toBeFocused();
+              expect(element.field(1)).not.toBeFocused();
             });
           });
         });
@@ -204,7 +205,7 @@ describe('afSubmit', function () {
         beforeEach(function () {
           this.$scope.submit.and.returnValue(callbackResult);
           form.$setDirty();
-          this.element.submit();
+          element.submit();
         });
 
         it('does no further processing', function () {
@@ -219,13 +220,13 @@ describe('afSubmit', function () {
 
     describe('when the form is client side invalid', function () {
       beforeEach(function () {
-        this.element.field(1).val('').trigger('input');
-        this.element.submit();
+        element.field(1).val('').trigger('input');
+        element.submit();
       });
 
       it('should autofocus the first field that contains a message', function () {
-        expect(this.element.field(1)).toBeFocused();
-        expect(this.element.field(0)).not.toBeFocused();
+        expect(element.field(1)).toBeFocused();
+        expect(element.field(0)).not.toBeFocused();
       });
 
       it('should stop further processing', function () {
@@ -236,7 +237,7 @@ describe('afSubmit', function () {
     describe('when the form has only empty errors', function () {
       beforeEach(function () {
         form.$valid = true;
-        this.element.submit();
+        element.submit();
       });
 
       it('should continue further processing', function () {

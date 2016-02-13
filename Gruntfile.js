@@ -1,101 +1,56 @@
 module.exports = function (grunt) {
 
   require('load-grunt-tasks')(grunt);
-  require('time-grunt')(grunt);
 
-  var appConfig = {
-    src: require('./bower.json').appPath || 'src',
-    tmp: '.tmp',
-    test: 'test',
-    dist: 'dist'
-  };
+  var
+    _ = require('lodash'),
+    paths = {
+      src: 'src',
+      test: 'test',
+      dist: 'dist'
+    },
+    uglifyConf = {
+      expand: true,
+      cwd: paths.dist, // 'dist' when using concat, else 'src/'
+      dest: paths.dist,
+      ext: '.min.js'
+    };
 
-  grunt.loadNpmTasks('grunt-mutation-testing');
   //grunt.option('verbose', true);
   grunt.initConfig({
     bwr: grunt.file.readJSON('bower.json'),
-    paths: appConfig,
-
-    // Watches files for changes and runs tasks based on the changed files
-    watch: {
-      bower: {
-        files: ['bower.json'],
-        tasks: ['wiredep']
-      },
-      js: {
-        files: ['<%= paths.src %>/{,*/}*.js'],
-        tasks: ['newer:jshint:all']
-      },
-      jsTest: {
-        files: ['test/spec/{,*/}*.js'],
-        tasks: ['newer:jshint:test', 'karma']
-      },
-      gruntfile: {
-        files: ['Gruntfile.js']
-      },
-      build: {
-        files: ['<%= paths.src %>/{,*/}*.js'],
-        tasks: ['default']
-      }
-    },
-
-    // Make sure code styles are up to par and there are no obvious mistakes
-    jshint: {
-      options: {
-        jshintrc: '.jshintrc',
-        reporter: require('jshint-stylish')
-      },
-      all: {
-        src: [
-          'Gruntfile.js',
-          '<%= paths.src %>/**/!(templateCache)*.js'
+    clean: {
+      dist: {
+        files: [
+          {
+            dot: true,
+            src: [
+              paths.dist + '/**/*'
+            ]
+          }
         ]
       },
-      test: {
-        options: {
-          jshintrc: 'test/.jshintrc'
-        },
-        src: ['test/spec/{,*/}*.js']
-      }
+      coverage: 'test/coverage'
     },
-
-    jscs: {
+    concat: {
       options: {
-        config: './.jscsrc'
+        sourceMap: true
       },
-      all: {
-        files: {
-          src: ['<%= paths.src %>/**/!(templateCache)*.js']
-        }
+      dist: {
+        src: [
+          paths.src + '/afModule.js',
+          paths.src + '/*.js'
+        ],
+        dest: paths.dist + '/<%= bwr.name %>.js'
       },
-      test: {
-        src: ['test/spec/{,**/}*.js']
+      bootstrap: {
+        src: [
+          paths.src + '/bootstrap/afModule.js',
+          paths.src + '/bootstrap/*.js'
+        ],
+        dest: paths.dist + '/<%= bwr.name %>-bootstrap.js'
       }
     },
-
-    lintspaces: {
-      options: {
-        newline: true,
-        newlineMaximum: 2,
-        trailingspaces: true
-      },
-      all: {
-        src: [
-          'Gruntfile.js',
-          '<%= paths.src %>/{,**/}*.js'
-        ]
-      },
-      test: {
-        src: [
-          'test/{,**/}*.js'
-        ]
-      }
-    },
-
-    jsonlint: {
-      src: '<%= paths.test %>/mock/**/*.json'
-    },
-
     coverage: {
       dist: {
         options: {
@@ -110,129 +65,89 @@ module.exports = function (grunt) {
         }
       }
     },
-
+    githooks: {
+      all: {
+        'pre-commit': 'default'
+      }
+    },
+    jscs: {
+      options: {
+        config: './.jscsrc'
+      },
+      src: {
+        src: paths.src + '/**/!(templateCache)*.js'
+      },
+      test: {
+        src: paths.test + '/spec/{,**/}*.js'
+      },
+      config: {
+        src: ['*.js', paths.test + '/{,!(spec)}/*.js']
+      }
+    },
+    jshint: {
+      options: {
+        jshintrc: '.jshintrc',
+        reporter: require('jshint-stylish')
+      },
+      src: {
+        src: paths.src + '/**/!(templateCache)*.js'
+      },
+      test: {
+        options: {
+          jshintrc: paths.test + '/.jshintrc'
+        },
+        src: paths.test + '/spec/{,*/}*.js'
+      },
+      config: {
+        src: ['*.js', paths.test + '/{,!(spec)}/*.js']
+      }
+    },
+    jsonlint: {
+      src: paths.test + '/mock/**/*.json'
+    },
     karma: {
       unit: {
-        configFile: 'test/karma.conf.js',
+        configFile: paths.test + '/karma.conf.js',
         singleRun: true
       }
     },
-
-    clean: {
+    ngAnnotate: {
       dist: {
-        files: [
-          {
-            dot: true,
-            src: [
-              '<%= paths.dist %>/**/*'
-            ]
-          }
-        ]
-      },
-      coverage: 'test/coverage'
-    },
-
-    wiredep: {
-      test: {
-        devDependencies: true,
-        src: '<%= karma.unit.configFile %>',
-        ignorePath: /\.\.\//,
-        fileTypes: {
-          js: {
-            block: /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
-            detect: {
-              js: /'(.*\.js)'/gi
-            },
-            replace: {
-              js: '\'{{filePath}}\','
-            }
-          }
+        files: {
+          'dist/<%= bwr.name %>.js': paths.dist + '/<%= bwr.name %>.js',
+          'dist/<%= bwr.name %>-bootstrap.js': paths.dist + '/<%= bwr.name %>-bootstrap.js'
         }
       }
     },
-
     ngtemplates: {
       options: {
         module: 'angularFormMessages'
       },
       bootstrap: {
         src: 'templates/bootstrap/*.html',
-        dest: '<%= paths.src %>/bootstrap/templateCache.js'
+        dest: paths.src + '/bootstrap/templateCache.js'
       }
     },
-
-    concat: {
+    uglify: {
       options: {
         sourceMap: true
       },
-      dist: {
-        src: [
-          '<%= paths.src %>/afModule.js',
-          '<%= paths.src %>/*.js'
-        ],
-        dest: '<%= paths.dist %>/<%= bwr.name %>.js'
-      },
-      bootstrap: {
-        src: [
-          '<%= paths.src %>/bootstrap/afModule.js',
-          '<%= paths.src %>/bootstrap/*.js'
-        ],
-        dest: '<%= paths.dist %>/<%= bwr.name %>-bootstrap.js'
-      }
-    },
-
-    uglify: {
-      dist: {
-        expand: true,
-        cwd: 'dist/', // 'dist' when using concat, else 'src/'
-        src: '<%= bwr.name %>.js',
-        dest: 'dist',
-        ext: '.min.js'
-      },
-      bootstrap: {
-        expand: true,
-        cwd: 'dist/', // 'dist' when using concat, else 'src/'
-        src: '<%= bwr.name %>-bootstrap.js',
-        dest: 'dist',
-        ext: '.min.js'
-      }
-    },
-
-    ngAnnotate: {
-      dist: {
-        files: {
-          'dist/<%= bwr.name %>.js': 'dist/<%= bwr.name %>.js',
-          'dist/<%= bwr.name %>-bootstrap.js': 'dist/<%= bwr.name %>-bootstrap.js'
-        }
-      }
-    },
-
-    githooks: {
-      all: {
-        'pre-commit': 'default'
-      }
-    },
-
-    bump: {
-      options: {
-        files: ['package.json', 'bower.json'],
-        commitFiles: ['package.json', 'bower.json'],
-        commitMessage: 'Bump version to v%VERSION%',
-        push: false
-      }
+      dist: _.extend({
+        src: '<%= bwr.name %>.js'
+      }, uglifyConf),
+      bootstrap: _.extend({
+        src: '<%= bwr.name %>-bootstrap.js'
+      }, uglifyConf)
     }
-
   });
 
   grunt.registerTask('test', [
-    'wiredep',
     'karma',
     'coverage'
   ]);
 
   grunt.registerTask('build', [
     'clean:dist',
-    'wiredep',
     'ngtemplates',
     'concat',
     'ngAnnotate',
@@ -242,7 +157,6 @@ module.exports = function (grunt) {
   grunt.registerTask('default', [
     'jshint',
     'jscs',
-    'lintspaces',
     'jsonlint',
     'test',
     'build'

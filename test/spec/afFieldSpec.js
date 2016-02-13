@@ -1,12 +1,22 @@
 describe('afField', function () {
+  var
+    $scope,
+    afField,
+    afSubmit,
+    element,
+    expectRequiredErrorEvent,
+    expectValidEvent,
+    MESSAGE_TYPES,
+    ngModel;
+
   function makeFieldEmpty() {
-    this.element.field().val('').trigger('input');
+    element.field().val('').trigger('input');
   }
 
   function compile(trigger, fieldTrigger) {
     // Due to a bug in Mox we need to create a new scope before we (re)compile a template, otherwise the scope is gone
-    createScope({ user: { email: 'email@address' } });
-    var element = addSelectors(compileHtml(
+    $scope = createScope({ user: { email: 'email@address' } });
+    element = addSelectors(compileHtml(
       '<form name="userForm" af-submit ' + (trigger ? 'af-trigger-on="' + trigger + '"' : '') + '>' +
         '<input type="email" af-field name="user.email" ng-model="user.email" af-trigger="triggerValue"' + (fieldTrigger ? 'af-trigger-on="' + fieldTrigger + '"' : '') + ' required />' +
       '</form>'), {
@@ -17,16 +27,16 @@ describe('afField', function () {
     afSubmit = element.controller('afSubmit');
     ngModel = element.field().controller('ngModel');
     afField = element.field().controller('afField');
-    spyOn(this.$scope, '$emit').and.callThrough();
+    spyOn($scope, '$emit').and.callThrough();
     spyOn(ngModel, '$validate').and.callThrough();
   }
 
   function compileWithSubform() {
-    createScope({ user: {
+    $scope = createScope({ user: {
       email: 'email@address',
       email2: undefined
     } });
-    addSelectors(compileHtml('<form name="userForm" af-submit>' +
+    element = addSelectors(compileHtml('<form name="userForm" af-submit>' +
         '<div ng-form name="subForm{{$index}}" ng-repeat="field in user">' +
           '<input type="email" af-field name="user.email" ng-model="field" />' +
         '</div>' +
@@ -38,25 +48,25 @@ describe('afField', function () {
         }
       }
     });
-    spyOn(this.$scope, '$emit').and.callThrough();
+    spyOn($scope, '$emit').and.callThrough();
   }
 
   function compileError(value) {
-    createScope({ user: { email: value } });
-    addSelectors(compileHtml(
+    $scope = createScope({ user: { email: value } });
+    element = addSelectors(compileHtml(
       '<form name="userForm" af-submit>' +
       '<input type="email" af-field name="user.email" ng-model="user.email" af-trigger="triggerValue" ng-required="triggerValue" />' +
       '</form>'), {
       field: '[af-field]'
     });
 
-    spyOn(this.$scope, '$emit').and.callThrough();
+    spyOn($scope, '$emit').and.callThrough();
   }
 
   function compileRadio() {
-    createScope({ user: {} });
-    spyOn(this.$scope, '$emit').and.callThrough();
-    var element = addSelectors(compileHtml(
+    $scope = createScope({ user: {} });
+    spyOn($scope, '$emit').and.callThrough();
+    element = addSelectors(compileHtml(
       '<form name="userForm" af-submit>' +
       '<input type="radio" id="{{gender}}" af-field name="user.gender" ng-model="user.gender" ng-value="gender" required ng-repeat="gender in [\'male\', \'female\']" />' +
       '</form>'), {
@@ -66,29 +76,21 @@ describe('afField', function () {
   }
 
   function expectMessage(type) {
-    this.$scope.$emit.calls.reset();
-    this.$scope.$digest();
-    expectEvent.call(this, [{ message: 'required', type: type }]);
+    $scope.$emit.calls.reset();
+    $scope.$digest();
+    expectEvent([{ message: 'required', type: type }]);
   }
 
   function expectEvent(messages) {
-    expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', messages);
+    expect($scope.$emit).toHaveBeenCalledWith('validation', 'user.email', messages);
   }
 
   /**
    * afSubmit is cleaning the messages on input, so we have to check for arguments
    */
   function expectNoValidEvent() {
-    expect(this.$scope.$emit).not.toHaveBeenCalledWith('validation',  'user.email', []);
+    expect($scope.$emit).not.toHaveBeenCalledWith('validation',  'user.email', []);
   }
-
-  var
-    afField,
-    afSubmit,
-    expectRequiredErrorEvent,
-    expectValidEvent,
-    MESSAGE_TYPES,
-    ngModel;
 
   beforeEach(function () {
     mox
@@ -115,32 +117,32 @@ describe('afField', function () {
 
     describe('when the field is invalid', function () {
       beforeEach(function () {
-        compileError.call(this, 'noEmail');
+        compileError('noEmail');
       });
 
       it('should emit no validation information', function () {
-        expect(this.element.field().controller('ngModel').$error).toEqual({ email: true });
-        expect(this.$scope.$emit).not.toHaveBeenCalled();
+        expect(element.field().controller('ngModel').$error).toEqual({ email: true });
+        expect($scope.$emit).not.toHaveBeenCalled();
       });
     });
 
     describe('when there are multiple afFields with the same ngModel and each of them with another scope', function () {
       beforeEach(function () {
-        compileRadio.call(this);
+        compileRadio();
       });
 
       it('should emit no validation information ', function () {
         expect(ngModel.$error).toEqual({ required: true });
-        expect(this.$scope.$emit).not.toHaveBeenCalled();
+        expect($scope.$emit).not.toHaveBeenCalled();
       });
 
       describe('when clicking not the last radio', function () {
         beforeEach(function () {
-          this.element.field(0).click().trigger('click');
+          element.field(0).click().trigger('click');
         });
 
         it('should set the validity because the clicked radio becomes dirty', function () {
-          expect(this.$scope.$emit).toHaveBeenCalled();
+          expect($scope.$emit).toHaveBeenCalled();
         });
       });
     });
@@ -148,65 +150,65 @@ describe('afField', function () {
 
   describe('when the field should be validated on change', function () {
     beforeEach(function () {
-      compile.call(this, 'change');
+      compile('change');
     });
 
     describe('and the user changes the field', function () {
       it('should validate the field as "valid" if it was initially valid', function () {
-        this.element.field().val('other@address').trigger('input');
-        expectValidEvent.call(this);
+        element.field().val('other@address').trigger('input');
+        expectValidEvent();
       });
 
       it('should validate the field and set the default (error) message if it was initially valid', function () {
-        makeFieldEmpty.call(this);
-        expectRequiredErrorEvent.call(this);
+        makeFieldEmpty();
+        expectRequiredErrorEvent();
       });
 
       it('should validate the field and set the default (error) message if it was initially invalid', function () {
-        this.element.field().val('email-invalid').trigger('input');
-        makeFieldEmpty.call(this);
-        expectRequiredErrorEvent.call(this);
+        element.field().val('email-invalid').trigger('input');
+        makeFieldEmpty();
+        expectRequiredErrorEvent();
       });
 
       it('should not validate the field on blur', function () {
-        this.element.field().trigger('blur');
-        expectNoValidEvent.call(this);
+        element.field().trigger('blur');
+        expectNoValidEvent();
       });
     });
   });
 
   describe('when the field should be validated on blur', function () {
     beforeEach(function () {
-      compile.call(this, 'blur');
+      compile('blur');
     });
 
     describe('and the user changes the field without blurring', function () {
       it('should not validate the field', function () {
-        this.element.field().val('other@address').trigger('input');
-        expectNoValidEvent.call(this);
+        element.field().val('other@address').trigger('input');
+        expectNoValidEvent();
       });
     });
 
     describe('and the user blurs the field', function () {
       it('should validate the field', function () {
-        this.element.field().trigger('blur');
-        expectValidEvent.call(this);
+        element.field().trigger('blur');
+        expectValidEvent();
       });
     });
   });
 
   describe('when the field should be validated on submit', function () {
     beforeEach(function () {
-      compile.call(this, 'submit');
+      compile('submit');
     });
 
     describe('and the user changes and blurs the field', function () {
       beforeEach(function () {
-        this.element.field().val('other@address').trigger('input').trigger('blur');
+        element.field().val('other@address').trigger('input').trigger('blur');
       });
 
       it('should not validate the field', function () {
-        expectNoValidEvent.call(this);
+        expectNoValidEvent();
       });
     });
   });
@@ -215,40 +217,40 @@ describe('afField', function () {
     // in 1.2 the validators that become valid set the value of $error.key to true, while it is deleted in 1.3
     // Since this test runs in 1.3, we have to set the $error object manually
     beforeEach(function () {
-      compile.call(this);
+      compile();
       ngModel.$error.email = false;
       ngModel.$error.required = true;
 
       // Use the trigger value because that triggers the validation event without evaluating the ngModel
-      this.$scope.triggerValue = 'changed';
-      this.$scope.$digest();
+      $scope.triggerValue = 'changed';
+      $scope.$digest();
     });
 
     it('should only broadcast messages in the validation event for valid validators', function () {
-      expectRequiredErrorEvent.call(this);
+      expectRequiredErrorEvent();
     });
   });
 
   describe('when the field has a triggerOn attribute', function () {
     beforeEach(function () {
-      compile.call(this, 'change', 'blur');
+      compile('change', 'blur');
     });
 
     it('should override the triggerOn value of the afSubmit directive', function () {
-      this.element.field().trigger('blur');
-      expectValidEvent.call(this);
+      element.field().trigger('blur');
+      expectValidEvent();
     });
   });
 
   describe('when the trigger value changes', function () {
     beforeEach(function () {
-      compileError.call(this);
+      compileError();
     });
 
     it('should validate the field', function () {
-      this.$scope.triggerValue = 'changed';
-      this.$scope.$digest();
-      expectRequiredErrorEvent.call(this);
+      $scope.triggerValue = 'changed';
+      $scope.$digest();
+      expectRequiredErrorEvent();
     });
   });
 
@@ -256,14 +258,14 @@ describe('afField', function () {
 
     // These are the same expectations as the case where the trigger is change and the model changes
     beforeEach(function () {
-      compile.call(this);
+      compile();
       spyOn(ngModel, '$setValidity').and.callThrough();
       ngModel.$error = { required: true, other: true };
     });
 
     describe('when it is addressed to this form', function () {
       beforeEach(function () {
-        this.$scope.$emit('validate', 'userForm');
+        $scope.$emit('validate', 'userForm');
       });
 
       it('should clear all current validations for the field and for the parent form', function () {
@@ -280,7 +282,7 @@ describe('afField', function () {
           // This method does not exist in 1.2
           delete ngModel.$validate;
           spyOn(ngModel, '$setViewValue');
-          this.$scope.$emit('validate', 'userForm');
+          $scope.$emit('validate', 'userForm');
         });
 
         it('should validate the field in Angular 1.2', function () {
@@ -289,20 +291,20 @@ describe('afField', function () {
       });
 
       it('should send validation "valid" to the ngSubmitController', function () {
-        expectValidEvent.call(this);
+        expectValidEvent();
       });
 
       it('should send validation "invalid" to the ngSubmitController', function () {
         // Make field invalid to trigger a second validation event via the model watch
-        makeFieldEmpty.call(this);
-        expectRequiredErrorEvent.call(this);
+        makeFieldEmpty();
+        expectRequiredErrorEvent();
       });
     });
 
     describe('when it is not addressed to this form', function () {
       beforeEach(function () {
         pending();
-        this.$scope.$emit('validate', 'otherForm');
+        $scope.$emit('validate', 'otherForm');
       });
 
       it('should do nothing', function () {
@@ -314,24 +316,25 @@ describe('afField', function () {
 
   describe('when a setValidity event is received', function () {
     beforeEach(function () {
-      compile.call(this);
+      compile();
       spyOn(ngModel, '$setValidity').and.callThrough();
     });
 
     describe('when it is addressed to this field', function () {
+      var messages;
 
       function expectValidation() {
-        this.$scope.$broadcast('setValidity', 'userForm.user.email', this.messages);
-        this.$scope.$digest();
+        $scope.$broadcast('setValidity', 'userForm.user.email', messages);
+        $scope.$digest();
         expect(ngModel.$dirty).toBe(false);
-        expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', this.messages);
+        expect($scope.$emit).toHaveBeenCalledWith('validation', 'user.email', messages);
       }
 
       beforeEach(function () {
-        this.messages = [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning message', type: MESSAGE_TYPES[2] }];
+        messages = [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning message', type: MESSAGE_TYPES[2] }];
         spyOn(afField, 'setMessageDetails').and.callThrough();
         // set isPristineAfterSubmit to true so that messages are cleared on next view change
-        this.$scope.$broadcast('setValidity', 'userForm.user.email', this.messages);
+        $scope.$broadcast('setValidity', 'userForm.user.email', messages);
       });
 
       it('should set the validity and message type for the field', function () {
@@ -340,21 +343,21 @@ describe('afField', function () {
       });
 
       it('should emit the validation information despite the field is not dirty', function () {
-        expectValidation.call(this);
+        expectValidation();
       });
 
       it('should emit the validation information as well when the field is not triggered on change', function () {
-        compile.call(this, 'blur');
-        expectValidation.call(this);
+        compile('blur');
+        expectValidation();
 
-        compile.call(this, 'submit');
-        expectValidation.call(this);
+        compile('submit');
+        expectValidation();
       });
 
       describe('and the user changes the field thereafter', function () {
         beforeEach(function () {
           ngModel.$setValidity.calls.reset();
-          this.element.field().val('noemail').trigger('input');
+          element.field().val('noemail').trigger('input');
         });
 
         it('should clear validation errors and do a revalidation', function () {
@@ -367,17 +370,17 @@ describe('afField', function () {
 
       describe('when the field in a subform with dynamic name', function () {
         beforeEach(function () {
-          this.$scope.$emit.calls.reset();
-          compileWithSubform.call(this);
+          $scope.$emit.calls.reset();
+          compileWithSubform();
         });
 
         it('should also process validity if there is an afField in a (sub)form with this name', function () {
-          this.$scope.$broadcast('setValidity', 'subForm1.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
+          $scope.$broadcast('setValidity', 'subForm1.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
           expect(ngModel.$setValidity).toHaveBeenCalledWith('User name server side error', false);
 
           ngModel.$setValidity.calls.reset();
 
-          this.$scope.$broadcast('setValidity', 'subFormNotExisting.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
+          $scope.$broadcast('setValidity', 'subFormNotExisting.user.email', [{ message: 'User name server side error', type: MESSAGE_TYPES[3] }, { message: 'Warning', type: MESSAGE_TYPES[2] }]);
           expect(ngModel.$setValidity).not.toHaveBeenCalledWith('User name server side error', false);
         });
       });
@@ -385,7 +388,7 @@ describe('afField', function () {
 
     describe('when it is not addresses to this field', function () {
       beforeEach(function () {
-        this.$scope.$broadcast('setValidity', 'user.other', [{ message: 'Warning', type: MESSAGE_TYPES[3] }]);
+        $scope.$broadcast('setValidity', 'user.other', [{ message: 'Warning', type: MESSAGE_TYPES[3] }]);
       });
 
       it('does nothing', function () {
@@ -396,29 +399,29 @@ describe('afField', function () {
 
   describe('when extra validation info is set in afField.$messages', function () {
     beforeEach(function () {
-      compile.call(this);
+      compile();
     });
 
     it('should validate the field and set the default message with the type that has been set via afField methods', function () {
       afField.setErrorDetails('required');
-      makeFieldEmpty.call(this);
-      expect(this.$scope.$emit).toHaveBeenCalledWith('validation', 'user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }]);
+      makeFieldEmpty();
+      expect($scope.$emit).toHaveBeenCalledWith('validation', 'user.email', [{ message: 'required', type: MESSAGE_TYPES[3] }]);
 
       afField.setWarningDetails('required');
-      this.$scope.triggerValue = 'something-else';
-      expectMessage.call(this, MESSAGE_TYPES[2]);
+      $scope.triggerValue = 'something-else';
+      expectMessage(MESSAGE_TYPES[2]);
 
       afField.setInfoDetails('required');
-      this.$scope.triggerValue = 'another-value';
-      expectMessage.call(this, MESSAGE_TYPES[1]);
+      $scope.triggerValue = 'another-value';
+      expectMessage(MESSAGE_TYPES[1]);
 
       afField.setSuccessDetails('required');
-      this.$scope.triggerValue = 'trigger-again';
-      expectMessage.call(this, MESSAGE_TYPES[0]);
+      $scope.triggerValue = 'trigger-again';
+      expectMessage(MESSAGE_TYPES[0]);
 
       afField.setMessageDetails('required', MESSAGE_TYPES[3]);
-      this.$scope.triggerValue = 'trigger';
-      expectMessage.call(this, MESSAGE_TYPES[3]);
+      $scope.triggerValue = 'trigger';
+      expectMessage(MESSAGE_TYPES[3]);
     });
   });
 

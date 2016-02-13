@@ -1,20 +1,11 @@
 {
   "name": "angular-form-messages",
   "main": "afModule.js",
-  "version": "0.13.0",
-  "authors": [
-    "Frank van Wijk <fvanwijk@xebia.com",
-    "Albert Brand <abrand@xebia.com>"
-  ],
+  "version": "0.14.0",
+  "authors": "Frank van Wijk <fvanwijk@xebia.com",
   "description": "Angular Form Messages lets you show custom serverside and clientside validation messages in your forms, not only on fields but also on groups of fields.",
-  "dependencies": {
-  },
-  "devDependencies": {
-    "angular-mocks": "1.4",
-    "mox": "0.4",
-    "jasmine-jquery": "~2.1.0",
-    "lodash": "~3.8.0"
-  },
+  "dependencies": {},
+  "devDependencies": {},
   "ignore": [
     "test",
     ".bowerrc",
@@ -35,6 +26,5 @@
       "main": []
     }
   },
-  "appPath": "src",
   "moduleName": "angularFormMessages"
 }
