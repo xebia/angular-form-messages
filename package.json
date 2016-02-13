@@ -3,7 +3,10 @@
   "version": "0.13.0",
   "author": "Frank van Wijk <f.e.vanwijk@xebia.com>",
   "dependencies": {},
-  "repository": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xebia/angular-form-messages.git"
+  },
   "devDependencies": {
     "bower": "^1.4.1",
     "grunt": "^0.4.5",
@@ -52,5 +55,6 @@
   "scripts": {
     "test": "grunt",
     "postinstall": "node_modules/.bin/bower install"
-  }
+  },
+  "license": "MIT"
 }
