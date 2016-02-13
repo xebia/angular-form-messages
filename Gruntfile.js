@@ -10,7 +10,6 @@ module.exports = function (grunt) {
     dist: 'dist'
   };
 
-  grunt.loadNpmTasks('grunt-mutation-testing');
   //grunt.option('verbose', true);
   grunt.initConfig({
     bwr: grunt.file.readJSON('bower.json'),
