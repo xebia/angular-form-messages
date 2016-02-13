@@ -54,7 +54,7 @@
   },
   "scripts": {
     "test": "grunt",
-    "postinstall": "node_modules/.bin/bower install"
+    "prepublish": "node_modules/.bin/bower install && npm test"
   },
   "license": "MIT"
 }
