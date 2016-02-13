@@ -14,10 +14,6 @@ module.exports = function (grunt) {
     bwr: grunt.file.readJSON('bower.json'),
 
     watch: {
-      bower: {
-        files: ['bower.json'],
-        tasks: ['wiredep']
-      },
       js: {
         files: [paths.src + '/{,*/}*.js'],
         tasks: ['newer:jshint:all']
@@ -108,25 +104,6 @@ module.exports = function (grunt) {
       coverage: 'test/coverage'
     },
 
-    wiredep: {
-      test: {
-        devDependencies: true,
-        src: '<%= karma.unit.configFile %>',
-        ignorePath: /\.\.\//,
-        fileTypes: {
-          js: {
-            block: /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
-            detect: {
-              js: /'(.*\.js)'/gi
-            },
-            replace: {
-              js: '\'{{filePath}}\','
-            }
-          }
-        }
-      }
-    },
-
     ngtemplates: {
       options: {
         module: 'angularFormMessages'
@@ -201,14 +178,12 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('test', [
-    'wiredep',
     'karma',
     'coverage'
   ]);
 
   grunt.registerTask('build', [
     'clean:dist',
-    'wiredep',
     'ngtemplates',
     'concat',
     'ngAnnotate',
