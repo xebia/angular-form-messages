@@ -68,25 +68,6 @@ module.exports = function (grunt) {
       }
     },
 
-    lintspaces: {
-      options: {
-        newline: true,
-        newlineMaximum: 2,
-        trailingspaces: true
-      },
-      all: {
-        src: [
-          'Gruntfile.js',
-          paths.src + '/{,**/}*.js'
-        ]
-      },
-      test: {
-        src: [
-          'test/{,**/}*.js'
-        ]
-      }
-    },
-
     jsonlint: {
       src: paths.test + '/mock/**/*.json'
     },
@@ -237,7 +218,6 @@ module.exports = function (grunt) {
   grunt.registerTask('default', [
     'jshint',
     'jscs',
-    'lintspaces',
     'jsonlint',
     'test',
     'build'
