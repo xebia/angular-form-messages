@@ -1,3 +1,5 @@
+var karmaFiles = require('test-runner-config').getKarmaFiles(require('./testFiles.js'));
+
 module.exports = function (config) {
   'use strict';
 
@@ -5,23 +7,8 @@ module.exports = function (config) {
     autoWatch: true,
     basePath: '../',
     frameworks: ['jasmine'],
-    files: [
-      'bower_components/jquery/dist/jquery.js',
-      'bower_components/angular/angular.js',
-      'bower_components/angular-mocks/angular-mocks.js',
-      'bower_components/jasmine-jquery/lib/jasmine-jquery.js',
-      'bower_components/mox/dist/mox.js',
-      'bower_components/lodash/lodash.js',
-      'src/afModule.js',
-      'src/bootstrap/afModule.js',
-      'src/**/*.js',
-      'templates/**/*.html',
-      'test/mock/*.js',
-      //'test/mock/html/**/*.html',
-      'test/spec/**/*.js'
-    ],
-    exclude: [
-    ],
+    files: karmaFiles.files,
+    exclude: karmaFiles.exclude,
     preprocessors: {
       'src/**/*.js': ['coverage'],
       'test/mock/html/**/*.html': 'ng-html2js',
