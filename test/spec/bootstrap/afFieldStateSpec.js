@@ -1,14 +1,17 @@
 describe('afFieldState', function () {
+  var
+    $scope,
+    element;
 
   function setup(messageTypes, fieldName) {
     // Add messages
-    this.$scope.messages = _.map(messageTypes, function (type) {
+    $scope.messages = _.map(messageTypes, function (type) {
       return type === inj.MESSAGE_TYPES[3] ? 'danger' : type.toLowerCase();
     });
-    this.$scope.$digest();
+    $scope.$digest();
 
     // Add 'has-...' classes that will be removed by the directive
-    var fieldState = this.element.fieldState();
+    var fieldState = element.fieldState();
     fieldState.addClass('has-warning has-info has-success has-error');
     if (messageTypes.length) {
       _.each(messageTypes, function (messageType) {
@@ -19,17 +22,17 @@ describe('afFieldState', function () {
     }
 
     // Send the validation event to trigger the directive
-    validate.call(this, fieldName);
+    validate(fieldName);
   }
 
   function validate(fieldName, messages) {
-    this.$scope.$emit('validation', fieldName || 'user.name', messages || []);
-    this.$scope.$digest();
+    $scope.$emit('validation', fieldName || 'user.name', messages || []);
+    $scope.$digest();
     inj.$timeout.flush();
   }
 
   function checkMessageClass(className, invert) {
-    var ex = expect(this.element.fieldState());
+    var ex = expect(element.fieldState());
     if (invert) {
       ex = ex.not;
     }
@@ -58,8 +61,8 @@ describe('afFieldState', function () {
       .run();
 
     inj = mox.inject('$rootScope', '$timeout', 'MESSAGE_TYPES');
-    createScope();
-    addSelectors(compileHtml('<form name="userForm" af-submit><div af-field-state="user.name">' +
+    $scope = createScope();
+    element = addSelectors(compileHtml('<form name="userForm" af-submit><div af-field-state="user.name">' +
                              '<div class="alert alert-{{message}}" ng-repeat="message in messages"></div>' +
                              '</div></form>'), {
       fieldState: '[af-field-state]'
@@ -69,7 +72,7 @@ describe('afFieldState', function () {
   describe('when a validation event has been fired', function () {
 
     function showSuccess(value) {
-      this.element.controller('afSubmit').showSuccess = value;
+      element.controller('afSubmit').showSuccess = value;
     }
 
     describe('when the fieldName is passed via the fieldName attribute', function () {
@@ -77,7 +80,7 @@ describe('afFieldState', function () {
         addSelectors(compileHtml('<form name="userForm" af-submit><div af-field-state af-field-name="user.name"></div></form>'), {
           fieldState: '[af-field-state]'
         });
-        validate.call(this, 'user.name', [{ type: inj.MESSAGE_TYPES[3] }]);
+        validate('user.name', [{ type: inj.MESSAGE_TYPES[3] }]);
       });
 
       it('should add the "has-error" class to the element', _.partial(checkMessageClass, 'error'));
@@ -96,14 +99,14 @@ describe('afFieldState', function () {
 
         describe('when there is another validation event for another fieldName', function () {
           beforeEach(function () {
-            validate.call(this, 'user.other', [{ type: inj.MESSAGE_TYPES[3] }]);
+            validate('user.other', [{ type: inj.MESSAGE_TYPES[3] }]);
           });
           it('should not remove the "has-success" class from the element', _.partial(checkMessageClass, 'success'));
         });
 
         describe('when there is another validation event for the same fieldName', function () {
           beforeEach(function () {
-            validate.call(this, 'user.name', [{ type: inj.MESSAGE_TYPES[3] }]);
+            validate('user.name', [{ type: inj.MESSAGE_TYPES[3] }]);
           });
           it('should remove the "has-success" class from the element', expectHasNoSuccess);
           it('should add the "has-error" class to the element', _.partial(checkMessageClass, 'error'));
@@ -112,7 +115,7 @@ describe('afFieldState', function () {
 
       describe('when there is an "error" message', function () {
         beforeEach(function () {
-          setup.call(this, [inj.MESSAGE_TYPES[3]]);
+          setup([inj.MESSAGE_TYPES[3]]);
         });
 
         it('should add the "has-error" class to the element', _.partial(checkMessageClass, 'error'));
@@ -123,7 +126,7 @@ describe('afFieldState', function () {
         // This block of course also applies to the other message types
         describe('when there is another validation event for the same fieldName', function () {
           beforeEach(function () {
-            validate.call(this, 'user.name', [{ type: inj.MESSAGE_TYPES[2] }]);
+            validate('user.name', [{ type: inj.MESSAGE_TYPES[2] }]);
           });
 
           // Message is ignored since there are still afMessages in the DOM
@@ -132,8 +135,8 @@ describe('afFieldState', function () {
 
           describe('and the messages are gone', function () {
             beforeEach(function () {
-              this.$scope.messages = [];
-              validate.call(this, 'user.name', [{ type: inj.MESSAGE_TYPES[2] }]);
+              $scope.messages = [];
+              validate('user.name', [{ type: inj.MESSAGE_TYPES[2] }]);
             });
             it('should remove the "has-error" class from the element', expectHasNoError);
             it('should not add the "warning" class to the element', _.partial(checkMessageClass, 'warning'));
@@ -143,7 +146,7 @@ describe('afFieldState', function () {
 
       describe('when there is a "warning" message', function () {
         beforeEach(function () {
-          setup.call(this, [inj.MESSAGE_TYPES[2]]);
+          setup([inj.MESSAGE_TYPES[2]]);
         });
 
         it('should add the "has-warning" class to the element', _.partial(checkMessageClass, 'warning'));
@@ -154,7 +157,7 @@ describe('afFieldState', function () {
 
       describe('when there is an "info" message', function () {
         beforeEach(function () {
-          setup.call(this, [inj.MESSAGE_TYPES[1]]);
+          setup([inj.MESSAGE_TYPES[1]]);
         });
 
         it('should add the "has-info" class to the element', _.partial(checkMessageClass, 'info'));
@@ -165,7 +168,7 @@ describe('afFieldState', function () {
 
       describe('when there is a "success" message', function () {
         beforeEach(function () {
-          setup.call(this, [inj.MESSAGE_TYPES[0]]);
+          setup([inj.MESSAGE_TYPES[0]]);
         });
 
         it('should add the "has-success" class to the element', _.partial(checkMessageClass, 'success'));
@@ -176,7 +179,7 @@ describe('afFieldState', function () {
 
       describe('when there is no message for another fieldName', function () {
         beforeEach(function () {
-          setup.call(this, [], 'user.other');
+          setup([], 'user.other');
         });
         it('should not add the "has-success" class to the element', expectHasNoSuccess);
       });
@@ -184,7 +187,7 @@ describe('afFieldState', function () {
       describe('when there are multiple messages', function () {
 
         beforeEach(function () {
-          setup.call(this, [inj.MESSAGE_TYPES[1], inj.MESSAGE_TYPES[0]]);
+          setup([inj.MESSAGE_TYPES[1], inj.MESSAGE_TYPES[0]]);
         });
 
         it('should remove the "has-warning" class from the element', expectHasNoInfo);
@@ -209,7 +212,7 @@ describe('afFieldState', function () {
 
       describe('when there is an "error" message', function () {
         beforeEach(function () {
-          setup.call(this, [inj.MESSAGE_TYPES[3]]);
+          setup([inj.MESSAGE_TYPES[3]]);
         });
 
         it('should add the "has-error" class', _.partial(checkMessageClass, 'error'));
@@ -220,7 +223,7 @@ describe('afFieldState', function () {
 
       describe('when there is a "success" message', function () {
         beforeEach(function () {
-          setup.call(this, [inj.MESSAGE_TYPES[0]]);
+          setup([inj.MESSAGE_TYPES[0]]);
         });
 
         it('should add the "has-success" class', _.partial(checkMessageClass, 'success'));
