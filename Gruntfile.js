@@ -129,6 +129,9 @@ module.exports = function (grunt) {
       }
     },
     uglify: {
+      options: {
+        sourceMap: true
+      },
       dist: _.extend({
         src: '<%= bwr.name %>.js'
       }, uglifyConf),
