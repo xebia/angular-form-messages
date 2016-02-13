@@ -2,15 +2,16 @@
   "name": "angular-form-messages",
   "version": "0.14.0",
   "author": "Frank van Wijk <f.e.vanwijk@xebia.com>",
-  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/xebia/angular-form-messages.git"
   },
+  "dependencies": {
+    "angular": "1.5.0"
+  },
   "devDependencies": {
     "angular-mocks": "1.5.0",
-    "angular-mox": "0.6.0",
-    "bower": "1.7.7",
+    "angular-mox": "0.6.2",
     "grunt": "0.4.5",
     "grunt-angular-templates": "1.0.2",
     "grunt-contrib-clean": "0.7.0",
