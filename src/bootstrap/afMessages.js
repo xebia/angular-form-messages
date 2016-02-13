@@ -29,6 +29,13 @@ angular.module('angularFormMessagesBootstrap')
       require: ['?^afFeedback', 'afMessages', '^afSubmit'],
       templateUrl: 'templates/bootstrap/messages.html',
       link: function ($scope, elem, attrs, ctrls) {
+        var
+          afFeedbackCtrl = ctrls[0],
+          afMessagesCtrl = ctrls[1],
+          afSubmitCtrl = ctrls[2],
+          allActiveMessages,
+          fieldName = afMessagesCtrl.fieldNamePrefix || afMessagesCtrl.fieldName;
+
         function addMessageInfo(messages) {
           angular.forEach(messages, function (message) {
             message.alertType = alertTypes[message.type];
@@ -50,13 +57,6 @@ angular.module('angularFormMessagesBootstrap')
           return angular.extend(allActiveMessages || {}, newMessages);
         }
 
-        var
-          afFeedbackCtrl = ctrls[0],
-          afMessagesCtrl = ctrls[1],
-          afSubmitCtrl = ctrls[2],
-          allActiveMessages;
-
-        var fieldName = afMessagesCtrl.fieldNamePrefix || afMessagesCtrl.fieldName;
         $scope.isAlert = attrs.afAlert !== undefined;
         AfMessageService.validation($scope.$parent, fieldName, function (validationFieldName, messages) {
           // Feedback

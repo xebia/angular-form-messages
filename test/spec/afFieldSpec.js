@@ -1,7 +1,13 @@
 describe('afField', function () {
   var
     $scope,
-    element;
+    afField,
+    afSubmit,
+    element,
+    expectRequiredErrorEvent,
+    expectValidEvent,
+    MESSAGE_TYPES,
+    ngModel;
 
   function makeFieldEmpty() {
     element.field().val('').trigger('input');
@@ -85,14 +91,6 @@ describe('afField', function () {
   function expectNoValidEvent() {
     expect($scope.$emit).not.toHaveBeenCalledWith('validation',  'user.email', []);
   }
-
-  var
-    afField,
-    afSubmit,
-    expectRequiredErrorEvent,
-    expectValidEvent,
-    MESSAGE_TYPES,
-    ngModel;
 
   beforeEach(function () {
     mox

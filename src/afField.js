@@ -6,6 +6,8 @@ angular.module('angularFormMessages').directive('afField', function (
   return {
     require: ['ngModel', 'afField', '^afSubmit', '^form'],
     controller: function () {
+      var ctrl = this;
+
       function setMessageDetails(type) {
         return function (key) {
           ctrl.$messages[key] = {
@@ -13,8 +15,6 @@ angular.module('angularFormMessages').directive('afField', function (
           };
         };
       }
-
-      var ctrl = this;
 
       // Object for storing extra message data such as message type
       this.$messages = {};

@@ -1,4 +1,13 @@
 describe('afFeedback', function () {
+  var
+    inj,
+
+    noMessageSetup = _.partial(setup, false, 0),
+    errorSetup = _.partial(setup, 'ERROR', 1),
+    successInfoSetup = _.partial(setup, false, 2),
+
+    expectHasFeedback = _.partial(checkMessageClass, 'has-feedback'),
+    expectHasNoFeedback = _.partial(checkMessageClass, 'has-feedback', true);
 
   function setup(messageType, messageCount) {
     this.element.feedback()[(messageType ? 'remove' : 'add') + 'Class']('has-feedback');
@@ -21,16 +30,6 @@ describe('afFeedback', function () {
     }
     ex.toHaveClass(className);
   }
-
-  var
-    inj,
-
-    noMessageSetup = _.partial(setup, false, 0),
-    errorSetup = _.partial(setup, 'ERROR', 1),
-    successInfoSetup = _.partial(setup, false, 2),
-
-    expectHasFeedback = _.partial(checkMessageClass, 'has-feedback'),
-    expectHasNoFeedback = _.partial(checkMessageClass, 'has-feedback', true);
 
   beforeEach(function () {
     mox

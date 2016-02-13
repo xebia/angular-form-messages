@@ -1,7 +1,18 @@
 describe('afFieldState', function () {
   var
     $scope,
-    element;
+    element,
+    expectHasNoError = _.partial(checkMessageClass, 'error', true),
+    expectHasNoWarning = _.partial(checkMessageClass, 'warning', true),
+    expectHasNoInfo = _.partial(checkMessageClass, 'info', true),
+    expectHasNoSuccess = _.partial(checkMessageClass, 'success', true),
+    inj;
+
+  function validate(fieldName, messages) {
+    $scope.$emit('validation', fieldName || 'user.name', messages || []);
+    $scope.$digest();
+    inj.$timeout.flush();
+  }
 
   function setup(messageTypes, fieldName) {
     // Add messages
@@ -25,12 +36,6 @@ describe('afFieldState', function () {
     validate(fieldName);
   }
 
-  function validate(fieldName, messages) {
-    $scope.$emit('validation', fieldName || 'user.name', messages || []);
-    $scope.$digest();
-    inj.$timeout.flush();
-  }
-
   function checkMessageClass(className, invert) {
     var ex = expect(element.fieldState());
     if (invert) {
@@ -38,14 +43,6 @@ describe('afFieldState', function () {
     }
     ex.toHaveClass('has-' + className);
   }
-
-  var
-    inj,
-
-    expectHasNoError = _.partial(checkMessageClass, 'error', true),
-    expectHasNoWarning = _.partial(checkMessageClass, 'warning', true),
-    expectHasNoInfo = _.partial(checkMessageClass, 'info', true),
-    expectHasNoSuccess = _.partial(checkMessageClass, 'success', true);
 
   beforeEach(function () {
     mox
