@@ -2,11 +2,19 @@ module.exports = function (grunt) {
 
   require('load-grunt-tasks')(grunt);
 
-  var paths = {
-    src: 'src',
-    test: 'test',
-    dist: 'dist'
-  };
+  var
+    _ = require('lodash'),
+    paths = {
+      src: 'src',
+      test: 'test',
+      dist: 'dist'
+    },
+    uglifyConf = {
+      expand: true,
+      cwd: paths.dist, // 'dist' when using concat, else 'src/'
+      dest: paths.dist,
+      ext: '.min.js'
+    };
 
   //grunt.option('verbose', true);
   grunt.initConfig({
@@ -66,14 +74,14 @@ module.exports = function (grunt) {
       options: {
         config: './.jscsrc'
       },
-      all: {
-        src: [
-          'Gruntfile.js',
-          paths.src + '/**/!(templateCache)*.js'
-        ]
+      src: {
+        src: paths.src + '/**/!(templateCache)*.js'
       },
       test: {
-        src: ['test/spec/{,**/}*.js']
+        src: paths.test + '/spec/{,**/}*.js'
+      },
+      config: {
+        src: ['*.js', paths.test + '/{,!(spec)}/*.js']
       }
     },
     jshint: {
@@ -81,17 +89,17 @@ module.exports = function (grunt) {
         jshintrc: '.jshintrc',
         reporter: require('jshint-stylish')
       },
-      all: {
-        src: [
-          'Gruntfile.js',
-          paths.src + '/**/!(templateCache)*.js'
-        ]
+      src: {
+        src: paths.src + '/**/!(templateCache)*.js'
       },
       test: {
         options: {
-          jshintrc: 'test/.jshintrc'
+          jshintrc: paths.test + '/.jshintrc'
         },
-        src: ['test/spec/{,*/}*.js']
+        src: paths.test + '/spec/{,*/}*.js'
+      },
+      config: {
+        src: ['*.js', paths.test + '/{,!(spec)}/*.js']
       }
     },
     jsonlint: {
@@ -99,15 +107,15 @@ module.exports = function (grunt) {
     },
     karma: {
       unit: {
-        configFile: 'test/karma.conf.js',
+        configFile: paths.test + '/karma.conf.js',
         singleRun: true
       }
     },
     ngAnnotate: {
       dist: {
         files: {
-          'dist/<%= bwr.name %>.js': 'dist/<%= bwr.name %>.js',
-          'dist/<%= bwr.name %>-bootstrap.js': 'dist/<%= bwr.name %>-bootstrap.js'
+          'dist/<%= bwr.name %>.js': paths.dist + '/<%= bwr.name %>.js',
+          'dist/<%= bwr.name %>-bootstrap.js': paths.dist + '/<%= bwr.name %>-bootstrap.js'
         }
       }
     },
@@ -121,20 +129,12 @@ module.exports = function (grunt) {
       }
     },
     uglify: {
-      dist: {
-        expand: true,
-        cwd: 'dist/', // 'dist' when using concat, else 'src/'
-        src: '<%= bwr.name %>.js',
-        dest: 'dist',
-        ext: '.min.js'
-      },
-      bootstrap: {
-        expand: true,
-        cwd: 'dist/', // 'dist' when using concat, else 'src/'
-        src: '<%= bwr.name %>-bootstrap.js',
-        dest: 'dist',
-        ext: '.min.js'
-      }
+      dist: _.extend({
+        src: '<%= bwr.name %>.js'
+      }, uglifyConf),
+      bootstrap: _.extend({
+        src: '<%= bwr.name %>-bootstrap.js'
+      }, uglifyConf)
     }
   });
 
