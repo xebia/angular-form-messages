@@ -3,6 +3,8 @@
 [![Build Status](https://travis-ci.org/xebia/angular-form-messages.svg?branch=master)](https://travis-ci.org/xebia/angular-form-messages)
 [![Test Coverage](https://codeclimate.com/github/xebia/angular-form-messages/badges/coverage.svg)](https://codeclimate.com/github/xebia/angular-form-messages)
 [![Code Climate](https://codeclimate.com/github/xebia/angular-form-messages/badges/gpa.svg)](https://codeclimate.com/github/xebia/angular-form-messages)
+[![devDependency Status](https://david-dm.org/xebia/angular-form-messages/dev-status.svg)](https://david-dm.org/xebia/angular-form-messages#info=devDependencies)
+[![Dependency Status](https://david-dm.org/xebia/angular-form-messages.svg)](https://david-dm.org/xebia/angular-form-messages)
 
 Angular Form Messages lets you show custom validation messages on your forms. There are several Github projects that provide form validation directives,
 but most of them do not allow you to set custom validation callbacks on your forms or they do not support validation messages that come from your backend.
