@@ -22,17 +22,22 @@ angular.module('angularFormMessages')
             formCtrl = ctrls[0],
             afMessagesCtrl = ctrls[1],
             fieldName = afMessagesCtrl.fieldName || afMessagesCtrl.fieldNamePrefix,
-            specificLabel = $interpolate(formCtrl.$name)($scope) + (fieldName ? '.' + fieldName : '') + '.' + newVal,
-            genericLabel = AfMessageService.getGenericLabelPrefix() + newVal;
+            formFieldValidatorLabel = $interpolate(formCtrl.$name)($scope) + (fieldName ? '.' + fieldName : '') + '.' + newVal,
+            fieldValidatorLabel = AfMessageService.getFieldValidatorLabelPrefix() + fieldName + '.' + newVal,
+            validatorLabel = AfMessageService.getValidatorLabelPrefix() + newVal;
 
-          $translate(specificLabel)
+          $translate(formFieldValidatorLabel)
             .then(translate)
             ['catch'](function () {
-              $translate(genericLabel)
+              $translate(fieldValidatorLabel)
                 .then(translate)
                 ['catch'](function () {
-                  $log.warn('Missing label: \'' + specificLabel + '\' (specific) or \'' + genericLabel + '\' (generic)');
-                  translate(newVal);
+                  $translate(validatorLabel)
+                    .then(translate)
+                    ['catch'](function () {
+                      $log.warn('Missing label: \'' + formFieldValidatorLabel + '\' (form, field and validator), \'' + fieldValidatorLabel + '\' (field and validator) or \'' + validatorLabel + '\' (validator)');
+                      translate(newVal);
+                    });
                 });
             });
         });

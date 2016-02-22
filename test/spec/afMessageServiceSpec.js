@@ -29,12 +29,21 @@ describe('AfMessageService', function () {
     };
   });
 
-  describe('genericLabelPrefix', function () {
-    it('should return the configured genericLabelPrefix value with a dot', function () {
-      expect(inj.AfMessageService.getGenericLabelPrefix()).toBeFalsy();
+  describe('validatorLabelPrefix', function () {
+    it('should return the configured validatorLabelPrefix value with a dot', function () {
+      expect(inj.AfMessageService.getValidatorLabelPrefix()).toBeFalsy();
 
-      afMessageServiceProvider.setGenericLabelPrefix('prefix');
-      expect(inj.AfMessageService.getGenericLabelPrefix()).toBe('prefix.');
+      afMessageServiceProvider.setValidatorLabelPrefix('prefix');
+      expect(inj.AfMessageService.getValidatorLabelPrefix()).toBe('prefix.');
+    });
+  });
+
+  describe('fieldValidatorLabelPrefix', function () {
+    it('should return the configured fieldValidatorLabelPrefix value with a dot', function () {
+      expect(inj.AfMessageService.getFieldValidatorLabelPrefix()).toBeFalsy();
+
+      afMessageServiceProvider.setFieldValidatorLabelPrefix('prefix');
+      expect(inj.AfMessageService.getFieldValidatorLabelPrefix()).toBe('prefix.');
     });
   });
 
