@@ -15,9 +15,9 @@ module.exports = function (config) {
     },
     reporters: ['progress', 'coverage'],
     port: 8080,
-    browsers: ['PhantomJS2'],
+    browsers: ['PhantomJS'],
     plugins: [
-      'karma-phantomjs2-launcher',
+      'karma-phantomjs-launcher',
       'karma-jasmine',
       'karma-ng-html2js-preprocessor',
       'karma-coverage'
